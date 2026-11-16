@@ -1,2 +1,8 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /portal
+Disallow: /account
+Disallow: /login
+Disallow: /membership/status
+Disallow: /membership/receipt
+Sitemap: /sitemap.xml

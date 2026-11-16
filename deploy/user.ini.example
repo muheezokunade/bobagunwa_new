@@ -1,0 +1,11 @@
+; Place in the application webroot (public/.user.ini) or set via cPanel ->
+; MultiPHP INI Editor for the staging/production domain. Values are minimums.
+memory_limit = 256M
+upload_max_filesize = 12M
+post_max_size = 16M
+max_execution_time = 60
+expose_php = Off
+display_errors = Off
+log_errors = On
+session.cookie_httponly = 1
+session.use_strict_mode = 1
