@@ -2,31 +2,82 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
+/**
+ * An authenticatable account. Members and officers share this model; an
+ * officer may also be linked to a member record. Permissions come only from
+ * assigned roles and are resolved server-side on every request.
+ */
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    protected $guarded = ['id', 'password', 'remember_token'];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    protected $hidden = ['password', 'remember_token'];
+
+    /** @var Collection<int, string>|null */
+    private ?Collection $permissionCache = null;
+
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            'activated_at' => 'datetime',
+            'last_login_at' => 'datetime',
+            'password_changed_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function member(): BelongsTo
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function roles(): BelongsToMany
+    {
+        return $this->belongsToMany(Role::class)->withPivot(['granted_by', 'granted_at', 'reason']);
+    }
+
+    /** @return Collection<int, string> */
+    public function permissionKeys(): Collection
+    {
+        return $this->permissionCache ??= Permission::query()
+            ->join('permission_role', 'permission_role.permission_id', '=', 'permissions.id')
+            ->join('role_user', 'role_user.role_id', '=', 'permission_role.role_id')
+            ->where('role_user.user_id', $this->id)
+            ->distinct()
+            ->pluck('permissions.key');
+    }
+
+    public function hasPermission(string $permission): bool
+    {
+        return $this->isActive() && $this->permissionKeys()->contains($permission);
+    }
+
+    public function hasAnyPermission(string ...$permissions): bool
+    {
+        return collect($permissions)->contains(fn ($p) => $this->hasPermission($p));
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->isActive() && $this->permissionKeys()->isNotEmpty();
+    }
+
+    public function isActive(): bool
+    {
+        if ($this->status !== 'active') {
+            return false;
+        }
+
+        return $this->member_id === null || $this->member?->status === 'active';
+    }
+
+    public function forgetPermissionCache(): void
+    {
+        $this->permissionCache = null;
     }
 }

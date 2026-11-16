@@ -37,6 +37,10 @@ final class ReferenceData
 
         DB::table('membership_number_sequences')->insertOrIgnore(['name' => 'members', 'next_value' => 1, 'updated_at' => $now]);
 
+        foreach (Content::PAGES as $key => $label) {
+            DB::table('pages')->insertOrIgnore(['key' => $key, 'label' => $label, 'created_at' => $now, 'updated_at' => $now]);
+        }
+
         foreach (Settings::defaults() as $key => $value) {
             DB::table('settings')->insertOrIgnore(['key' => $key, 'value' => json_encode($value), 'version' => 1, 'created_at' => $now, 'updated_at' => $now]);
         }
