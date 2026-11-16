@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Membership;
 
+use App\Models\AuditEvent;
 use App\Models\Member;
 use App\Models\MembershipApplication;
 use App\Models\OutboundMessage;
@@ -115,7 +116,7 @@ class ApplicationWorkflowTest extends TestCase
         $this->assertSame('pending_activation', $member->user->status);
         $this->assertNull($member->user->password);
         $this->assertStringNotContainsString(session('one_time_link')['url'], OutboundMessage::pluck('body')->implode("\n"));
-        $this->assertStringNotContainsString(explode('/', session('one_time_link')['url'])[5] ?? 'none', \App\Models\AuditEvent::get()->toJson());
+        $this->assertStringNotContainsString(explode('/', session('one_time_link')['url'])[5] ?? 'none', AuditEvent::get()->toJson());
 
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Again'])->assertSessionHasErrors('domain');
         $this->assertSame(1, Member::count());

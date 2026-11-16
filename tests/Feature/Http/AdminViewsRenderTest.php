@@ -23,6 +23,7 @@ use App\Models\PrivateFile;
 use App\Models\RecoveryRequest;
 use App\Models\SecurityEvent;
 use App\Support\Audit;
+use App\Support\Settings;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
@@ -81,7 +82,7 @@ class AdminViewsRenderTest extends TestCase
         RecoveryRequest::create(['identifier_hash' => str_repeat('0', 64), 'status' => 'pending']);
         $bk = BackupRun::create(['kind' => 'backup', 'status' => 'succeeded', 'file_name' => 'b.enc', 'sha256' => str_repeat('1', 64), 'size_bytes' => 123456, 'details' => ['tables' => 30, 'rows' => 1000, 'triggers' => 12, 'migration' => 'm', 'finance' => ['verified_payments' => 5000, 'outstanding' => 100]], 'created_by' => $admin->id]);
         BackupRun::create(['kind' => 'restore_verification', 'status' => 'failed', 'file_name' => 'b.enc', 'details' => ['ok' => false, 'problems' => ['x differs'], 'rows' => 1000, 'triggers' => 12]]);
-        \App\Support\Settings::set('approval.member_import', ['approved' => true, 'reference' => 'MIN', 'recorded_by' => $admin->id, 'recorded_at' => now()->toIso8601String()], $admin->id);
+        Settings::set('approval.member_import', ['approved' => true, 'reference' => 'MIN', 'recorded_by' => $admin->id, 'recorded_at' => now()->toIso8601String()], $admin->id);
 
         $urls = [
             route('admin.applications.index'), route('admin.applications.index', ['status' => 'all', 'eligibility' => 'flagged', 'q' => 'Ade']),
@@ -99,7 +100,7 @@ class AdminViewsRenderTest extends TestCase
         $out = getenv('RENDER_OUT') ?: sys_get_temp_dir();
         foreach ($urls as $i => $url) {
             $response = $this->get($url);
-            $this->assertSame(200, $response->status(), $url."\n".($response->exception?->getMessage() ?? ""));
+            $this->assertSame(200, $response->status(), $url."\n".($response->exception?->getMessage() ?? ''));
             file_put_contents($out.'/page-'.$i.'.html', $response->getContent());
         }
         // A POST with validation errors to check error rendering paths.

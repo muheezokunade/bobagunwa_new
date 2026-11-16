@@ -17,9 +17,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ReportController extends Controller
 {
-    public function __construct(private LedgerQuery $ledger)
-    {
-    }
+    public function __construct(private LedgerQuery $ledger) {}
 
     public function index(Request $request): View
     {

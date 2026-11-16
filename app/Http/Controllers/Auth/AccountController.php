@@ -17,9 +17,7 @@ use Illuminate\View\View;
 
 class AccountController extends Controller
 {
-    public function __construct(private AccountService $accounts)
-    {
-    }
+    public function __construct(private AccountService $accounts) {}
 
     public function activateForm(string $token): View
     {

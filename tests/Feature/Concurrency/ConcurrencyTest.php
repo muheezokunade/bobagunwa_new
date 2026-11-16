@@ -2,14 +2,15 @@
 
 namespace Tests\Feature\Concurrency;
 
+use App\Models\Assessment;
 use App\Models\Member;
 use App\Models\MembershipApplication;
 use App\Models\Payment;
 use App\Models\User;
 use App\Services\ApplicationService;
 use App\Services\Finance\AssessmentService;
-use App\Services\Finance\PaymentService;
 use App\Services\Finance\LedgerQuery;
+use App\Services\Finance\PaymentService;
 use Closure;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -37,12 +38,12 @@ class ConcurrencyTest extends TestCase
         }
     }
 
-    public static function tearDownAfterClass(): void
+    protected function tearDown(): void
     {
-        // Leave a clean schema for the transactional tests that follow.
+        // Committed data must not leak into the transactional tests that follow.
         Artisan::call('migrate:fresh', ['--force' => true]);
-        self::$migrated = false;
-        parent::tearDownAfterClass();
+        self::$migrated = true;
+        parent::tearDown();
     }
 
     /**
@@ -182,7 +183,7 @@ class ConcurrencyTest extends TestCase
         $member = $this->member();
         $treasurer = $this->officer('treasurer');
         $draft = app(AssessmentService::class)->createDraft(['fee_category_id' => $this->category()->id, 'title' => 'Race', 'amount' => '1000', 'effective_on' => now()->toDateString(), 'target_mode' => 'selected', 'member_ids' => [$member->id]], $treasurer);
-        $post = fn () => app(AssessmentService::class)->post(\App\Models\Assessment::find($draft->id), User::find($treasurer->id), $this->key(), 1);
+        $post = fn () => app(AssessmentService::class)->post(Assessment::find($draft->id), User::find($treasurer->id), $this->key(), 1);
         $results = $this->race([$post, $post]);
         $this->assertSame(1, count(array_filter($results, fn ($r) => $r === 'ok')), json_encode($results));
         $this->assertSame(1, DB::table('member_obligations')->where('assessment_id', $draft->id)->count());

@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class PaymentController extends Controller
 {
-    public function __construct(private PaymentService $payments)
-    {
-    }
+    public function __construct(private PaymentService $payments) {}
 
     public function index(Request $request): View
     {

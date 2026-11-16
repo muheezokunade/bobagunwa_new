@@ -43,9 +43,7 @@ class MemberImportService
         'address' => ['home_address'],
     ];
 
-    public function __construct(private MembershipNumberService $numbers)
-    {
-    }
+    public function __construct(private MembershipNumberService $numbers) {}
 
     public function template(): string
     {

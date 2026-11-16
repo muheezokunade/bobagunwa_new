@@ -7,6 +7,7 @@ use App\Models\AuditEvent;
 use App\Models\SecurityEvent;
 use App\Support\Audit;
 use App\Support\Csv;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -34,7 +35,7 @@ class AuditController extends Controller
             $query->where('created_at', '>=', $filters['from']);
         }
         if (! empty($filters['to'])) {
-            $query->where('created_at', '<', \Carbon\CarbonImmutable::parse($filters['to'])->addDay());
+            $query->where('created_at', '<', CarbonImmutable::parse($filters['to'])->addDay());
         }
 
         return view('admin.audit', ['events' => $query->paginate(50)->withQueryString(), 'filters' => $filters, 'log' => $filters['log'] ?? 'audit']);

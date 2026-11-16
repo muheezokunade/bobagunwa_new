@@ -19,9 +19,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class FinanceController extends Controller
 {
-    public function __construct(private LedgerQuery $ledger)
-    {
-    }
+    public function __construct(private LedgerQuery $ledger) {}
 
     public function index(): View
     {

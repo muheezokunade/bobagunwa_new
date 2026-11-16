@@ -143,11 +143,11 @@ SQL;
         }
 
         $endOfDay = $to->endOfDay()->utc()->toDateTimeString();
-        $asAt = DB::selectOne("SELECT
+        $asAt = DB::selectOne('SELECT
             (SELECT COALESCE(SUM(amount_kobo), 0) FROM member_obligations WHERE member_id = ? AND effective_on <= ?)
               + (SELECT COALESCE(SUM(amount_kobo), 0) FROM obligation_adjustments WHERE member_id = ? AND effective_on <= ?) AS effective,
             (SELECT COALESCE(SUM(a.amount_kobo), 0) FROM payment_allocations a LEFT JOIN financial_reversals r ON r.id = a.reversal_id
-               WHERE a.member_id = ? AND a.created_at <= ? AND (a.reversal_id IS NULL OR r.created_at > ?)) AS allocated", [$memberId, $toS, $memberId, $toS, $memberId, $endOfDay, $endOfDay]);
+               WHERE a.member_id = ? AND a.created_at <= ? AND (a.reversal_id IS NULL OR r.created_at > ?)) AS allocated', [$memberId, $toS, $memberId, $toS, $memberId, $endOfDay, $endOfDay]);
         $closing = $running;
         $outstanding = (int) $asAt->effective - (int) $asAt->allocated;
 
@@ -234,7 +234,7 @@ SQL;
             'Reversed payments without a reversal record' => DB::select("SELECT p.reference FROM payments p WHERE p.status = 'reversed' AND NOT EXISTS (SELECT 1 FROM financial_reversals r WHERE r.payment_id = p.id AND r.kind = 'payment')"),
             'Reversed allocations without a reversal record' => DB::select("SELECT a.id FROM payment_allocations a WHERE a.status = 'reversed' AND NOT EXISTS (SELECT 1 FROM financial_reversals r WHERE r.id = a.reversal_id AND r.kind = 'allocation' AND r.payment_allocation_id = a.id)"),
             'Posted assessment totals that differ from their obligations' => DB::select("SELECT a.reference, a.total_kobo, COALESCE(SUM(o.amount_kobo), 0) AS obligations FROM assessments a LEFT JOIN member_obligations o ON o.assessment_id = a.id WHERE a.status = 'posted' GROUP BY a.id, a.reference, a.total_kobo HAVING a.total_kobo <> COALESCE(SUM(o.amount_kobo), 0)"),
-            'Self-verified payments where a second officer was required' => DB::select("SELECT reference FROM payments WHERE requires_distinct_verifier = 1 AND verified_by = recorded_by"),
+            'Self-verified payments where a second officer was required' => DB::select('SELECT reference FROM payments WHERE requires_distinct_verifier = 1 AND verified_by = recorded_by'),
         ];
     }
 

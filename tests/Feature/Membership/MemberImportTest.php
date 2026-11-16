@@ -5,6 +5,8 @@ namespace Tests\Feature\Membership;
 use App\Models\ImportBatch;
 use App\Models\Member;
 use App\Models\User;
+use App\Support\Settings;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -97,11 +99,11 @@ class MemberImportTest extends TestCase
         $this->actingAs($officer)->post(route('admin.imports.members.preview'), ['file' => $this->csv(2)]);
         $batch = ImportBatch::latest('id')->first();
         $this->app['env'] = 'production';
-        $this->withoutMiddleware(\Illuminate\Foundation\Http\Middleware\PreventRequestForgery::class); // CSRF/origin checks are only auto-skipped in the testing environment
+        $this->withoutMiddleware(PreventRequestForgery::class); // CSRF/origin checks are only auto-skipped in the testing environment
         $this->actingAs($officer)->post(route('admin.imports.members.commit', $batch), ['confirm' => '1'])->assertSessionHasErrors('domain');
         $this->assertSame(0, Member::count());
-        \App\Support\Settings::set('approval.member_import', ['approved' => true, 'reference' => 'Synthetic minute 1'], $officer->id);
-        \App\Support\Settings::set('approval.membership_number_format', ['approved' => true, 'reference' => 'Synthetic minute 2'], $officer->id);
+        Settings::set('approval.member_import', ['approved' => true, 'reference' => 'Synthetic minute 1'], $officer->id);
+        Settings::set('approval.membership_number_format', ['approved' => true, 'reference' => 'Synthetic minute 2'], $officer->id);
         $this->actingAs($officer)->post(route('admin.imports.members.commit', $batch), ['confirm' => '1'])->assertSessionHasNoErrors();
         $this->assertSame(2, Member::count());
     }

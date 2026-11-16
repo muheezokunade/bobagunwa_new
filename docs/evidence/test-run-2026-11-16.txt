@@ -1,0 +1,137 @@
+
+   PASS  Tests\Unit\MoneyTest
+  ✓ parses decimal naira to integer kobo with data set #0
+  ✓ parses decimal naira to integer kobo with data set #1
+  ✓ parses decimal naira to integer kobo with data set #2
+  ✓ parses decimal naira to integer kobo with data set #3
+  ✓ parses decimal naira to integer kobo with data set #4
+  ✓ parses decimal naira to integer kobo with data set #5
+  ✓ parses decimal naira to integer kobo with data set #6
+  ✓ rejects invalid amounts with data set #0
+  ✓ rejects invalid amounts with data set #1
+  ✓ rejects invalid amounts with data set #2
+  ✓ rejects invalid amounts with data set #3
+  ✓ rejects invalid amounts with data set #4
+  ✓ rejects invalid amounts with data set #5
+  ✓ rejects invalid amounts with data set #6
+  ✓ negative only when allowed and formatting
+  ✓ no floating point drift
+
+   PASS  Tests\Unit\NormalizeAndCsvTest
+  ✓ nigerian phone numbers normalise to one form
+  ✓ names fold yoruba diacritics for duplicate detection only
+  ✓ csv reads excel bom semicolons and aliases
+  ✓ csv row limit is enforced
+  ✓ dates accept iso and day first and reject impossible dates           0.01s  
+  ✓ csv injection is neutralised in exports
+
+   PASS  Tests\Feature\Acceptance\MandatoryWorkflowsTest
+  ✓ all seven mandatory workflows pass together                          3.85s  
+
+   PASS  Tests\Feature\Auth\AccountLifecycleTest
+  ✓ imported member cannot log in until activated then activation is si… 1.73s  
+  ✓ expired and superseded activation tokens are refused                 0.05s  
+  ✓ unapproved applicant has no account to activate                      0.01s  
+  ✓ suspended member is denied and existing sessions end                 0.05s  
+  ✓ reset tokens expire are single use and end sessions                  0.05s  
+  ✓ recovery is enumeration safe and queued for officers                 0.05s  
+  ✓ login is rate limited and failures are logged without disclosure     0.05s  
+  ✓ password change requires current password and keeps only this sessi… 0.03s  
+  ✓ no public registration route exists                                  0.02s  
+
+   PASS  Tests\Feature\Backup\BackupRestoreTest
+  ✓ encrypted backup restores into isolated database with integrity      2.88s  
+  ✓ wrong key is rejected                                                2.31s  
+  ✓ tampered truncated and header modified backups are rejected before…  2.20s  
+  ✓ restore refuses live database and non empty targets                  2.66s  
+  ✓ backup requires a configured custodian public key                    2.36s  
+  ✓ restore command reports verification                                 2.60s  
+
+   PASS  Tests\Feature\Concurrency\ConcurrencyTest
+  ✓ two requests cannot exhaust the same payment twice                   6.14s  
+  ✓ direct sql racers cannot over allocate even under repeatable read    2.11s  
+  ✓ duplicate payment submitted concurrently is recorded once            2.03s  
+  ✓ concurrent approval creates exactly one member and number            1.51s  
+  ✓ concurrent number issuance never duplicates                          1.85s  
+  ✓ concurrent assessment posting creates one set of obligations         1.49s  
+
+   PASS  Tests\Feature\Database\IntegrityTriggersTest
+  ✓ every integrity trigger is installed                                 0.01s  
+  ✓ cross member allocation by direct sql is rejected                    0.04s  
+  ✓ over allocation and unverified allocation are rejected               0.04s  
+  ✓ posted records are immutable and undeletable                         0.03s  
+  ✓ self verification is rejected when two officers are required         0.02s  
+  ✓ reversal rules hold at database level                                0.04s  
+  ✓ adjustments cannot go negative or below allocations                  0.04s  
+  ✓ membership numbers are never changed deleted or reused               0.02s  
+  ✓ failed multi record transaction rolls back completely                0.05s  
+
+   PASS  Tests\Feature\Finance\LedgerServiceTest
+  ✓ assessment posts exactly once and replays idempotently               0.04s  
+  ✓ posting refuses when member list changed since preview               0.03s  
+  ✓ recorded payment counts only after independent verification          0.03s  
+  ✓ single verifier policy is configurable but snapshotted per payment   0.03s  
+  ✓ duplicate payment protection                                         0.03s  
+  ✓ partial split and multi payment allocation reconcile                 0.06s  
+  ✓ allocation rejections and replay                                     0.04s  
+  ✓ payment reversal reverses dependent allocations consistently         0.05s  
+  ✓ allocation reversal frees funds for reallocation                     0.05s  
+  ✓ adjustments waive cancel and respect allocations                     0.06s  
+  ✓ permissions are enforced inside finance services                     0.06s  
+  ✓ statement summary reports and raw sql reconcile                      0.11s  
+
+   PASS  Tests\Feature\Http\AdminViewsRenderTest
+  ✓ all admin pages render                                               0.36s  
+
+   PASS  Tests\Feature\Http\AuthorisationMatrixTest
+  ✓ every role reaches exactly the admin pages it is permitted           0.62s  
+  ✓ anonymous visitors are redirected from every private page            0.04s  
+  ✓ system administrator has no treasury or approval powers              0.03s  
+  ✓ membership officer sees no finance and executive is read only        0.05s  
+  ✓ member cannot reach another members records                          0.06s  
+  ✓ unauthorised exports are denied                                      0.05s  
+  ✓ role escalation and last administrator protection                    0.07s  
+
+   PASS  Tests\Feature\Http\ContentAndUploadSecurityTest
+  ✓ drafts stay private until a publisher publishes them                 0.03s  
+  ✓ news publication and member only notices                             0.06s  
+  ✓ prohibited and disguised uploads are rejected                        0.04s  
+  ✓ media upload requires rights confirmation and valid image            0.02s  
+
+   PASS  Tests\Feature\Http\PublicSiteTest
+  ✓ every public page renders with security headers and metadata         0.06s  
+  ✓ no fabricated content is shown on an empty site                      0.02s  
+  ✓ unpublished and member only events are hidden from the public        0.01s  
+  ✓ contact enquiry is stored with reference                             0.01s  
+  ✓ csrf and origin protection reject forged posts outside tests         0.01s  
+
+   PASS  Tests\Feature\Membership\ApplicationWorkflowTest
+  ✓ public submission creates no member or account and tracks privately  0.03s  
+  ✓ out of range birth date is flagged not rejected                      0.04s  
+  ✓ validation duplicates and anti automation                            0.03s  
+  ✓ officer review approval creates exactly one member and rejects repe… 0.10s  
+  ✓ rejection requires applicant message and is final                    0.04s  
+
+[evidence] member import 2 rows: preview+commit 0.02s, peak memory 73.0 MB
+
+[evidence] member import 86 rows: preview+commit 0.28s, peak memory 73.0 MB
+
+[evidence] member import 100 rows: preview+commit 0.22s, peak memory 73.0 MB
+
+[evidence] member import 500 rows: preview+commit 1.09s, peak memory 73.0 MB
+
+[evidence] member import 1000 rows: preview+commit 2.67s, peak memory 75.0 MB
+
+   PASS  Tests\Feature\Membership\MemberImportTest
+  ✓ import volumes commit atomically without accounts with data set #0   0.04s  
+  ✓ import volumes commit atomically without accounts with data set #1   0.30s  
+  ✓ import volumes commit atomically without accounts with data set #2   0.24s  
+  ✓ import volumes commit atomically without accounts with data set #3   1.12s  
+  ✓ import volumes commit atomically without accounts with data set #4   2.71s  
+  ✓ invalid and duplicate rows are reported and block commit             0.06s  
+  ✓ provided legacy numbers are kept and sequence skips them             0.05s  
+  ✓ import requires permission and production approval                   0.06s  
+
+  Tests:    95 passed (1167 assertions)
+  Duration: 43.34s
+

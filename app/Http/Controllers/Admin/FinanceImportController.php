@@ -14,9 +14,7 @@ use Illuminate\View\View;
 
 class FinanceImportController extends Controller
 {
-    public function __construct(private FinanceImportService $imports)
-    {
-    }
+    public function __construct(private FinanceImportService $imports) {}
 
     public function index(): View
     {

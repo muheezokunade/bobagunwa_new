@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http;
 
+use App\Models\User;
 use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
@@ -130,7 +131,7 @@ class AuthorisationMatrixTest extends TestCase
         $this->actingAs($fourth->fresh())->post(route('admin.access.roles', $third), ['roles' => ['secretariat'], 'reason' => 'Demote'])->assertSessionHasNoErrors();
         $this->actingAs($third->fresh())->get(route('admin.access.index'))->assertForbidden();
         $this->actingAs($fourth->fresh())->post(route('admin.access.status', $fourth), ['status' => 'disabled', 'reason' => 'Self disable attempt'])->assertSessionHasErrors('domain');
-        $remaining = \App\Models\User::where('status', 'active')->get()->filter(fn ($u) => $u->hasPermission('access.manage'));
+        $remaining = User::where('status', 'active')->get()->filter(fn ($u) => $u->hasPermission('access.manage'));
         $this->assertCount(1, $remaining);
     }
 }

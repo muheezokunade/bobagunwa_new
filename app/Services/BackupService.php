@@ -38,9 +38,7 @@ class BackupService
 
     public const DELIMITER = ';;';
 
-    public function __construct(private LedgerQuery $ledger)
-    {
-    }
+    public function __construct(private LedgerQuery $ledger) {}
 
     /** @return array{public: string, keypair: string} base64 keys */
     public static function generateKeypair(): array
@@ -132,9 +130,9 @@ class BackupService
             $tables = array_column($pdo->query("SHOW FULL TABLES WHERE Table_type = 'BASE TABLE'")->fetchAll(PDO::FETCH_NUM), 0);
             sort($tables);
             $schemaOnly = config('boba.backup.schema_only_tables');
-            $emit("SET NAMES utf8mb4");
-            $emit("SET FOREIGN_KEY_CHECKS = 0");
-            $emit("SET UNIQUE_CHECKS = 0");
+            $emit('SET NAMES utf8mb4');
+            $emit('SET FOREIGN_KEY_CHECKS = 0');
+            $emit('SET UNIQUE_CHECKS = 0');
             $emit("SET SQL_MODE = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION'");
             $counts = [];
             foreach ($tables as $table) {
@@ -318,7 +316,7 @@ class BackupService
         DB::purge('boba_restore');
         $target = DB::connection('boba_restore');
         try {
-            $existing = $target->select("SELECT COUNT(*) AS n FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?", [$targetDatabase])[0]->n;
+            $existing = $target->select('SELECT COUNT(*) AS n FROM information_schema.TABLES WHERE TABLE_SCHEMA = ?', [$targetDatabase])[0]->n;
             if ((int) $existing > 0) {
                 throw new DomainRuleException("The target database {$targetDatabase} is not empty. Restore only into a new, empty database.");
             }

@@ -13,9 +13,7 @@ use Illuminate\View\View;
 
 class AssessmentController extends Controller
 {
-    public function __construct(private AssessmentService $assessments)
-    {
-    }
+    public function __construct(private AssessmentService $assessments) {}
 
     public function index(Request $request): View
     {

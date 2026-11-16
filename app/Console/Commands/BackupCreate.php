@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\BackupRun;
 use App\Services\BackupService;
 use Illuminate\Console\Command;
 

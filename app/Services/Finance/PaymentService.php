@@ -35,6 +35,7 @@ class PaymentService
         if ($data['received_on'] > now()->toDateString()) {
             throw new DomainRuleException('The date received cannot be in the future.');
         }
+
         // Duplicate checks run inside the idempotent unit of work, so a replayed
         // submission returns the original record instead of an error.
         return Ledger::guard(fn () => Idempotency::run('payment.record', $idempotencyKey, [$member->id, $amount, $data['received_on'], $external, $data['method']], function () use ($data, $member, $amount, $external, $officer, $evidenceFileId) {

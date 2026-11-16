@@ -12,9 +12,7 @@ use Illuminate\View\View;
 
 class MemberImportController extends Controller
 {
-    public function __construct(private MemberImportService $imports)
-    {
-    }
+    public function __construct(private MemberImportService $imports) {}
 
     public function index(): View
     {

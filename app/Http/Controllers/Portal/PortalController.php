@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Portal;
 
+use App\Exceptions\DomainRuleException;
 use App\Http\Controllers\Controller;
 use App\Models\Document;
 use App\Models\Event;
@@ -29,9 +30,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class PortalController extends Controller
 {
-    public function __construct(private LedgerQuery $ledger)
-    {
-    }
+    public function __construct(private LedgerQuery $ledger) {}
 
     private function member(Request $request): Member
     {
@@ -170,7 +169,7 @@ class PortalController extends Controller
             if ($data['response'] === 'attending' && $locked->capacity) {
                 $taken = EventRsvp::where('event_id', $locked->id)->where('response', 'attending')->where('member_id', '!=', $member->id)->sum(DB::raw('1 + guests'));
                 if ($taken + 1 + (int) ($data['guests'] ?? 0) > $locked->capacity) {
-                    throw new \App\Exceptions\DomainRuleException('The event has reached its capacity.');
+                    throw new DomainRuleException('The event has reached its capacity.');
                 }
             }
             EventRsvp::updateOrCreate(['event_id' => $locked->id, 'member_id' => $member->id], ['response' => $data['response'], 'guests' => (int) ($data['guests'] ?? 0), 'note' => $data['note'] ?? null]);

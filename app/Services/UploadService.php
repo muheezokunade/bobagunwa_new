@@ -49,7 +49,7 @@ class UploadService
     {
         $maxKb = (int) config('boba.uploads.document_max_kb');
         if (! $file->isValid() || $file->getSize() > $maxKb * 1024) {
-            throw new DomainRuleException("Upload a file smaller than ".intdiv($maxKb, 1024).' MB.');
+            throw new DomainRuleException('Upload a file smaller than '.intdiv($maxKb, 1024).' MB.');
         }
         $mime = (new \finfo(FILEINFO_MIME_TYPE))->file($file->getRealPath());
         if ($mime === 'application/pdf') {

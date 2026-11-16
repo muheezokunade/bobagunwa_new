@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Support\Tokens;
 use Closure;
 use Illuminate\Database\QueryException;
+use Illuminate\Database\UniqueConstraintViolationException;
 
 /**
  * Shared guards for financial mutations.
@@ -38,7 +39,7 @@ final class Ledger
             if (preg_match('/(LEDGER|REGISTER): ([^(]+?)(?: \(Connection|$)/', $message, $m)) {
                 throw new DomainRuleException(ucfirst(trim($m[2])).'.', 0, $e);
             }
-            if ($e instanceof \Illuminate\Database\UniqueConstraintViolationException) {
+            if ($e instanceof UniqueConstraintViolationException) {
                 throw new DomainRuleException(str_contains($message, 'external_reference')
                     ? 'A payment with this bank or receipt reference is already recorded.'
                     : 'This record already exists, so nothing was duplicated.', 0, $e);

@@ -25,9 +25,7 @@ use Illuminate\Support\Str;
  */
 class AccountService
 {
-    public function __construct(private MessageService $messages)
-    {
-    }
+    public function __construct(private MessageService $messages) {}
 
     /** Create (or return) the pending account linked to an approved member. */
     public function provisionMemberAccount(Member $member): User
@@ -99,7 +97,7 @@ class AccountService
             $purpose === 'activation' ? 'Activate your Bobagunwa member account' : 'Reset your Bobagunwa password',
             $template."\n\n[One-time link withheld from records]", $user
         );
-        $this->messages->attemptEmail($message, str_replace('provided with this message', "below", $template)."\n\n{$url}\n");
+        $this->messages->attemptEmail($message, str_replace('provided with this message', 'below', $template)."\n\n{$url}\n");
 
         return $message->fresh();
     }

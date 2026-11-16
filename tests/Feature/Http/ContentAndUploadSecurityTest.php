@@ -2,7 +2,10 @@
 
 namespace Tests\Feature\Http;
 
+use App\Models\Media;
 use App\Models\Page;
+use App\Models\Payment;
+use App\Models\Post;
 use App\Models\PrivateFile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -33,8 +36,8 @@ class ContentAndUploadSecurityTest extends TestCase
         $editor = $this->officer('secretariat');
         $this->actingAs($editor)->post(route('admin.content.store', 'news'), ['title' => 'Synthetic headline', 'body' => 'Body'])->assertRedirect();
         $this->actingAs($editor)->post(route('admin.content.store', 'announcements'), ['title' => 'Members only notice', 'body' => 'Private'])->assertRedirect();
-        $news = \App\Models\Post::where('title', 'Synthetic headline')->first();
-        $notice = \App\Models\Post::where('title', 'Members only notice')->first();
+        $news = Post::where('title', 'Synthetic headline')->first();
+        $notice = Post::where('title', 'Members only notice')->first();
         $this->post(route('logout'));
         $this->get(route('news.show', $news->slug))->assertNotFound();
         $this->actingAs($editor)->post(route('admin.content.status', ['news', $news->id]), ['status' => 'published']);
@@ -64,7 +67,7 @@ class ContentAndUploadSecurityTest extends TestCase
             $this->actingAs($treasurer)->post(route('admin.finance.payments.store'), $base + ['evidence' => $file, 'idempotency_key' => $this->key()])->assertSessionHasErrors('domain');
             $this->assertSame(0, PrivateFile::count(), $label);
         }
-        $this->assertSame(0, \App\Models\Payment::count());
+        $this->assertSame(0, Payment::count());
 
         // A genuine image is re-encoded (metadata and trailing payloads discarded) and stored privately.
         $image = imagecreatetruecolor(40, 30);
@@ -76,7 +79,7 @@ class ContentAndUploadSecurityTest extends TestCase
         $content = file_get_contents(storage_path('app/private/files/'.$stored->path));
         $this->assertStringNotContainsString('trailing payload', $content);
         $this->assertStringStartsNotWith(public_path(), storage_path('app/private/files/'.$stored->path));
-        $this->actingAs($this->officer('membership_officer'))->get(route('admin.finance.payments.evidence', \App\Models\Payment::sole()))->assertForbidden();
+        $this->actingAs($this->officer('membership_officer'))->get(route('admin.finance.payments.evidence', Payment::sole()))->assertForbidden();
     }
 
     public function test_media_upload_requires_rights_confirmation_and_valid_image(): void
@@ -86,7 +89,7 @@ class ContentAndUploadSecurityTest extends TestCase
         $this->actingAs($editor)->post(route('admin.content.media.upload'), ['image' => $png, 'alt_text' => 'Synthetic'])->assertSessionHasErrors('rights_confirmed');
         $this->actingAs($editor)->post(route('admin.content.media.upload'), ['image' => UploadedFile::fake()->createWithContent('x.png', 'GIF89a fake'), 'alt_text' => 'Synthetic', 'rights_confirmed' => '1'])->assertSessionHasErrors('domain');
         $this->actingAs($editor)->post(route('admin.content.media.upload'), ['image' => $png, 'alt_text' => 'Synthetic', 'rights_confirmed' => '1'])->assertSessionHasNoErrors();
-        $media = \App\Models\Media::sole();
+        $media = Media::sole();
         $this->assertFileExists(public_path('media/'.$media->path));
         @unlink(public_path('media/'.$media->path));
     }

@@ -15,9 +15,7 @@ use Illuminate\Support\Facades\DB;
  */
 class MemberService
 {
-    public function __construct(private AccountService $accounts)
-    {
-    }
+    public function __construct(private AccountService $accounts) {}
 
     /** @param array<string, mixed> $changes */
     public function correct(Member $member, array $changes, int $expectedVersion, User $actor, string $reason, bool $selfService = false): Member
@@ -26,7 +24,7 @@ class MemberService
         $changes = array_intersect_key($changes, array_flip($allowed));
 
         try {
-            return DB::transaction(function () use ($member, $changes, $expectedVersion, $actor, $reason, $selfService) {
+            return DB::transaction(function () use ($member, $changes, $expectedVersion, $reason, $selfService) {
                 $locked = Member::lockForUpdate()->findOrFail($member->id);
                 if ($locked->version !== $expectedVersion) {
                     throw new DomainRuleException('This record was changed by someone else while you were editing. Reload and try again.');

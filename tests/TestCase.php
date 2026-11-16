@@ -14,6 +14,7 @@ use App\Services\Finance\PaymentService;
 use App\Services\MembershipNumberService;
 use App\Support\Idempotency;
 use App\Support\Normalize;
+use App\Support\Settings;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
 
@@ -28,7 +29,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->withoutVite();
-        \App\Support\Settings::flush();
+        Settings::flush();
     }
 
     protected function officer(string|array $roles, array $attributes = []): User

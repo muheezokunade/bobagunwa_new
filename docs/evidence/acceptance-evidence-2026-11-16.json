@@ -1,0 +1,98 @@
+{
+    "executed_at": "2026-11-16T10:08:44+00:00",
+    "database": "11.4.13-MariaDB-ubu2404",
+    "php": "8.3.6",
+    "laravel": "13.42.0",
+    "data": "synthetic only",
+    "workflows": [
+        {
+            "workflow": 1,
+            "name": "Existing-member import",
+            "result": "pass",
+            "batch": "IMP-2026-SZN7EE",
+            "members_created": 2,
+            "login_accounts_created": 0,
+            "replay": "returned original receipt",
+            "duplicate_detection": "2 of 2 rows flagged on re-upload",
+            "anonymous": "redirected to sign-in",
+            "unauthorised_role": 403
+        },
+        {
+            "workflow": 2,
+            "name": "Membership application and approval",
+            "result": "pass",
+            "application": "BOB-APP-2026-257D6H",
+            "member": "BOB-000003",
+            "members_for_application": 1,
+            "missing_declaration": "rejected",
+            "duplicate_application": "rejected",
+            "wrong_tracking_code": "not found",
+            "system_admin_decision": 403,
+            "repeat_approval": "rejected"
+        },
+        {
+            "workflow": 3,
+            "name": "Account activation",
+            "result": "pass",
+            "login_before_activation": "denied",
+            "activation": "succeeded",
+            "portal": 200,
+            "admin_area_for_member": 403,
+            "replayed_token": "rejected",
+            "expired_token": "rejected"
+        },
+        {
+            "workflow": 4,
+            "name": "Financial assessment (₦50,000 synthetic fixture)",
+            "result": "pass",
+            "assessment": "ASM-2026-G2FCR9A",
+            "obligations": 1,
+            "amount_kobo": 5000000,
+            "same_key_replay": "returned original",
+            "second_post": "rejected",
+            "membership_officer": 403
+        },
+        {
+            "workflow": 5,
+            "name": "Manual ₦20,000 bank-transfer payment",
+            "result": "pass",
+            "payment": "PAY-2026-D3HDUMX",
+            "status": "verified",
+            "member_recording": 403,
+            "treasurer_self_verify": 403,
+            "over_allocation": "rejected",
+            "duplicate_submission": "returned original",
+            "repeat_allocation": "rejected"
+        },
+        {
+            "workflow": 6,
+            "name": "Statement reconciliation",
+            "result": "pass",
+            "assessed": "₦50,000.00",
+            "allocated": "₦20,000.00",
+            "outstanding": "₦30,000.00",
+            "member_statement": "matches",
+            "treasury_report_and_csv": "matches",
+            "raw_mariadb_totals": "matches",
+            "ledger_exceptions": 0
+        },
+        {
+            "workflow": 7,
+            "name": "Encrypted backup and isolated restoration",
+            "result": "pass",
+            "cipher": "libsodium sealed box + XChaCha20-Poly1305 secretstream",
+            "backup_bytes": 125096,
+            "backup_sha256": "bb5131f6440b0233051ee363b396c3e084d50b67ed549818241f4543fee8feb7",
+            "tables": 46,
+            "rows": 165,
+            "triggers_restored": 30,
+            "foreign_keys_checked": 81,
+            "orphaned_rows": 0,
+            "restored_members": 3,
+            "restored_outstanding_kobo": 3000000,
+            "restored_audit_events": 16,
+            "wrong_key": "rejected",
+            "tampered": "rejected"
+        }
+    ]
+}

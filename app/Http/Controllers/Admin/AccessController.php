@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Member;
 use App\Models\RecoveryRequest;
 use App\Models\Role;
+use App\Models\SecurityEvent;
 use App\Models\User;
 use App\Services\AccountService;
 use App\Support\Audit;
@@ -24,9 +25,7 @@ use Illuminate\View\View;
  */
 class AccessController extends Controller
 {
-    public function __construct(private AccountService $accounts)
-    {
-    }
+    public function __construct(private AccountService $accounts) {}
 
     public function index(): View
     {
@@ -89,7 +88,7 @@ class AccessController extends Controller
         return view('admin.access.show', [
             'user' => $user->load('roles', 'member'),
             'roles' => Role::with('permissions')->orderBy('id')->get(),
-            'events' => \App\Models\SecurityEvent::where('user_id', $user->id)->latest('id')->limit(20)->get(),
+            'events' => SecurityEvent::where('user_id', $user->id)->latest('id')->limit(20)->get(),
         ]);
     }
 

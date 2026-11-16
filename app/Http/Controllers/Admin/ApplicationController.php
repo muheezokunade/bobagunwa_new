@@ -7,6 +7,7 @@ use App\Models\Member;
 use App\Models\MembershipApplication;
 use App\Models\OutboundMessage;
 use App\Services\ApplicationService;
+use App\Support\Normalize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -38,7 +39,7 @@ class ApplicationController extends Controller
     {
         $possibleMatches = Member::where('email_normalized', $application->email_normalized)
             ->orWhere('phone_normalized', $application->phone_normalized)
-            ->orWhere('name_normalized', \App\Support\Normalize::name($application->fullName()))->limit(5)->get();
+            ->orWhere('name_normalized', Normalize::name($application->fullName()))->limit(5)->get();
 
         return view('admin.applications.show', [
             'application' => $application->load('events.actor', 'member', 'decider'),

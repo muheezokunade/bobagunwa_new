@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
-use App\Models\MembershipApplication;
 use App\Services\ApplicationService;
 use App\Support\FormGuard;
 use App\Support\Settings;
@@ -13,9 +12,7 @@ use Illuminate\View\View;
 
 class ApplicationController extends Controller
 {
-    public function __construct(private ApplicationService $applications)
-    {
-    }
+    public function __construct(private ApplicationService $applications) {}
 
     public function create(): View
     {

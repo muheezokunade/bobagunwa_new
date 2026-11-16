@@ -54,7 +54,7 @@ class IntegrityTriggersTest extends TestCase
         $obligation = $this->obligationOf($m, $assessment);
         $payment = $this->verifiedPayment($m, '20000');
         $officer = $this->officer('treasurer')->id;
-        $insert = fn ($amount, $paymentId = null) => "INSERT INTO payment_allocations (payment_id, member_obligation_id, member_id, amount_kobo, allocated_by) VALUES (".($paymentId ?? $payment->id).", {$obligation->id}, {$m->id}, {$amount}, {$officer})";
+        $insert = fn ($amount, $paymentId = null) => 'INSERT INTO payment_allocations (payment_id, member_obligation_id, member_id, amount_kobo, allocated_by) VALUES ('.($paymentId ?? $payment->id).", {$obligation->id}, {$m->id}, {$amount}, {$officer})";
         $this->rejects($insert(2_000_001), 'exceeds the available payment');
         DB::statement($insert(1_500_000));
         $this->rejects($insert(500_001), 'exceeds the available payment');
@@ -76,8 +76,8 @@ class IntegrityTriggersTest extends TestCase
         $this->rejects("UPDATE payments SET amount_kobo = 1 WHERE id = {$payment->id}", 'immutable');
         $this->rejects("UPDATE payments SET verified_by = recorded_by WHERE id = {$payment->id}", 'verification history is immutable');
         $this->rejects("DELETE FROM payments WHERE id = {$payment->id}", 'never deleted');
-        $this->rejects("UPDATE member_obligations SET amount_kobo = 1", 'immutable');
-        $this->rejects("DELETE FROM member_obligations", 'immutable');
+        $this->rejects('UPDATE member_obligations SET amount_kobo = 1', 'immutable');
+        $this->rejects('DELETE FROM member_obligations', 'immutable');
         $this->rejects("UPDATE assessments SET amount_kobo = 1 WHERE id = {$assessment->id}", 'immutable');
         $this->rejects("DELETE FROM assessments WHERE id = {$assessment->id}", 'never deleted');
         $this->rejects("UPDATE payments SET status = 'reversed' WHERE id = {$payment->id}", 'reversal record');
@@ -129,7 +129,7 @@ class IntegrityTriggersTest extends TestCase
         $this->rejects($adjust(100, 'waiver', 'A2'), 'sign does not match');
         DB::statement($adjust(-3_000_000, 'waiver', 'A3'));
         $this->rejects($adjust(-1, 'correction', 'A4'), 'below allocated');
-        $this->rejects("UPDATE obligation_adjustments SET amount_kobo = 0", 'append-only');
+        $this->rejects('UPDATE obligation_adjustments SET amount_kobo = 0', 'append-only');
     }
 
     public function test_membership_numbers_are_never_changed_deleted_or_reused(): void

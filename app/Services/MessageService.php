@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\DomainRuleException;
 use App\Models\OutboundMessage;
 use App\Models\User;
 use App\Support\Audit;
@@ -69,7 +70,7 @@ class MessageService
     public function attestManualDelivery(OutboundMessage $message, User $officer, string $note): void
     {
         if (in_array($message->status, ['delivered_manually', 'cancelled'], true)) {
-            throw new \App\Exceptions\DomainRuleException('This message has already been closed.');
+            throw new DomainRuleException('This message has already been closed.');
         }
         $message->update(['status' => 'delivered_manually', 'attested_by' => $officer->id, 'attested_at' => now(), 'attestation_note' => $note]);
         Audit::record('message.delivery_attested', "Delivery attested for {$message->purpose} message to {$message->recipient_name}", $message, ['note' => $note]);
@@ -78,6 +79,6 @@ class MessageService
     public function cancel(OutboundMessage $message, string $note): void
     {
         $message->update(['status' => 'cancelled', 'attested_by' => auth()->id(), 'attested_at' => now(), 'attestation_note' => $note]);
-        Audit::record('message.cancelled', "Prepared message cancelled", $message, ['note' => $note]);
+        Audit::record('message.cancelled', 'Prepared message cancelled', $message, ['note' => $note]);
     }
 }

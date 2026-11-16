@@ -30,8 +30,7 @@ class ApplicationService
         private MembershipNumberService $numbers,
         private AccountService $accounts,
         private MessageService $messages,
-    ) {
-    }
+    ) {}
 
     /** @return array{status: string, flags: list<array{code: string, message: string}>} */
     public function screen(CarbonImmutable $dateOfBirth): array

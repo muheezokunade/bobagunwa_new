@@ -10,6 +10,7 @@ use App\Services\AccountService;
 use App\Services\MemberService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class AccountLifecycleTest extends TestCase
@@ -140,7 +141,7 @@ class AccountLifecycleTest extends TestCase
         $member = $this->member([], true);
         $this->actingAs($member->user)->post(route('portal.security.password'), ['current_password' => 'nope', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasErrors('domain');
         $this->actingAs($member->user)->post(route('portal.security.password'), ['current_password' => 'synthetic-password-123', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasNoErrors();
-        $this->assertTrue(\Illuminate\Support\Facades\Hash::check(self::PASSWORD, $member->user->fresh()->password));
+        $this->assertTrue(Hash::check(self::PASSWORD, $member->user->fresh()->password));
     }
 
     public function test_no_public_registration_route_exists(): void
