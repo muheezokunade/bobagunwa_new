@@ -35,16 +35,17 @@ class PaymentService
         if ($data['received_on'] > now()->toDateString()) {
             throw new DomainRuleException('The date received cannot be in the future.');
         }
-        if ($external && Payment::where('external_reference', $external)->exists()) {
-            throw new DomainRuleException("A payment with bank/receipt reference {$external} is already recorded.");
-        }
-        $possibleDuplicate = Payment::where('member_id', $member->id)->where('amount_kobo', $amount)
-            ->where('received_on', $data['received_on'])->whereIn('status', ['pending', 'verified'])->exists();
-        if ($possibleDuplicate && empty($data['confirm_possible_duplicate'])) {
-            throw new DomainRuleException('A payment with the same member, amount and date is already recorded. Check it, then tick “This is a separate payment” if it is genuinely different.');
-        }
-
+        // Duplicate checks run inside the idempotent unit of work, so a replayed
+        // submission returns the original record instead of an error.
         return Ledger::guard(fn () => Idempotency::run('payment.record', $idempotencyKey, [$member->id, $amount, $data['received_on'], $external, $data['method']], function () use ($data, $member, $amount, $external, $officer, $evidenceFileId) {
+            if ($external && Payment::where('external_reference', $external)->exists()) {
+                throw new DomainRuleException("A payment with bank/receipt reference {$external} is already recorded.");
+            }
+            $possibleDuplicate = Payment::where('member_id', $member->id)->where('amount_kobo', $amount)
+                ->where('received_on', $data['received_on'])->whereIn('status', ['pending', 'verified'])->exists();
+            if ($possibleDuplicate && empty($data['confirm_possible_duplicate'])) {
+                throw new DomainRuleException('A payment with the same member, amount and date is already recorded. Check it, then tick “This is a separate payment” if it is genuinely different.');
+            }
             $payment = Payment::create([
                 'reference' => Ledger::reference('PAY'),
                 'member_id' => $member->id,

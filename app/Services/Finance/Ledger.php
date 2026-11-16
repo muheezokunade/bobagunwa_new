@@ -38,6 +38,11 @@ final class Ledger
             if (preg_match('/(LEDGER|REGISTER): ([^(]+?)(?: \(Connection|$)/', $message, $m)) {
                 throw new DomainRuleException(ucfirst(trim($m[2])).'.', 0, $e);
             }
+            if ($e instanceof \Illuminate\Database\UniqueConstraintViolationException) {
+                throw new DomainRuleException(str_contains($message, 'external_reference')
+                    ? 'A payment with this bank or receipt reference is already recorded.'
+                    : 'This record already exists, so nothing was duplicated.', 0, $e);
+            }
             if (str_contains($message, 'CONSTRAINT') && str_contains($message, 'Check constraint')) {
                 throw new DomainRuleException('The amount or values entered are not allowed.', 0, $e);
             }

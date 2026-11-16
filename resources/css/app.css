@@ -137,6 +137,8 @@ p { margin: 0 0 1em; }
 .section.dark h2 { color: #fff; }
 .section.dark h2 em { color: var(--crown); }
 .section.wine { background: var(--wine); color: #fff; }
+.section.wine h2 { color: #fff; }
+.section.wine h2 em { color: var(--sun); }
 .section h2 { font-size: clamp(32px, 4.4vw, 58px); }
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(32px, 6vw, 90px); align-items: start; }
 .split.wide-left { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
@@ -354,3 +356,22 @@ dl.details dt { font-weight: 700; font-size: 15px; padding-right: 14px; }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
 }
+
+/* ---------- Small utilities ---------- */
+hr.spacer { border: 0; border-top: 1px solid var(--line); margin: 48px 0; }
+.section-gap { margin-top: 48px; }
+.thumb { width: 120px; height: 90px; object-fit: cover; background: var(--mist); }
+.media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+.media-grid figure { margin: 0; font-size: 13px; }
+.media-grid .thumb { width: 100%; height: 110px; }
+pre { white-space: pre-wrap; word-break: break-word; font-size: 13px; background: var(--mist); padding: 10px; margin: 6px 0 0; }
+.message-body { white-space: normal; font: 16px/1.7 var(--serif); }
+.tile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px; }
+.tile { display: block; background: #fff; border: 1px solid var(--line); border-top: 3px solid var(--wine); padding: 18px; text-decoration: none; color: var(--ink); }
+.tile:hover { background: var(--mist); color: var(--ink); }
+.tile strong { display: block; font: 400 34px/1.1 var(--serif); color: var(--wine); }
+.tile span { font-weight: 600; font-size: 15px; }
+.tile.alert-tile { border-top-color: var(--danger); background: var(--danger-bg); }
+.alloc-input { max-width: 160px; }
+.inline-fields { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; }
+.inline-fields .field { margin-bottom: 0; flex: 1 1 200px; }
