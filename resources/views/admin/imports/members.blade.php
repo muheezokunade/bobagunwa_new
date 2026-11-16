@@ -26,7 +26,7 @@
 @if ($batches->isEmpty())
     <x-empty title="No imports yet"><p>Uploaded files and their outcome will appear here.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">File</th><th scope="col">Status</th><th scope="col" class="num">Rows</th><th scope="col" class="num">Valid</th><th scope="col" class="num">Problems</th><th scope="col">Uploaded</th><th scope="col">Completed</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($batches as $batch)
         <tr>

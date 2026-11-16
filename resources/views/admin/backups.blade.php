@@ -33,7 +33,7 @@
 @if ($runs->isEmpty())
     <x-empty title="No backups yet"><p>Created backups and restore verifications will appear here.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Time</th><th scope="col">Type</th><th scope="col">Result</th><th scope="col">File</th><th scope="col" class="num">Size</th><th scope="col">SHA-256</th><th scope="col">Details</th><th scope="col">Created by</th><th scope="col"><span class="sr-only">Download</span></th></tr></thead>
     <tbody>@foreach ($runs as $run)
         @php $d = is_array($run->details) ? $run->details : []; $fin = is_array($d['finance'] ?? null) ? $d['finance'] : []; @endphp

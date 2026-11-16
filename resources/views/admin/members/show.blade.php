@@ -150,7 +150,7 @@
     @if ($history->isEmpty())
         <p class="muted">No changes recorded.</p>
     @else
-    <div class="table-wrap"><table>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
         <thead><tr><th scope="col">Time</th><th scope="col">Officer</th><th scope="col">Action</th><th scope="col">Details</th></tr></thead>
         <tbody>@foreach ($history as $entry)
             @php $ctx = is_array($entry->context) ? $entry->context : []; @endphp

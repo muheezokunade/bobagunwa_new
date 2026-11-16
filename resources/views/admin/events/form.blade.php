@@ -67,7 +67,7 @@
             {{ $rsvps->where('response', 'not_attending')->count() }} not attending.
             <a class="text-link" href="{{ route('admin.events.responses', $event) }}">Download responses (CSV)</a>
         </p>
-        <div class="table-wrap"><table>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
             <thead><tr><th scope="col">Membership number</th><th scope="col">Name</th><th scope="col">Response</th><th scope="col" class="num">Guests</th><th scope="col">Note</th></tr></thead>
             <tbody>@foreach ($rsvps as $rsvp)
                 <tr>

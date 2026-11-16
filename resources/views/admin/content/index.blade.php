@@ -4,7 +4,7 @@
     <a class="btn secondary" href="{{ route('admin.content.media') }}">Media library</a>
 </x-page-head>
 <h2>Managed pages</h2>
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Page</th><th scope="col">State</th><th scope="col">Latest draft</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($pages as $page)
         <tr>

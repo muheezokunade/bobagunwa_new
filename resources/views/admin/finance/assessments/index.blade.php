@@ -12,7 +12,7 @@
 @if ($assessments->isEmpty())
     <x-empty title="No assessments"><p>Create an assessment to charge dues or a levy to members.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Title</th><th scope="col">Category</th><th scope="col">Effective</th><th scope="col">Origin</th><th scope="col">Status</th><th scope="col" class="num">Per member</th><th scope="col" class="num">Members</th><th scope="col" class="num">Total</th></tr></thead>
     <tbody>@foreach ($assessments as $a)
         <tr><td><a href="{{ route('admin.finance.assessments.show', $a) }}">{{ $a->reference }}</a></td><td>{{ $a->title }}</td><td>{{ $a->category->name }}</td><td>{{ \App\Support\Format::date($a->effective_on) }}</td><td>{{ \App\Support\Format::label($a->origin) }}</td><td><x-status :value="$a->status" /></td>

@@ -16,7 +16,7 @@
 @if ($members->isEmpty())
     <x-empty title="No members match these filters"><p>Change the filters, or add members through an approved application or import.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Membership number</th><th scope="col">Name</th><th scope="col">Status</th><th scope="col">Origin</th><th scope="col">Portal account</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($members as $member)
         <tr>

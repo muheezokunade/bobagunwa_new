@@ -62,7 +62,7 @@
         <form method="post" action="{{ route('admin.finance.payments.allocate', $payment) }}" data-allocation-form data-available="{{ \App\Support\Money::decimal($available) }}">
             @csrf
             <x-idem />
-            <div class="table-wrap"><table>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
                 <thead><tr><th scope="col">Obligation</th><th scope="col">Date</th><th scope="col" class="num">Outstanding</th><th scope="col">Allocate (₦)</th></tr></thead>
                 <tbody>@foreach ($obligations as $o)
                     <tr><td>{{ $o->title }}<br><span class="small muted">{{ $o->reference }} · {{ $o->category }}</span></td><td>{{ \Carbon\Carbon::parse($o->effective_on)->format('j M Y') }}</td><td class="num"><x-money :kobo="$o->outstanding" /></td>
@@ -83,7 +83,7 @@
 @if ($payment->allocations->isEmpty())
     <p class="muted">No allocations.</p>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Obligation</th><th scope="col">By</th><th scope="col">When</th><th scope="col">Status</th><th scope="col" class="num">Amount</th>@if ($u->hasPermission('finance.reverse'))<th scope="col">Reverse</th>@endif</tr></thead>
     <tbody>@foreach ($payment->allocations as $a)
         <tr><td>{{ $a->obligation->assessment->title }} <span class="small muted">{{ $a->obligation->assessment->reference }}</span></td><td>{{ $a->allocator->name }}</td><td>{{ \App\Support\Format::dateTime($a->created_at) }}</td><td><x-status :value="$a->status" /></td><td class="num"><x-money :kobo="$a->amount_kobo" /></td>
@@ -105,7 +105,7 @@
 
 @if ($payment->reversals->isNotEmpty())
 <h2>Reversals</h2>
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">Reason</th><th scope="col">By</th><th scope="col">When</th><th scope="col" class="num">Amount</th></tr></thead>
     <tbody>@foreach ($payment->reversals as $r)
         <tr><td>{{ $r->reference }}</td><td>{{ ucfirst($r->kind) }}</td><td>{{ $r->reason }}</td><td>{{ $r->creator->name }}</td><td>{{ \App\Support\Format::dateTime($r->created_at) }}</td><td class="num"><x-money :kobo="$r->amount_kobo" /></td></tr>

@@ -5,7 +5,7 @@
 @if ($categories->isEmpty())
     <x-empty title="No categories yet"><p>Create a category such as “Annual dues” before creating an assessment. Official amounts require the association’s approval.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Code</th><th scope="col">Name</th><th scope="col">Kind</th><th scope="col" class="num">Suggested amount</th><th scope="col">Status</th>@if ($canManage)<th scope="col">Edit</th>@endif</tr></thead>
     <tbody>@foreach ($categories as $category)
         <tr>

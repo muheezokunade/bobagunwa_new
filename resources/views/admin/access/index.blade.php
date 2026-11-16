@@ -13,7 +13,7 @@
 @if ($officers->isEmpty())
     <x-empty title="No officer accounts"><p>Create an officer account below.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Name</th><th scope="col">Email</th><th scope="col">Roles</th><th scope="col">Linked member</th><th scope="col">Status</th><th scope="col">Last signed in</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($officers as $officer)
         <tr>
@@ -69,7 +69,7 @@
     @if ($recovery->isEmpty())
         <p class="muted">No pending requests.</p>
     @else
-    <div class="table-wrap"><table>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
         <thead><tr><th scope="col">Requested</th><th scope="col">Account</th><th scope="col">Decision</th></tr></thead>
         <tbody>@foreach ($recovery as $item)
             <tr>

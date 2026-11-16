@@ -18,7 +18,7 @@
 @if ($obligations->isEmpty())
     <p class="muted">No obligations have been posted to this member.</p>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Assessment</th><th scope="col">Date</th><th scope="col" class="num">Original</th><th scope="col" class="num">Adjustments</th><th scope="col" class="num">Allocated</th><th scope="col" class="num">Outstanding</th>@if ($u->hasPermission('finance.adjust'))<th scope="col">Adjust</th>@endif</tr></thead>
     <tbody>@foreach ($obligations as $o)
         <tr><td>{{ $o->title }}<br><span class="small muted">{{ $o->reference }} · {{ $o->category }}</span></td><td>{{ \Carbon\Carbon::parse($o->effective_on)->format('j M Y') }}</td>
@@ -44,7 +44,7 @@
 @if ($payments->isEmpty())
     <p class="muted">No payments recorded.</p>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Received</th><th scope="col">Method</th><th scope="col">Status</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Allocated</th></tr></thead>
     <tbody>@foreach ($payments as $p)
         <tr><td><a href="{{ route('admin.finance.payments.show', $p->id) }}">{{ $p->reference }}</a></td><td>{{ \Carbon\Carbon::parse($p->received_on)->format('j M Y') }}</td><td>{{ \App\Support\Format::label($p->method) }}</td><td><x-status :value="$p->status" /></td><td class="num"><x-money :kobo="$p->amount_kobo" /></td><td class="num"><x-money :kobo="$p->allocated" /></td></tr>

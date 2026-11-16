@@ -1,0 +1,2076 @@
+{
+  "summary": {
+    "executed_at": "2026-11-16T10:22:26.353Z",
+    "base": "http://127.0.0.1:8000",
+    "widths": [
+      320,
+      375,
+      768,
+      1024,
+      1440
+    ],
+    "page_views": 205,
+    "failures": 0,
+    "console_errors": 0,
+    "keyboard": {
+      "mobile_menu_opens_with_enter": true,
+      "escape_closes_and_returns_focus": true,
+      "skip_link_visible_on_focus": true,
+      "focus_ring_visible": true
+    }
+  },
+  "failures": [],
+  "consoleErrors": [],
+  "results": [
+    {
+      "role": "visitor",
+      "page": "/",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/about",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/about",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/about",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/about",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/about",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/history",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/history",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/history",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/history",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/history",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/leadership",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/leadership",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/leadership",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/leadership",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/leadership",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/apply",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/apply",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/apply",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/apply",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/apply",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/status",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/status",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/status",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/status",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/membership/status",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/events",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/events",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/events",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/events",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/events",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/news",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/news",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/news",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/news",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/news",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/contact",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/contact",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/contact",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/contact",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/contact",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/privacy",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/privacy",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/privacy",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/privacy",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/privacy",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/login",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/login",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/login",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/login",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/login",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/account/recover",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/account/recover",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/account/recover",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/account/recover",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "visitor",
+      "page": "/account/recover",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/profile",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/profile",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/profile",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/profile",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/profile",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances/statement",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances/statement",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances/statement",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances/statement",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/finances/statement",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/notices",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/notices",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/notices",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/notices",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/notices",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/events",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/events",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/events",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/events",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/events",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/security",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/security",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/security",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/security",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "applicant@example.test",
+      "page": "/portal/security",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications?status=all",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications?status=all",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications?status=all",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications?status=all",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications?status=all",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications/2",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications/2",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications/2",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications/2",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/applications/2",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/1",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/1",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/1",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/1",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/1",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments/2",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments/2",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments/2",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments/2",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/payments/2",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/assessments/create",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/assessments/create",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/assessments/create",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/assessments/create",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/assessments/create",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/reports",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/reports",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/reports",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/reports",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/reports",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/members/1",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/members/1",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/members/1",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/members/1",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/members/1",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/categories",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/categories",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/categories",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/categories",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/finance/categories",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members/1",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members/1",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members/1",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members/1",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/imports/members/1",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/content",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/content",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/content",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/content",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/content",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/events",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/events",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/events",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/events",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/events",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/enquiries",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/enquiries",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/enquiries",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/enquiries",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "secretariat@example.test",
+      "page": "/admin/enquiries",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/access",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/access",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/access",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/access",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/access",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/settings",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/settings",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/settings",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/settings",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/settings",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/audit",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/audit",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/audit",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/audit",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/audit",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/backups",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/backups",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/backups",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/backups",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/backups",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    }
+  ]
+}

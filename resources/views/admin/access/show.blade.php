@@ -83,7 +83,7 @@
     @if ($events->isEmpty())
         <p class="muted">No security events recorded.</p>
     @else
-    <div class="table-wrap"><table>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
         <thead><tr><th scope="col">Time</th><th scope="col">Event</th><th scope="col">Details</th></tr></thead>
         <tbody>@foreach ($events as $event)
             <tr>

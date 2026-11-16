@@ -28,7 +28,7 @@
         <p class="small muted">Not charged because they are not active: {{ $preview['excluded']->map(fn ($m) => $m->membership_number)->implode(', ') }}</p>
     @endif
     <details><summary>Members to be charged ({{ $preview['targets']->count() }})</summary>
-        <div class="table-wrap"><table><thead><tr><th scope="col">Number</th><th scope="col">Name</th></tr></thead>
+        <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table><thead><tr><th scope="col">Number</th><th scope="col">Name</th></tr></thead>
             <tbody>@foreach ($preview['targets'] as $m)<tr><td>{{ $m->membership_number }}</td><td>{{ $m->full_name }}</td></tr>@endforeach</tbody></table></div>
     </details>
     @if (auth()->user()->hasPermission('finance.assessments.manage'))
@@ -55,7 +55,7 @@
 @if ($obligations)
     <h2>Obligations created</h2>
     <dl class="stats"><div><dt>Members charged</dt><dd>{{ $assessment->target_count }}</dd></div><div><dt>Total assessed</dt><dd><x-money :kobo="$assessment->total_kobo" /></dd></div></dl>
-    <div class="table-wrap"><table>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
         <thead><tr><th scope="col">Member</th><th scope="col" class="num">Amount</th><th scope="col">Ledger</th></tr></thead>
         <tbody>@foreach ($obligations as $o)
             <tr><td>{{ $o->member->membership_number }} · {{ $o->member->full_name }}</td><td class="num"><x-money :kobo="$o->amount_kobo" /></td><td><a href="{{ route('admin.finance.members.show', $o->member_id) }}">Member ledger</a></td></tr>

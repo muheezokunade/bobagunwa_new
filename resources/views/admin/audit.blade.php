@@ -18,7 +18,7 @@
 @if ($events->isEmpty())
     <x-empty title="No entries match these filters"><p>Change the filters to see other entries.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption>{{ $security ? 'Security events' : 'Officer actions' }}</caption>
     <thead><tr>
         <th scope="col">Time</th>

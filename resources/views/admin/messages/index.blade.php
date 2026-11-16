@@ -8,7 +8,7 @@
 @if ($messages->isEmpty())
     <x-empty title="No messages match this filter"><p>{{ $status === 'open' ? 'There is nothing waiting to be delivered.' : 'Choose another status to see other messages.' }}</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Prepared</th><th scope="col">Recipient</th><th scope="col">Subject</th><th scope="col">Purpose</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($messages as $message)
         <tr>

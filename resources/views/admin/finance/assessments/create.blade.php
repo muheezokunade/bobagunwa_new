@@ -21,7 +21,7 @@
         <label class="check" for="mode-selected"><input type="radio" id="mode-selected" name="target_mode" value="selected" @checked(old('target_mode') === 'selected')><span>Only the members selected below</span></label>
         <details>
             <summary>Select members</summary>
-            <div class="table-wrap"><table>
+            <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
                 <thead><tr><th scope="col">Select</th><th scope="col">Number</th><th scope="col">Name</th></tr></thead>
                 <tbody>@foreach ($members as $m)
                     <tr><td><input type="checkbox" id="m{{ $m->id }}" name="member_ids[]" value="{{ $m->id }}" @checked(in_array($m->id, old('member_ids', []))) aria-label="Select {{ $m->full_name }}"></td><td><label for="m{{ $m->id }}">{{ $m->membership_number }}</label></td><td>{{ $m->full_name }}</td></tr>

@@ -9,7 +9,7 @@
 @if ($records->isEmpty())
     <x-empty title="Nothing here yet"><p>No {{ $spec['singular'] }} entries have been created.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Title</th><th scope="col">Status</th><th scope="col">Last updated</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($records as $record)
         <tr>

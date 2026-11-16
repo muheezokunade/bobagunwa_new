@@ -11,7 +11,7 @@
     <div><dt>Closing position ({{ $to->format('j M Y') }})</dt><dd class="value wine"><x-money :kobo="$statement['closing']" /></dd></div>
 </dl>
 <p class="small muted">A positive position is an amount owed to the association; a negative position is a credit in your favour.</p>
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption>Transactions from {{ $from->format('j M Y') }} to {{ $to->format('j M Y') }}</caption>
     <thead><tr><th scope="col">Date</th><th scope="col">Transaction</th><th scope="col">Reference</th><th scope="col" class="num">Charges</th><th scope="col" class="num">Payments</th><th scope="col" class="num">Position</th></tr></thead>
     <tbody>

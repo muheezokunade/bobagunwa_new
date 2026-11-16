@@ -15,7 +15,7 @@
 @if ($applications->isEmpty())
     <x-empty title="No applications match these filters"><p>Change the filters to see other applications.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Name</th><th scope="col">Eligibility</th><th scope="col">Status</th><th scope="col">Received</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
     <tbody>@foreach ($applications as $application)
         <tr>

@@ -13,7 +13,7 @@
 @if ($obligations->isEmpty())
     <x-empty title="Nothing has been assessed to you yet"><p>Dues and levies appear here once the treasurer posts them.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption class="sr-only">Your dues and levies</caption>
     <thead><tr><th scope="col">Item</th><th scope="col">Reference</th><th scope="col">Date</th><th scope="col">Due</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Paid</th><th scope="col" class="num">Outstanding</th></tr></thead>
     <tbody>
@@ -28,7 +28,7 @@
 @if ($payments->isEmpty())
     <x-empty title="No payments recorded"><p>When you pay, the treasurer records and verifies the payment. It then appears here.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption class="sr-only">Your payments</caption>
     <thead><tr><th scope="col">Reference</th><th scope="col">Received</th><th scope="col">Method</th><th scope="col">Status</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Applied to dues</th></tr></thead>
     <tbody>

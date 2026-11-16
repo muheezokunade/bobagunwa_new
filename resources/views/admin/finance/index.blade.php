@@ -19,7 +19,7 @@
 @if ($pending->isEmpty())
     <x-empty title="Nothing waiting"><p>All recorded payments have been verified or rejected.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Payment</th><th scope="col">Member</th><th scope="col">Received</th><th scope="col" class="num">Amount</th></tr></thead>
     <tbody>@foreach ($pending as $p)
         <tr><td><a href="{{ route('admin.finance.payments.show', $p) }}">{{ $p->reference }}</a></td><td>{{ $p->member->membership_number }} · {{ $p->member->full_name }}</td><td>{{ \App\Support\Format::date($p->received_on) }}</td><td class="num"><x-money :kobo="$p->amount_kobo" /></td></tr>

@@ -54,7 +54,7 @@
 @if ($revisions->isEmpty())
     <x-empty title="No revisions yet"><p>Save a draft to create the first revision.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Revision</th><th scope="col">Title</th><th scope="col">Author</th><th scope="col">Saved</th><th scope="col">Note</th><th scope="col">State</th>@if ($canPublish)<th scope="col"><span class="sr-only">Actions</span></th>@endif</tr></thead>
     <tbody>@foreach ($revisions as $revision)
         @php $isPublished = $revision->id === $page->published_revision_id; @endphp

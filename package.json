@@ -6,6 +6,7 @@
         "dev": "vite"
     },
     "devDependencies": {
+        "axe-core": "^4.14.0",
         "laravel-vite-plugin": "^3.1",
         "vite": "^8.0.0"
     },

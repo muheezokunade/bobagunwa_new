@@ -12,7 +12,7 @@
 @endif
 @if ($recent->isNotEmpty())
     <h2>Recent activity</h2>
-    <div class="table-wrap"><table>
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
         <thead><tr><th scope="col">When</th><th scope="col">Officer</th><th scope="col">Activity</th></tr></thead>
         <tbody>@foreach ($recent as $event)
             <tr><td>{{ \App\Support\Format::dateTime($event->created_at) }}</td><td>{{ $event->actor?->name ?? 'System or applicant' }}</td><td>{{ $event->summary }}</td></tr>

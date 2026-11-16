@@ -34,7 +34,7 @@
 @if ($batches->isEmpty())
     <p class="muted">No financial imports yet.</p>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Type</th><th scope="col">File</th><th scope="col">Rows</th><th scope="col">Status</th><th scope="col">Uploaded by</th><th scope="col">Confirmed by</th></tr></thead>
     <tbody>@foreach ($batches as $b)
         <tr><td><a href="{{ route('admin.finance.imports.show', $b) }}">{{ $b->reference }}</a></td><td>{{ \App\Support\Format::label($b->kind) }}</td><td>{{ $b->original_filename }}</td><td>{{ $b->valid_count }}/{{ $b->row_count }} valid</td><td><x-status :value="$b->status" /></td><td>{{ $b->creator->name }}</td><td>{{ $b->committer?->name ?? '—' }}</td></tr>

@@ -81,7 +81,7 @@
 @endif
 
 <h2>Rows</h2>
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr>
         <th scope="col" class="num">Row</th><th scope="col">Status</th>
         @if ($isMembers)

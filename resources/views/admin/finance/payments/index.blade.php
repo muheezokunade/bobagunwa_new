@@ -13,7 +13,7 @@
 @if ($payments->isEmpty())
     <x-empty title="No payments match"><p>Adjust the filters or record a payment.</p></x-empty>
 @else
-<div class="table-wrap"><table>
+<div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <thead><tr><th scope="col">Reference</th><th scope="col">Member</th><th scope="col">Received</th><th scope="col">Method</th><th scope="col">Bank / receipt ref.</th><th scope="col">Status</th><th scope="col" class="num">Amount</th><th scope="col">Recorded by</th></tr></thead>
     <tbody>@foreach ($payments as $p)
         <tr><td><a href="{{ route('admin.finance.payments.show', $p) }}">{{ $p->reference }}</a></td><td>{{ $p->member->membership_number }}<br><span class="small muted">{{ $p->member->full_name }}</span></td><td>{{ \App\Support\Format::date($p->received_on) }}</td><td>{{ \App\Support\Format::label($p->method) }}</td><td>{{ $p->external_reference ?: '—' }}</td><td><x-status :value="$p->status" /></td><td class="num"><x-money :kobo="$p->amount_kobo" /></td><td>{{ $p->recorder->name }}</td></tr>
