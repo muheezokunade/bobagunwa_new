@@ -16,16 +16,16 @@ npm ci && npm run build
 cp .env.example .env && php artisan key:generate
 # set DB_* for a MariaDB 11.4 database, then:
 php artisan migrate
-php artisan boba:demo:seed        # synthetic officers and members; prints sign-in details
+php artisan boba:demo:seed        # synthetic officers and members; prints a generated password once
 php artisan serve                 # http://127.0.0.1:8000
 ```
 
-Demo accounts (local only): `admin@`, `membership@`, `secretariat@`, `treasurer@`, `verifier@`, `executive@`, `applicant@example.test`, password `REMOVED-DEMO-PASSWORD`.
+Demo accounts (local only, refused in staging/production): `admin@`, `membership@`, `secretariat@`, `treasurer@`, `verifier@`, `executive@`, `applicant@example.test`. The seeder generates a random password on each run and prints it; set `BOBA_DEMO_PASSWORD` to choose one (needed for the browser audit). No fixed password exists in the code.
 
 ## Tests
 
 ```bash
-php artisan test        # 98 tests on MariaDB 11.4 (database bobagunwa_test)
+php artisan test        # 103 tests on MariaDB 11.4 (database bobagunwa_test)
 ```
 
 Includes direct-SQL ledger invariants, forked-process concurrency, the seven mandatory end-to-end workflows, encrypted backup/restore with tamper and wrong-key rejection, an authorisation matrix and volume tests. Browser audit: `node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000`.

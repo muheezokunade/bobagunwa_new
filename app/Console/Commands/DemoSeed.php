@@ -14,6 +14,7 @@ use App\Services\Finance\AssessmentService;
 use App\Services\Finance\PaymentService;
 use App\Services\MemberImportService;
 use App\Support\Idempotency;
+use App\Support\Tokens;
 use Illuminate\Console\Command;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Artisan;
@@ -29,8 +30,6 @@ class DemoSeed extends Command
 
     protected $description = 'Populate a LOCAL database with clearly synthetic demonstration data';
 
-    public const PASSWORD = 'REMOVED-DEMO-PASSWORD';
-
     public function handle(ApplicationService $applications, MemberImportService $imports, AssessmentService $assessments, PaymentService $payments): int
     {
         if (app()->environment(['production', 'staging'])) {
@@ -39,6 +38,9 @@ class DemoSeed extends Command
             return self::FAILURE;
         }
 
+        // No fixed demo password exists anywhere in the code: one is generated per run
+        // (or taken from BOBA_DEMO_PASSWORD so browser audits can sign in) and printed once.
+        $password = (string) (getenv('BOBA_DEMO_PASSWORD') ?: Tokens::generate(12));
         $officers = [];
         foreach ([
             'admin' => ['System Administrator (synthetic)', ['system_admin']],
@@ -49,7 +51,7 @@ class DemoSeed extends Command
             'executive' => ['Executive (synthetic)', ['executive']],
         ] as $key => [$name, $roles]) {
             $user = User::firstOrCreate(['email' => "{$key}@example.test"], ['name' => $name, 'status' => 'active', 'activated_at' => now()]);
-            $user->forceFill(['password' => self::PASSWORD, 'status' => 'active'])->save();
+            $user->forceFill(['password' => $password, 'status' => 'active'])->save();
             $user->roles()->syncWithoutDetaching(Role::whereIn('key', $roles)->pluck('id'));
             $officers[$key] = $user->fresh();
         }
@@ -75,7 +77,7 @@ class DemoSeed extends Command
         $applications->transition($application, 'under_review', $officers['membership'], 'Synthetic review started.', null);
         [$member] = $applications->approve($application->fresh(), $officers['membership'], 'Synthetic approval for demonstration.', null);
         $memberUser = $member->user;
-        $memberUser->forceFill(['password' => self::PASSWORD, 'status' => 'active', 'activated_at' => now()])->save();
+        $memberUser->forceFill(['password' => $password, 'status' => 'active', 'activated_at' => now()])->save();
         $applications->submit(['first_name' => 'Pending', 'last_name' => 'Applicant', 'other_names' => null, 'email' => 'pending@example.test', 'phone' => '08029990002', 'date_of_birth' => '1979-02-11', 'ijebu_town' => 'Ago Iwoye', 'city' => 'Abuja', 'occupation' => 'Synthetic engineer', 'reason' => 'Synthetic application with a birth date outside the range, to show the flagged review.']);
 
         // Finance: a synthetic assessment, payments, verification and allocation.
@@ -104,7 +106,7 @@ class DemoSeed extends Command
         Auth::logout();
 
         $this->info('Synthetic demonstration data created.');
-        $this->table(['Role', 'Email', 'Password'], collect($officers)->map(fn ($u, $k) => [$k, $u->email, self::PASSWORD])->push(['member', $memberUser->email, self::PASSWORD])->values()->all());
+        $this->table(['Role', 'Email', 'Password'], collect($officers)->map(fn ($u, $k) => [$k, $u->email, $password])->push(['member', $memberUser->email, $password])->values()->all());
 
         return self::SUCCESS;
     }

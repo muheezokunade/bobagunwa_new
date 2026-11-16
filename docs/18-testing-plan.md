@@ -13,6 +13,7 @@ php artisan test tests/Feature/Concurrency        # forked-process races (needs 
 composer audit && npm audit                       # dependency advisories
 npm run build                                     # production assets
 # browser audit (needs the demo data and a running server)
+export BOBA_DEMO_PASSWORD=$(openssl rand -hex 12)
 php artisan boba:demo:seed && php artisan serve
 node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000 docs/evidence/responsive-a11y-<date>.json
 ```
@@ -36,6 +37,10 @@ node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000 docs/evidence/respo
 | Seven mandatory workflows together | `tests/Feature/Acceptance/MandatoryWorkflowsTest` (writes `storage/logs/acceptance-evidence.json`) |
 | Volume (100/500/1,000 members), query counts, N+1 guard | `tests/Feature/Http/PerformanceTest` |
 | Responsive (320/375/768/1024/1440), axe WCAG 2.1 A/AA, keyboard, console/CSP | `tests/browser/responsive-a11y.cjs` |
+
+## Test credentials
+
+`tests/TestCase.php` creates fixture accounts with the password `synthetic-password-123`. They exist only inside the rolled-back transactions of the `bobagunwa_test` database (or are dropped by `migrate:fresh` in the committed-data suites), so the value cannot sign in to any real environment. It is deliberately kept for readable tests.
 
 ## Not automated (manual acceptance required)
 

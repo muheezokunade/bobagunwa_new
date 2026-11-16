@@ -1,7 +1,8 @@
 /*
  * Responsive and automated accessibility audit (Playwright + axe-core).
  * Usage: node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000 [output.json]
- * Requires the synthetic demo data from `php artisan boba:demo:seed`.
+ * Requires the synthetic demo data from `BOBA_DEMO_PASSWORD=... php artisan boba:demo:seed`
+ * and the same BOBA_DEMO_PASSWORD in the environment of this script.
  * Automated checks do not replace manual keyboard and screen-reader review.
  */
 const { chromium } = require('playwright');
@@ -12,7 +13,8 @@ const axeSource = fs.readFileSync(require.resolve('axe-core/axe.min.js'), 'utf8'
 const BASE = process.argv[2] || 'http://127.0.0.1:8000';
 const OUT = process.argv[3] || 'docs/evidence/responsive-a11y.json';
 const WIDTHS = [320, 375, 768, 1024, 1440];
-const PASSWORD = 'REMOVED-DEMO-PASSWORD';
+const PASSWORD = process.env.BOBA_DEMO_PASSWORD;
+if (!PASSWORD) { console.error('Set BOBA_DEMO_PASSWORD to the password used for boba:demo:seed.'); process.exit(2); }
 
 const journeys = [
   { role: null, pages: ['/', '/about', '/history', '/leadership', '/membership', '/membership/apply', '/membership/status', '/events', '/news', '/contact', '/privacy', '/login', '/account/recover'] },
