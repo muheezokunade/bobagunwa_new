@@ -34,3 +34,5 @@
     @if ($u->hasPermission('settings.manage')) {!! $link('admin.settings.index', 'Settings', 'admin.settings.*') !!} @endif
     @if ($u->hasPermission('backups.manage')) {!! $link('admin.backups.index', 'Backups', 'admin.backups.*') !!} @endif
 @endif
+<h2>My account</h2>
+{!! $link('admin.account', 'Password and sessions', 'admin.account*') !!}

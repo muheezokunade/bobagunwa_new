@@ -5,7 +5,7 @@
     @if (auth()->user()->hasPermission('finance.assessments.manage'))<a class="btn secondary" href="{{ route('admin.finance.assessments.create') }}">New assessment</a>@endif
 </x-page-head>
 @if ($exceptions)
-    <div class="alert error" role="alert"><strong>Reconciliation exceptions found.</strong> {{ implode('; ', array_keys($exceptions)) }}. <a href="{{ route('admin.finance.reports.index') }}#exceptions">Review them</a> and escalate to the treasurer and auditors.</div>
+    <div class="alert error" role="alert"><strong>Reconciliation exceptions found.</strong> {{ implode('; ', array_keys($exceptions)) }}. <a href="{{ route('admin.finance.reports.index') }}#exceptions">Review them</a> and tell the treasurer and executive, and escalate to the technical maintainer before any correction.</div>
 @endif
 <dl class="stats">
     <div><dt>Effective obligations</dt><dd><x-money :kobo="$totals['effective_obligations']" /></dd></div>

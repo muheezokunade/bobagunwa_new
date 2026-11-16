@@ -174,7 +174,7 @@ class ContentController extends Controller
     {
         $this->can($request, 'content.manage');
         $gallery = Gallery::findOrFail($id);
-        $data = $request->validate(['image' => ['required', 'file', 'max:'.config('boba.uploads.image_max_kb')], 'alt_text' => ['required', 'string', 'max:255'], 'caption' => ['nullable', 'string', 'max:255']]);
+        $data = $request->validate(['image' => ['required', 'file', 'max:'.config('boba.uploads.image_max_kb')], 'alt_text' => ['required', 'string', 'max:255'], 'caption' => ['nullable', 'string', 'max:255'], 'rights_confirmed' => ['accepted']], ['rights_confirmed.accepted' => 'Confirm that the association has permission to publish this image.']);
         $media = $uploads->storePublicImage($request->file('image'), $data['alt_text'], $request->user());
         GalleryItem::create(['gallery_id' => $gallery->id, 'media_id' => $media->id, 'caption' => $data['caption'] ?? null, 'sort_order' => $gallery->items()->count()]);
         Audit::record('gallery.item_added', "Image added to gallery {$gallery->title}", $gallery);

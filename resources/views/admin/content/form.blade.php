@@ -97,7 +97,7 @@
             <x-field prefix="g-" name="image" label="Image file" type="file" required accept="image/jpeg,image/png" hint="JPEG or PNG." />
             <x-field prefix="g-" name="alt_text" label="Description for screen readers (alt text)" required hint="Describe what the image shows." />
             <x-field prefix="g-" name="caption" label="Caption (optional)" />
-            <p class="small muted">Only add images the association has permission to publish.</p>
+            <x-check prefix="g-" name="rights_confirmed" label="The association has permission to publish this image (and consent from anyone pictured)." />
             <button class="btn" type="submit">Add image</button>
         </form>
     @endif

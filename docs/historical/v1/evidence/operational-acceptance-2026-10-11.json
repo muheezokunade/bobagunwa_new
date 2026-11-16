@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "runId": "1791758864406",
+  "completedAt": "2026-10-11T22:52:05.247Z",
+  "environment": "isolated local Cloudflare Worker and D1-compatible SQLite",
+  "syntheticOnly": true,
+  "productionModified": false,
+  "status": "passed",
+  "workflows": {
+    "memberImport": { "status": "passed", "totalRows": 2, "validRows": 2, "duplicateRowsOnReplayPreview": 2, "importedRows": 2, "loginAccountsCreated": 0 },
+    "membershipApplication": { "status": "passed", "reference": "EBI-APP-20261011-RZ9NJW", "applicationId": "21d244f8-f302-4cf8-b640-224e3dea203b", "memberId": "d9aa6fbf-6112-444e-a4eb-3088db0b31ff", "membershipNumber": "BOB-000002", "memberRecordsCreated": 1 },
+    "accountActivation": { "status": "passed", "acceptedInvitations": 1, "activationReplayHttpStatus": 400, "memberAdminHttpStatus": 307 },
+    "assessment": { "status": "passed", "assessmentId": "54d9e32e-da28-46f3-9435-5d808b712c38", "obligationId": "ac497b80-4388-44c7-a7da-a30fdaf0ac6a", "amountKobo": 5000000, "obligationsCreated": 1 },
+    "partialPayment": { "status": "passed", "paymentId": "d7f62710-6b5b-4572-92be-e8f21a4740a4", "amountKobo": 2000000, "outstandingKobo": 3000000 },
+    "reconciliation": { "status": "passed", "statementAssessedKobo": 5000000, "statementPaidKobo": 2000000, "statementOutstandingKobo": 3000000, "reportOutstandingKobo": 3000000 },
+    "backupRestore": { "status": "passed", "algorithm": "AES-256-CBC", "keyDerivation": "PBKDF2", "iterations": 200000, "encryptedBytes": 737312, "sha256": "b1c92dcda20d28a3c36010727f72365da96e12287ef3c4ccf9ae2fde7b6003f0", "integrityCheck": "ok", "foreignKeyViolations": 0, "connectedAuditEvents": 6 }
+  },
+  "frontendPagesVerified": 9,
+  "failurePathsVerified": [400, 401, 403, 409],
+  "notes": [
+    "The first reconciliation run exposed a missing visible balance on the member statement; the page was fixed and the integrated checks passed on rerun.",
+    "Temporary encrypted and restored databases remain under the isolated /tmp test directory; no production system was changed."
+  ]
+}

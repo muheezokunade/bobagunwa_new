@@ -90,6 +90,8 @@ Route::middleware(['auth', 'member'])->prefix('portal')->name('portal.')->contro
 */
 Route::middleware(['auth', 'staff'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/account', [Admin\AccountController::class, 'show'])->name('account');
+    Route::post('/account/password', [Admin\AccountController::class, 'password'])->name('account.password');
 
     Route::middleware('permission:applications.review')->controller(Admin\ApplicationController::class)->group(function () {
         Route::get('/applications', 'index')->name('applications.index');

@@ -11,7 +11,7 @@
         <x-field name="title" label="Title" required hint="For example “Annual dues 2027”" />
         <x-field name="amount" label="Amount per member (₦)" required hint="Enter naira, e.g. 50000 or 50,000.00. Official amounts need the association’s approval." />
         <x-field name="period_label" label="Period label (optional)" hint="Used to warn about members already charged for the same period, e.g. 2027" />
-        <x-field name="effective_on" label="Effective date" type="date" required :value="now()->toDateString()" />
+        <x-field name="effective_on" label="Effective date" type="date" required :value="now(config('boba.display_timezone'))->toDateString()" />
         <x-field name="due_on" label="Due date (optional)" type="date" />
         <x-textarea name="description" label="Description (optional)" rows="3" class="full" />
     </div>

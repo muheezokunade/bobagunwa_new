@@ -10,7 +10,7 @@ class Payment extends Model
 {
     protected $table = 'payments';
 
-    protected $guarded = ['id'];
+    protected $guarded = ['id', 'live_external_reference'];
 
     protected $casts = ['received_on' => 'date', 'verified_at' => 'datetime', 'rejected_at' => 'datetime', 'requires_distinct_verifier' => 'boolean'];
 

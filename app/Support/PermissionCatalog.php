@@ -7,7 +7,7 @@ namespace App\Support;
  *
  * Roles are assignment templates; every protected route and service checks a
  * named permission. Final role assignments require association approval
- * (docs/client-decisions.md, D-005, D-007, D-008).
+ * (docs/23-client-decisions.md, D-005, D-007, D-008).
  */
 final class PermissionCatalog
 {

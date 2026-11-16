@@ -101,7 +101,7 @@ return new class extends Migration
             $table->char('currency', 3)->default('NGN');
             $table->enum('method', ['bank_transfer', 'cash', 'pos', 'other']);
             $table->date('received_on');
-            $table->string('external_reference', 120)->nullable()->unique();
+            $table->string('external_reference', 120)->nullable()->index();
             $table->string('payer_name', 190)->nullable();
             $table->string('narrative', 255)->nullable();
             $table->enum('origin', ['native', 'historical'])->default('native');
@@ -125,6 +125,9 @@ return new class extends Migration
             $table->index(['member_id', 'amount_kobo', 'received_on']);
         });
         DB::statement("ALTER TABLE payments ADD CONSTRAINT payments_amount_positive CHECK (amount_kobo > 0), ADD CONSTRAINT payments_currency_ngn CHECK (currency = 'NGN')");
+        // A bank/receipt reference may appear once among payments that count or have counted;
+        // a payment rejected as recorded in error releases its reference for correct re-entry.
+        DB::statement("ALTER TABLE payments ADD COLUMN live_external_reference VARCHAR(120) AS (IF(status <> 'rejected', external_reference, NULL)) PERSISTENT, ADD UNIQUE KEY payments_external_reference_unique (live_external_reference)");
 
         Schema::create('financial_reversals', function (Blueprint $table) {
             $table->id();

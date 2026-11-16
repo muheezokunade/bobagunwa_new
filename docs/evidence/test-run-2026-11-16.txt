@@ -26,82 +26,127 @@
   ✓ csv injection is neutralised in exports
 
    PASS  Tests\Feature\Acceptance\MandatoryWorkflowsTest
-  ✓ all seven mandatory workflows pass together                          3.85s  
+  ✓ all seven mandatory workflows pass together                          3.36s  
 
    PASS  Tests\Feature\Auth\AccountLifecycleTest
-  ✓ imported member cannot log in until activated then activation is si… 1.73s  
-  ✓ expired and superseded activation tokens are refused                 0.05s  
+  ✓ imported member cannot log in until activated then activation is si… 1.52s  
+  ✓ expired and superseded activation tokens are refused                 0.04s  
   ✓ unapproved applicant has no account to activate                      0.01s  
-  ✓ suspended member is denied and existing sessions end                 0.05s  
-  ✓ reset tokens expire are single use and end sessions                  0.05s  
-  ✓ recovery is enumeration safe and queued for officers                 0.05s  
-  ✓ login is rate limited and failures are logged without disclosure     0.05s  
-  ✓ password change requires current password and keeps only this sessi… 0.03s  
-  ✓ no public registration route exists                                  0.02s  
+  ✓ suspended member is denied and existing sessions end                 0.04s  
+  ✓ reset tokens expire are single use and end sessions                  0.04s  
+  ✓ recovery is enumeration safe and queued for officers                 0.03s  
+  ✓ login is rate limited and failures are logged without disclosure     0.03s  
+  ✓ password change requires current password and keeps only this sessi… 0.02s  
+  ✓ no public registration route exists                                  0.01s  
+  ✓ officer without member record can change own password                0.03s  
 
    PASS  Tests\Feature\Backup\BackupRestoreTest
-  ✓ encrypted backup restores into isolated database with integrity      2.88s  
-  ✓ wrong key is rejected                                                2.31s  
-  ✓ tampered truncated and header modified backups are rejected before…  2.20s  
-  ✓ restore refuses live database and non empty targets                  2.66s  
-  ✓ backup requires a configured custodian public key                    2.36s  
-  ✓ restore command reports verification                                 2.60s  
+  ✓ encrypted backup restores into isolated database with integrity      2.47s  
+  ✓ wrong key is rejected                                                2.91s  
+  ✓ tampered truncated and header modified backups are rejected before…  2.68s  
+  ✓ restore refuses live database and non empty targets                  2.93s  
+  ✓ backup requires a configured custodian public key                    2.72s  
+  ✓ restore command reports verification                                 3.01s  
 
    PASS  Tests\Feature\Concurrency\ConcurrencyTest
-  ✓ two requests cannot exhaust the same payment twice                   6.14s  
-  ✓ direct sql racers cannot over allocate even under repeatable read    2.11s  
-  ✓ duplicate payment submitted concurrently is recorded once            2.03s  
+  ✓ two requests cannot exhaust the same payment twice                   5.94s  
+  ✓ direct sql racers cannot over allocate even under repeatable read    2.35s  
+  ✓ duplicate payment submitted concurrently is recorded once            1.99s  
   ✓ concurrent approval creates exactly one member and number            1.51s  
-  ✓ concurrent number issuance never duplicates                          1.85s  
-  ✓ concurrent assessment posting creates one set of obligations         1.49s  
+  ✓ concurrent number issuance never duplicates                          1.61s  
+  ✓ concurrent assessment posting creates one set of obligations         1.63s  
 
    PASS  Tests\Feature\Database\IntegrityTriggersTest
-  ✓ every integrity trigger is installed                                 0.01s  
-  ✓ cross member allocation by direct sql is rejected                    0.04s  
-  ✓ over allocation and unverified allocation are rejected               0.04s  
+  ✓ every integrity trigger is installed                                 0.02s  
+  ✓ cross member allocation by direct sql is rejected                    0.06s  
+  ✓ over allocation and unverified allocation are rejected               0.05s  
   ✓ posted records are immutable and undeletable                         0.03s  
   ✓ self verification is rejected when two officers are required         0.02s  
   ✓ reversal rules hold at database level                                0.04s  
-  ✓ adjustments cannot go negative or below allocations                  0.04s  
-  ✓ membership numbers are never changed deleted or reused               0.02s  
-  ✓ failed multi record transaction rolls back completely                0.05s  
+  ✓ adjustments cannot go negative or below allocations                  0.05s  
+  ✓ membership numbers are never changed deleted or reused               0.01s  
+  ✓ failed multi record transaction rolls back completely                0.04s  
+
+   PASS  Tests\Feature\Finance\HistoricalImportTest
+  ✓ historical transactions import with two officers and replay protect… 0.08s  
+  ✓ invalid rows block commit and credit opening balances are refused    0.04s  
+  ✓ opening balances are labelled and reconcile                          0.05s  
 
    PASS  Tests\Feature\Finance\LedgerServiceTest
-  ✓ assessment posts exactly once and replays idempotently               0.04s  
-  ✓ posting refuses when member list changed since preview               0.03s  
-  ✓ recorded payment counts only after independent verification          0.03s  
-  ✓ single verifier policy is configurable but snapshotted per payment   0.03s  
+  ✓ assessment posts exactly once and replays idempotently               0.03s  
+  ✓ posting refuses when member list changed since preview               0.02s  
+  ✓ recorded payment counts only after independent verification          0.04s  
+  ✓ single verifier policy is configurable but snapshotted per payment   0.02s  
   ✓ duplicate payment protection                                         0.03s  
-  ✓ partial split and multi payment allocation reconcile                 0.06s  
-  ✓ allocation rejections and replay                                     0.04s  
+  ✓ partial split and multi payment allocation reconcile                 0.07s  
+  ✓ allocation rejections and replay                                     0.06s  
   ✓ payment reversal reverses dependent allocations consistently         0.05s  
-  ✓ allocation reversal frees funds for reallocation                     0.05s  
-  ✓ adjustments waive cancel and respect allocations                     0.06s  
-  ✓ permissions are enforced inside finance services                     0.06s  
-  ✓ statement summary reports and raw sql reconcile                      0.11s  
+  ✓ allocation reversal frees funds for reallocation                     0.06s  
+  ✓ adjustments waive cancel and respect allocations                     0.07s  
+  ✓ permissions are enforced inside finance services                     0.07s  
+  ✓ statement summary reports and raw sql reconcile                      0.14s  
+  ✓ rejected payment releases its bank reference for correct re entry    0.03s  
 
    PASS  Tests\Feature\Http\AdminViewsRenderTest
-  ✓ all admin pages render                                               0.36s  
+  ✓ all admin pages render                                               0.35s  
 
    PASS  Tests\Feature\Http\AuthorisationMatrixTest
-  ✓ every role reaches exactly the admin pages it is permitted           0.62s  
-  ✓ anonymous visitors are redirected from every private page            0.04s  
+  ✓ every role reaches exactly the admin pages it is permitted           0.71s  
+  ✓ anonymous visitors are redirected from every private page            0.05s  
   ✓ system administrator has no treasury or approval powers              0.03s  
-  ✓ membership officer sees no finance and executive is read only        0.05s  
-  ✓ member cannot reach another members records                          0.06s  
-  ✓ unauthorised exports are denied                                      0.05s  
-  ✓ role escalation and last administrator protection                    0.07s  
+  ✓ membership officer sees no finance and executive is read only        0.06s  
+  ✓ member cannot reach another members records                          0.07s  
+  ✓ unauthorised exports are denied                                      0.07s  
+  ✓ role escalation and last administrator protection                    0.08s  
 
    PASS  Tests\Feature\Http\ContentAndUploadSecurityTest
-  ✓ drafts stay private until a publisher publishes them                 0.03s  
-  ✓ news publication and member only notices                             0.06s  
-  ✓ prohibited and disguised uploads are rejected                        0.04s  
-  ✓ media upload requires rights confirmation and valid image            0.02s  
+  ✓ drafts stay private until a publisher publishes them                 0.04s  
+  ✓ news publication and member only notices                             0.07s  
+  ✓ prohibited and disguised uploads are rejected                        0.06s  
+  ✓ media upload requires rights confirmation and valid image            0.05s  
+
+[evidence] 100 members, 200 obligations, 100 payments (50 verified+allocated), peak memory 73 MB
+  admin.members.index                               16 ms    5 queries
+  admin.finance.index                               14 ms   15 queries
+  admin.finance.reports.index (all balances)        51 ms   23 queries
+  admin.finance.payments.index                      21 ms    5 queries
+  admin.finance.members.show                        15 ms   11 queries
+  admin.dashboard                                   13 ms   17 queries
+  portal.dashboard                                  10 ms    9 queries
+  portal.statement                                   8 ms    8 queries
+  balances CSV export                                6 ms  101 rows
+
+[evidence] 500 members, 1000 obligations, 500 payments (250 verified+allocated), peak memory 75 MB
+  admin.members.index                               17 ms    5 queries
+  admin.finance.index                               21 ms   15 queries
+  admin.finance.reports.index (all balances)       162 ms   23 queries
+  admin.finance.payments.index                      14 ms    5 queries
+  admin.finance.members.show                        12 ms   11 queries
+  admin.dashboard                                   15 ms   17 queries
+  portal.dashboard                                   9 ms    9 queries
+  portal.statement                                   6 ms    8 queries
+  balances CSV export                                9 ms  501 rows
+
+[evidence] 1000 members, 2000 obligations, 1000 payments (500 verified+allocated), peak memory 79 MB
+  admin.members.index                               11 ms    5 queries
+  admin.finance.index                               23 ms   15 queries
+  admin.finance.reports.index (all balances)       258 ms   23 queries
+  admin.finance.payments.index                      18 ms    5 queries
+  admin.finance.members.show                        20 ms   11 queries
+  admin.dashboard                                   28 ms   17 queries
+  portal.dashboard                                  15 ms    9 queries
+  portal.statement                                  10 ms    8 queries
+  balances CSV export                               18 ms 1001 rows
+
+   PASS  Tests\Feature\Http\PerformanceTest
+  ✓ heavy pages stay bounded at volume with data set #0                  0.25s  
+  ✓ heavy pages stay bounded at volume with data set #1                  0.52s  
+  ✓ heavy pages stay bounded at volume with data set #2                  0.82s  
 
    PASS  Tests\Feature\Http\PublicSiteTest
-  ✓ every public page renders with security headers and metadata         0.06s  
+  ✓ every public page renders with security headers and metadata         0.07s  
   ✓ no fabricated content is shown on an empty site                      0.02s  
-  ✓ unpublished and member only events are hidden from the public        0.01s  
+  ✓ unpublished and member only events are hidden from the public        0.02s  
   ✓ contact enquiry is stored with reference                             0.01s  
   ✓ csrf and origin protection reject forged posts outside tests         0.01s  
 
@@ -109,29 +154,29 @@
   ✓ public submission creates no member or account and tracks privately  0.03s  
   ✓ out of range birth date is flagged not rejected                      0.04s  
   ✓ validation duplicates and anti automation                            0.03s  
-  ✓ officer review approval creates exactly one member and rejects repe… 0.10s  
-  ✓ rejection requires applicant message and is final                    0.04s  
+  ✓ officer review approval creates exactly one member and rejects repe… 0.11s  
+  ✓ rejection requires applicant message and is final                    0.05s  
 
-[evidence] member import 2 rows: preview+commit 0.02s, peak memory 73.0 MB
+[evidence] member import 2 rows: preview+commit 0.03s, peak memory 77.0 MB
 
-[evidence] member import 86 rows: preview+commit 0.28s, peak memory 73.0 MB
+[evidence] member import 86 rows: preview+commit 0.18s, peak memory 77.0 MB
 
-[evidence] member import 100 rows: preview+commit 0.22s, peak memory 73.0 MB
+[evidence] member import 100 rows: preview+commit 0.25s, peak memory 77.0 MB
 
-[evidence] member import 500 rows: preview+commit 1.09s, peak memory 73.0 MB
+[evidence] member import 500 rows: preview+commit 1.44s, peak memory 77.0 MB
 
-[evidence] member import 1000 rows: preview+commit 2.67s, peak memory 75.0 MB
+[evidence] member import 1000 rows: preview+commit 2.15s, peak memory 77.0 MB
 
    PASS  Tests\Feature\Membership\MemberImportTest
-  ✓ import volumes commit atomically without accounts with data set #0   0.04s  
-  ✓ import volumes commit atomically without accounts with data set #1   0.30s  
-  ✓ import volumes commit atomically without accounts with data set #2   0.24s  
-  ✓ import volumes commit atomically without accounts with data set #3   1.12s  
-  ✓ import volumes commit atomically without accounts with data set #4   2.71s  
-  ✓ invalid and duplicate rows are reported and block commit             0.06s  
-  ✓ provided legacy numbers are kept and sequence skips them             0.05s  
-  ✓ import requires permission and production approval                   0.06s  
+  ✓ import volumes commit atomically without accounts with data set #0   0.05s  
+  ✓ import volumes commit atomically without accounts with data set #1   0.20s  
+  ✓ import volumes commit atomically without accounts with data set #2   0.27s  
+  ✓ import volumes commit atomically without accounts with data set #3   1.48s  
+  ✓ import volumes commit atomically without accounts with data set #4   2.22s  
+  ✓ invalid and duplicate rows are reported and block commit             0.05s  
+  ✓ provided legacy numbers are kept and sequence skips them             0.04s  
+  ✓ import requires permission and production approval                   0.07s  
 
-  Tests:    95 passed (1167 assertions)
-  Duration: 43.34s
+  Tests:    103 passed (1289 assertions)
+  Duration: 46.16s
 

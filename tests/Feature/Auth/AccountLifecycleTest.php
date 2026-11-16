@@ -149,4 +149,12 @@ class AccountLifecycleTest extends TestCase
         $this->get('/register')->assertNotFound();
         $this->post('/register', ['email' => 'x@example.test'])->assertNotFound();
     }
+
+    public function test_officer_without_member_record_can_change_own_password(): void
+    {
+        $officer = $this->officer('system_admin');
+        $this->actingAs($officer)->get(route('admin.account'))->assertOk();
+        $this->actingAs($officer)->post(route('admin.account.password'), ['current_password' => 'synthetic-password-123', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasNoErrors();
+        $this->assertTrue(Hash::check(self::PASSWORD, $officer->fresh()->password));
+    }
 }

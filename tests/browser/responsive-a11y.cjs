@@ -20,7 +20,7 @@ const journeys = [
   { role: 'membership@example.test', pages: ['/admin', '/admin/applications?status=all', '/admin/members', 'FIRST:/admin/applications/', 'FIRST:/admin/members/'] },
   { role: 'treasurer@example.test', pages: ['/admin/finance', '/admin/finance/payments', 'FIRST:/admin/finance/payments/', '/admin/finance/assessments/create', '/admin/finance/reports', 'FIRST:/admin/finance/members/', '/admin/finance/categories'] },
   { role: 'secretariat@example.test', pages: ['/admin/imports/members', 'FIRST:/admin/imports/members/', '/admin/content', '/admin/events', '/admin/enquiries'] },
-  { role: 'admin@example.test', pages: ['/admin/access', '/admin/settings', '/admin/audit', '/admin/backups'] },
+  { role: 'admin@example.test', pages: ['/admin/access', '/admin/settings', '/admin/audit', '/admin/backups', '/admin/account'] },
 ];
 
 async function resolveFirst(page, prefix) {

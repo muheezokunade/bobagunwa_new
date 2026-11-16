@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
  * Public membership applications: submission, eligibility screening, private
  * status tracking and the authorised review workflow.
  *
- * Policy 2026-10-11-v1 (docs/membership-procedures.md): the inclusive
+ * Policy 2026-10-11-v1 (docs/11-membership-procedures.md): the inclusive
  * birth-date range is 1980-01-01 to 1982-12-31. A date outside the range is
  * flagged for human review — never automatically approved or discarded.
  * Submission never creates a member or an account.
@@ -244,9 +244,9 @@ class ApplicationService
         });
 
         $link = $this->accounts->issue($user, 'activation', 'approval', $officer->id);
-        $this->accounts->prepareLinkMessage($user, 'activation', $link['url'], $link['record']);
+        $message = $this->accounts->prepareLinkMessage($user, 'activation', $link['url'], $link['record']);
 
-        return [$member->fresh('application'), ['token' => $link['token'], 'url' => $link['url']]];
+        return [$member->fresh('application'), ['token' => $link['token'], 'url' => $link['url'], 'message_id' => $message->id]];
     }
 
     private function authorise(User $officer): void

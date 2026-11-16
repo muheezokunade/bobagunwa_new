@@ -61,7 +61,7 @@ class ApplicationController extends Controller
 
             return redirect()->route('admin.applications.show', $application)
                 ->with('status', "Approved. Member {$member->membership_number} has been created.")
-                ->with('one_time_link', ['url' => $link['url'], 'label' => 'Activation link for '.$member->full_name, 'expires' => 'in '.config('boba.accounts.activation_token_days').' days']);
+                ->with('one_time_link', ['url' => $link['url'], 'message_id' => $link['message_id'], 'label' => 'Activation link for '.$member->full_name, 'expires' => 'in '.config('boba.accounts.activation_token_days').' days']);
         }
         $service->transition($application, $data['decision'], $request->user(), $data['private_note'], $data['applicant_message'] ?? null);
 

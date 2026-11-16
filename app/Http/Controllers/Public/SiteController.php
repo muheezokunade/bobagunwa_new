@@ -39,7 +39,7 @@ class SiteController extends Controller
 
     public function leadership(): View
     {
-        $leaders = Leader::with('photo')->where('status', 'published')->orderBy('group')->orderBy('sort_order')->orderBy('name')->get()->groupBy('group');
+        $leaders = Leader::with('photo')->where('status', 'published')->orderByRaw("FIELD(`group`, 'executive', 'council', 'chiefs', 'other')")->orderBy('sort_order')->orderBy('name')->get()->groupBy('group');
 
         return view('public.leadership', ['groups' => $leaders]);
     }

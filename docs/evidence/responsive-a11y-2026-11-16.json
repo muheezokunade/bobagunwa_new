@@ -1,6 +1,6 @@
 {
   "summary": {
-    "executed_at": "2026-11-16T10:22:26.353Z",
+    "executed_at": "2026-11-16T10:39:06.516Z",
     "base": "http://127.0.0.1:8000",
     "widths": [
       320,
@@ -9,7 +9,7 @@
       1024,
       1440
     ],
-    "page_views": 205,
+    "page_views": 210,
     "failures": 0,
     "console_errors": 0,
     "keyboard": {
@@ -2065,6 +2065,56 @@
     {
       "role": "admin@example.test",
       "page": "/admin/backups",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/account",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/account",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/account",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/account",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/account",
       "width": 1440,
       "status": 200,
       "violations": [],

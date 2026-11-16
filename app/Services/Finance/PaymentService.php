@@ -39,7 +39,7 @@ class PaymentService
         // Duplicate checks run inside the idempotent unit of work, so a replayed
         // submission returns the original record instead of an error.
         return Ledger::guard(fn () => Idempotency::run('payment.record', $idempotencyKey, [$member->id, $amount, $data['received_on'], $external, $data['method']], function () use ($data, $member, $amount, $external, $officer, $evidenceFileId) {
-            if ($external && Payment::where('external_reference', $external)->exists()) {
+            if ($external && Payment::where('external_reference', $external)->where('status', '!=', 'rejected')->exists()) {
                 throw new DomainRuleException("A payment with bank/receipt reference {$external} is already recorded.");
             }
             $possibleDuplicate = Payment::where('member_id', $member->id)->where('amount_kobo', $amount)

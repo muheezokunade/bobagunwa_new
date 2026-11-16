@@ -16,7 +16,7 @@ use Tests\TestCase;
  * payment and allocation for half of them, pending payments, applications,
  * notices and events. Measures time, query count and memory for the heaviest
  * pages and fails on N+1 query growth. Local MariaDB measurements; shared
- * hosting will be slower and is not load-tested (see docs/22-performance.md).
+ * hosting will be slower and is not load-tested (see docs/19-test-evidence.md).
  */
 class PerformanceTest extends TestCase
 {

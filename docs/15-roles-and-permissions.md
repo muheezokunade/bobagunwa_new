@@ -1,0 +1,69 @@
+# Roles and permissions
+
+Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the database by the reference-data migration. Roles are **templates**; every route checks a named permission (`permission:` middleware) and every financial or membership decision re-checks it inside the service. Hidden menu items are never relied upon. **Final assignments require association approval (decisions D-005, D-007, D-008).**
+
+## Permissions (24)
+
+| Group | Permission | Allows |
+|---|---|---|
+| Membership | `applications.review` | Review, request information, approve, reject applications |
+| | `members.read` | View the register |
+| | `members.manage` | Correct permitted fields; suspend/reactivate |
+| | `members.import` | Preview and commit existing-member imports |
+| | `members.export` | Export the register |
+| | `accounts.issue` | Issue member activation/reset links |
+| Finance | `finance.read` | View assessments, payments, balances, reports |
+| | `finance.categories.manage` | Manage dues/levy categories |
+| | `finance.assessments.manage` | Create, preview, post assessments |
+| | `finance.payments.record` | Record payments |
+| | `finance.payments.verify` | Verify/reject payments |
+| | `finance.allocate` | Allocate verified payments |
+| | `finance.adjust` | Waivers, corrections, cancellations |
+| | `finance.reverse` | Reverse allocations and payments |
+| | `finance.import` | Import approved historical records |
+| | `finance.reports.export` | Export financial reports and statements |
+| Content | `content.manage` | Edit pages, news, notices, activities, leadership, media, documents |
+| | `content.publish` | Publish, unpublish, archive |
+| | `events.manage` | Manage events and RSVPs |
+| | `enquiries.manage` | Handle enquiries |
+| Administration | `access.manage` | Officer accounts, roles, account recovery |
+| | `audit.read` | Audit and security history |
+| | `settings.manage` | Organisation settings and launch approvals |
+| | `backups.manage` | Create and download encrypted backups |
+
+## Role templates
+
+| Permission | Member | System Administrator | Membership Officer | Secretariat | Treasurer | Payment Verifier | Executive |
+|---|---|---|---|---|---|---|---|
+| applications.review | | | ✓ | | | | |
+| members.read | | | ✓ | ✓ | ✓ | ✓ | ✓ |
+| members.manage | | | ✓ | | | | |
+| members.import | | | | ✓ | | | |
+| members.export | | | | ✓ | | | |
+| accounts.issue | | | ✓ | | | | |
+| finance.read | | | | | ✓ | ✓ | ✓ |
+| finance.categories.manage | | | | | ✓ | | |
+| finance.assessments.manage | | | | | ✓ | | |
+| finance.payments.record | | | | | ✓ | | |
+| finance.payments.verify | | | | | | ✓ | |
+| finance.allocate | | | | | ✓ | | |
+| finance.adjust | | | | | ✓ | | |
+| finance.reverse | | | | | | ✓ | |
+| finance.import | | | | | ✓ | | |
+| finance.reports.export | | | | | ✓ | | ✓ |
+| content.manage / publish | | | | ✓ | | | |
+| events.manage, enquiries.manage | | | | ✓ | | | |
+| access.manage, settings.manage, backups.manage | | ✓ | | | | | |
+| audit.read | | ✓ | | | | | ✓ |
+
+Members have no permissions; their portal access is scoped to the member record linked to their own account (resolved from the session, never from a URL parameter).
+
+## Critical separations (tested)
+
+* **System Administrator has no treasury or approval powers** — cannot record, verify, allocate, reverse or post (`AuthorisationMatrixTest::test_system_administrator_has_no_treasury_or_approval_powers`, `LedgerServiceTest::test_permissions_are_enforced_inside_finance_services`).
+* **Membership Officer sees no financial details** (finance summary hidden and finance routes forbidden).
+* **Recording vs verifying vs reversing** are different permissions held by different default roles; the two-officer rule additionally stops one person who holds both from verifying their own entry.
+* **No self-escalation**: officers cannot change their own roles or account status.
+* **Last administrator**: a change that would leave no active account holding `access.manage` is refused; access changes are serialised with a lock.
+* Role changes end the affected officer's sessions so they take effect immediately.
+* `AuthorisationMatrixTest::test_every_role_reaches_exactly_the_admin_pages_it_is_permitted` requests every parameter-free administration page as every role (7 × 25) and asserts 200 only where the permission is held.

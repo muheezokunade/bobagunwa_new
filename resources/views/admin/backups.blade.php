@@ -58,7 +58,7 @@
                 @endif
             </td>
             <td>{{ $run->creator?->name ?? ($run->kind === 'restore_verification' ? 'Command line' : '—') }}</td>
-            <td>@if ($run->kind === 'backup' && $run->status === 'succeeded' && $run->file_name)<a class="text-link" href="{{ route('admin.backups.download', $run) }}">Download <span class="sr-only">{{ $run->file_name }}</span></a>@endif</td>
+            <td>@if ($run->kind === 'backup' && $run->status === 'succeeded' && $run->file_name && is_file(rtrim(config('boba.backup.path'), '/').'/'.basename($run->file_name)))<a class="text-link" href="{{ route('admin.backups.download', $run) }}">Download <span class="sr-only">{{ $run->file_name }}</span></a>@endif</td>
         </tr>
     @endforeach</tbody>
 </table></div>

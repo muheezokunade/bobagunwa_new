@@ -39,7 +39,7 @@ class Preflight extends Command
             $this->check('Database connection', true, $version);
             $this->check('MariaDB ≥ 10.6 (11.4 expected)', str_contains($version, 'MariaDB') && version_compare(explode('-', $version)[0], '10.6', '>='), $version);
             $this->check('InnoDB default engine', strtolower((string) DB::selectOne('SELECT @@default_storage_engine AS e')->e) === 'innodb', DB::selectOne('SELECT @@default_storage_engine AS e')->e);
-            $binlog = DB::selectOne("SELECT @@log_bin AS b")->b;
+            $binlog = DB::selectOne('SELECT @@log_bin AS b')->b;
             $this->check('Binary logging (trigger privilege implications)', true, $binlog ? 'ON — trigger creation may need log_bin_trust_function_creators; see docs' : 'OFF');
             $probe = 'boba_preflight_'.bin2hex(random_bytes(3));
             DB::statement("CREATE TABLE {$probe} (id INT PRIMARY KEY) ENGINE=InnoDB");
@@ -95,6 +95,8 @@ class Preflight extends Command
         $unit = strtolower(substr($value, -1));
         $n = (int) $value;
 
-        return match ($unit) { 'g' => $n * 1073741824, 'm' => $n * 1048576, 'k' => $n * 1024, default => $n };
+        return match ($unit) {
+            'g' => $n * 1073741824, 'm' => $n * 1048576, 'k' => $n * 1024, default => $n
+        };
     }
 }

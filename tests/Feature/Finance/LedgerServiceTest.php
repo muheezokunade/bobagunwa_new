@@ -327,4 +327,17 @@ class LedgerServiceTest extends TestCase
         $this->assertSame(6_700_000, $period['collections']['total']);
         $this->assertEmpty(array_filter($this->ledger->exceptions()));
     }
+
+    public function test_rejected_payment_releases_its_bank_reference_for_correct_re_entry(): void
+    {
+        $m = $this->member();
+        $t = $this->officer('treasurer');
+        $data = ['member_id' => $m->id, 'amount' => '2000', 'method' => 'bank_transfer', 'received_on' => now()->toDateString(), 'external_reference' => 'TRF-REUSE-1'];
+        [$wrong] = $this->payments->record($data, $t, $this->key());
+        $this->payments->reject($wrong, $this->officer('payment_verifier'), 'Wrong amount entered (synthetic)');
+        [$right] = $this->payments->record(['amount' => '20000'] + $data, $t, $this->key());
+        $this->assertSame('pending', $right->status);
+        $this->expectException(DomainRuleException::class);
+        $this->payments->record(['amount' => '200'] + $data, $t, $this->key());
+    }
 }

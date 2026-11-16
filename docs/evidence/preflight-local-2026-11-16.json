@@ -1,0 +1,230 @@
+[
+    {
+        "check": "PHP version ≥ 8.3",
+        "ok": true,
+        "required": true,
+        "detail": "8.3.6 (cli; web requests must also use 8.3 — confirm in cPanel MultiPHP Manager)"
+    },
+    {
+        "check": "Extension pdo_mysql",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension sodium",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension gd",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension intl",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension mbstring",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension fileinfo",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension openssl",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension ctype",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension tokenizer",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension xml",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "Extension curl",
+        "ok": true,
+        "required": true,
+        "detail": "loaded"
+    },
+    {
+        "check": "libsodium secretstream + sealed boxes",
+        "ok": true,
+        "required": true,
+        "detail": "required for encrypted backups"
+    },
+    {
+        "check": "GD JPEG/PNG support",
+        "ok": true,
+        "required": true,
+        "detail": "required to re-encode uploaded images"
+    },
+    {
+        "check": "Memory limit ≥ 128M",
+        "ok": true,
+        "required": true,
+        "detail": "-1"
+    },
+    {
+        "check": "Upload size ≥ 10M",
+        "ok": false,
+        "required": false,
+        "detail": "upload_max_filesize=2M, post_max_size=8M"
+    },
+    {
+        "check": "APP_KEY set",
+        "ok": true,
+        "required": true,
+        "detail": "set"
+    },
+    {
+        "check": "Debug disabled outside local",
+        "ok": true,
+        "required": true,
+        "detail": "APP_DEBUG=true, APP_ENV=local"
+    },
+    {
+        "check": "Secure session cookies",
+        "ok": true,
+        "required": false,
+        "detail": "SESSION_SECURE_COOKIE=false"
+    },
+    {
+        "check": "Database connection",
+        "ok": true,
+        "required": true,
+        "detail": "11.4.13-MariaDB-ubu2404"
+    },
+    {
+        "check": "MariaDB ≥ 10.6 (11.4 expected)",
+        "ok": true,
+        "required": true,
+        "detail": "11.4.13-MariaDB-ubu2404"
+    },
+    {
+        "check": "InnoDB default engine",
+        "ok": true,
+        "required": true,
+        "detail": "InnoDB"
+    },
+    {
+        "check": "Binary logging (trigger privilege implications)",
+        "ok": true,
+        "required": true,
+        "detail": "OFF"
+    },
+    {
+        "check": "CREATE TRIGGER privilege",
+        "ok": true,
+        "required": true,
+        "detail": "trigger created and dropped"
+    },
+    {
+        "check": "Ledger integrity triggers installed",
+        "ok": true,
+        "required": true,
+        "detail": "30 installed"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/storage/framework/sessions",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/storage/framework/views",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/storage/logs",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/storage/app/private",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/bootstrap/cache",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/public/media",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Writable: /home/user/Bobagunwa-Claude/storage/app/private/backups",
+        "ok": true,
+        "required": true,
+        "detail": "ok"
+    },
+    {
+        "check": "Private storage outside webroot",
+        "ok": true,
+        "required": true,
+        "detail": "/home/user/Bobagunwa-Claude/storage"
+    },
+    {
+        "check": "Backup path outside webroot",
+        "ok": true,
+        "required": true,
+        "detail": "/home/user/Bobagunwa-Claude/storage/app/private/backups"
+    },
+    {
+        "check": "Backup public key configured",
+        "ok": false,
+        "required": false,
+        "detail": "not set — backups disabled"
+    },
+    {
+        "check": "Symbolic links (informational)",
+        "ok": true,
+        "required": false,
+        "detail": "supported"
+    },
+    {
+        "check": "Built assets present",
+        "ok": true,
+        "required": true,
+        "detail": "public/build/manifest.json"
+    },
+    {
+        "check": "exec() available (informational)",
+        "ok": true,
+        "required": false,
+        "detail": "available (not required)"
+    }
+]
