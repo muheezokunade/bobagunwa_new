@@ -20,6 +20,9 @@ cd "$STAGE"
 COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --prefer-dist --optimize-autoloader --classmap-authoritative --no-interaction --no-progress --no-scripts >/dev/null 2>&1 \
   || COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --prefer-source --optimize-autoloader --classmap-authoritative --no-interaction --no-progress --no-scripts >/dev/null
 find vendor -name .git -type d -prune -exec rm -rf {} +
+# Source installs include each package's own test suites and docs; dist archives would not.
+find vendor -mindepth 3 -maxdepth 4 -type d \( -name tests -o -name Tests -o -name .github -o -name docs \) -prune -exec rm -rf {} +
+COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --no-dev --classmap-authoritative --no-scripts >/dev/null
 npm ci --no-audit --no-fund >/dev/null
 npm run build >/dev/null
 rm -rf node_modules tests phpunit.xml .github .editorconfig .gitattributes .styleci.yml package.json package-lock.json vite.config.js resources/css resources/js docs/evidence/screens
