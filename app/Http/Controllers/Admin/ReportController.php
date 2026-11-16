@@ -32,7 +32,7 @@ class ReportController extends Controller
             'pending' => Payment::with('member:id,membership_number,full_name')->where('status', 'pending')->oldest('received_on')->get(),
             'corrections' => [
                 'adjustments' => ObligationAdjustment::with('creator:id,name', 'obligation.member:id,membership_number')->whereBetween('effective_on', [$from->toDateString(), $to->toDateString()])->latest('id')->limit(100)->get(),
-                'reversals' => FinancialReversal::with('creator:id,name', 'payment.member:id,membership_number')->whereBetween('created_at', [$from->startOfDay()->utc(), $to->endOfDay()->utc()])->latest('id')->limit(100)->get(),
+                'reversals' => FinancialReversal::with('creator:id,name', 'payment.member:id,membership_number')->whereBetween('created_at', [CarbonImmutable::parse($from->toDateString(), config('boba.display_timezone'))->startOfDay()->utc(), CarbonImmutable::parse($to->toDateString(), config('boba.display_timezone'))->endOfDay()->utc()])->latest('id')->limit(100)->get(),
             ],
             'exceptions' => $this->ledger->exceptions(),
             'filter' => $request->query('filter', 'all'),

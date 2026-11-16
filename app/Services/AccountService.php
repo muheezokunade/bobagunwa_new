@@ -206,6 +206,9 @@ class AccountService
         if (mb_strlen($password) < $min || mb_strlen($password) > 128) {
             throw new DomainRuleException("Choose a password of {$min} to 128 characters.");
         }
+        if (in_array(hash('sha256', $password), config('boba.accounts.denied_password_sha256', []), true)) {
+            throw new DomainRuleException('This password has been shown publicly and cannot be used. Choose another.');
+        }
         $lower = mb_strtolower($password);
         foreach (array_filter([$user->email, $user->member?->membership_number, 'bobagunwa', 'password']) as $weak) {
             if (str_contains($lower, mb_strtolower((string) $weak))) {

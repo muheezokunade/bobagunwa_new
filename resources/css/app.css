@@ -312,6 +312,16 @@ dl.details dt { font-weight: 700; font-size: 15px; padding-right: 14px; }
     th { background: #eee !important; }
     a { color: #000; text-decoration: none; }
     .print-only { display: block !important; }
+    .print-header { display: flex !important; gap: 14px; align-items: center; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; font-size: 11pt; }
+    .print-header img { width: 40px; height: auto; }
+    .page-head .actions, .page-head p { display: none !important; }
+    table { font-size: 10pt; }
+    tr, dl.details div { page-break-inside: avoid; }
+    thead { display: table-header-group; }
+    tfoot { display: table-footer-group; }
+    .stats { grid-template-columns: repeat(4, 1fr) !important; }
+    .stats dd { font-size: 13pt !important; }
+    @page { margin: 15mm; }
 }
 .print-only { display: none; }
 

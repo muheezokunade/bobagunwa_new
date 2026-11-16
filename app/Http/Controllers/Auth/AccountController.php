@@ -19,20 +19,34 @@ class AccountController extends Controller
 {
     public function __construct(private AccountService $accounts) {}
 
-    public function activateForm(string $token): View
+    /**
+     * The emailed/delivered link carries the token once. It is moved into the
+     * encrypted server-side session and the browser is redirected to a clean
+     * URL, so the token is not kept in history, page source or Referer.
+     */
+    public function activateLink(Request $request, string $token): RedirectResponse
     {
-        $record = $this->accounts->findUsableToken($token, 'activation');
+        $request->session()->put('account.activation_token', $token);
 
-        return view('auth.activate', ['token' => $token, 'valid' => (bool) $record, 'user' => $record?->user]);
+        return redirect()->route('account.activate.form');
+    }
+
+    public function activateForm(Request $request): View
+    {
+        $token = (string) $request->session()->get('account.activation_token');
+        $record = $token !== '' ? $this->accounts->findUsableToken($token, 'activation') : null;
+
+        return view('auth.activate', ['valid' => (bool) $record, 'user' => $record?->user]);
     }
 
     public function activate(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'token' => ['required', 'string', 'max:100'],
+            'token' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'string', 'confirmed', 'max:128'],
         ]);
-        $user = $this->accounts->activate($data['token'], $data['password']);
+        $user = $this->accounts->activate((string) ($data['token'] ?? $request->session()->get('account.activation_token')), $data['password']);
+        $request->session()->forget('account.activation_token');
         Auth::login($user);
         $request->session()->regenerate();
 
@@ -77,20 +91,28 @@ class AccountController extends Controller
         return redirect()->route('password.request')->with('status', 'If an account matches that email address, the secretariat will help you regain access. For your security, an officer may contact you to confirm your identity before sending a private reset link.');
     }
 
-    public function resetForm(string $token): View
+    public function resetLink(Request $request, string $token): RedirectResponse
     {
-        $record = $this->accounts->findUsableToken($token, 'password_reset');
+        $request->session()->put('account.reset_token', $token);
 
-        return view('auth.reset', ['token' => $token, 'valid' => (bool) $record]);
+        return redirect()->route('password.reset.form');
+    }
+
+    public function resetForm(Request $request): View
+    {
+        $token = (string) $request->session()->get('account.reset_token');
+
+        return view('auth.reset', ['valid' => $token !== '' && $this->accounts->findUsableToken($token, 'password_reset')]);
     }
 
     public function reset(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'token' => ['required', 'string', 'max:100'],
+            'token' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'string', 'confirmed', 'max:128'],
         ]);
-        $this->accounts->resetPassword($data['token'], $data['password']);
+        $this->accounts->resetPassword((string) ($data['token'] ?? $request->session()->get('account.reset_token')), $data['password']);
+        $request->session()->forget('account.reset_token');
 
         return redirect()->route('login')->with('status', 'Your password has been changed. Sign in with your new password. Other sessions have been signed out.');
     }

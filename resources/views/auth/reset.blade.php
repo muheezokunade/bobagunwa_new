@@ -11,7 +11,6 @@
         @else
             <form method="post" action="{{ route('password.update') }}" class="panel">
                 @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
                 <x-field name="password" label="New password" type="password" required autocomplete="new-password" hint="At least {{ config('boba.accounts.password_min_length') }} characters." />
                 <x-field name="password_confirmation" label="Confirm new password" type="password" required autocomplete="new-password" />
                 <button type="submit" class="btn">Save new password</button>

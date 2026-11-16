@@ -1,6 +1,7 @@
 <?php
 
 use App\Services\IntegrityMonitor;
+use App\Services\UploadService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schedule;
 
@@ -8,6 +9,7 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::command('boba:ledger:verify')->dailyAt('01:30');
 Schedule::command('boba:backup:create --keep=14')->dailyAt('02:00')->when(fn () => (string) config('boba.backup.public_key') !== '');
 Schedule::call(fn () => app(IntegrityMonitor::class)->checkOverdue())->hourly()->name('boba:integrity-overdue');
+Schedule::call(fn () => app(UploadService::class)->pruneOrphans())->dailyAt('03:00')->name('boba:prune-orphan-files');
 Schedule::call(function () {
     DB::table('sessions')->where('last_activity', '<', now()->subDays(2)->timestamp)->delete();
     DB::table('cache')->where('expiration', '<', now()->timestamp)->delete();

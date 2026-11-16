@@ -57,9 +57,11 @@ Route::middleware('guest')->group(function () {
     Route::post('/account/recover', [AccountController::class, 'recover'])->middleware('throttle:recovery')->name('password.email');
 });
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
-Route::get('/account/activate/{token}', [AccountController::class, 'activateForm'])->name('account.activate');
+Route::get('/account/activate/{token}', [AccountController::class, 'activateLink'])->name('account.activate');
+Route::get('/account/activate', [AccountController::class, 'activateForm'])->name('account.activate.form');
 Route::post('/account/activate', [AccountController::class, 'activate'])->middleware('throttle:tokens')->name('account.activate.store');
-Route::get('/account/reset/{token}', [AccountController::class, 'resetForm'])->name('password.reset');
+Route::get('/account/reset/{token}', [AccountController::class, 'resetLink'])->name('password.reset');
+Route::get('/account/reset', [AccountController::class, 'resetForm'])->name('password.reset.form');
 Route::post('/account/reset', [AccountController::class, 'reset'])->middleware('throttle:tokens')->name('password.update');
 
 /*

@@ -51,6 +51,11 @@ class Preflight extends Command
             } finally {
                 DB::statement("DROP TABLE IF EXISTS {$probe}");
             }
+            if (! app()->environment(['local', 'testing'])) {
+                $synthetic = (int) DB::table('users')->where('email', 'like', '%@example.test')->count();
+                $this->check('No demonstration accounts', $synthetic === 0, $synthetic ? "{$synthetic} @example.test account(s) present — remove the demonstration data" : 'none');
+                $this->check('Demo seeder disabled here', ! app()->environment(['local', 'testing']), 'boba:demo:seed refuses this environment');
+            }
             $installed = collect(DB::select('SELECT TRIGGER_NAME AS n FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()'))->pluck('n')->all();
             if ($installed) {
                 $missing = array_diff(IntegrityTriggers::names(), $installed);

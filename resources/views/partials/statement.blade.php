@@ -3,7 +3,16 @@
     <x-field name="to" label="To" type="date" :value="$to->toDateString()" />
     <button class="btn secondary" type="submit">Show period</button>
 </form>
-<p class="print-only">Statement period {{ $from->format('j M Y') }} to {{ $to->format('j M Y') }} · produced {{ \App\Support\Format::dateTime(now()) }}</p>
+<div class="actions no-print"><button type="button" class="btn secondary" data-print hidden>Print statement</button><span class="small muted">Prints without menus; use your browser’s “Save as PDF” for a file.</span></div>
+<header class="print-only print-header">
+    <img src="{{ asset('images/crest-160.webp') }}" alt="" width="58" height="64">
+    <div>
+        <strong>Ẹgbẹ́ Bobagunwa Okunrin Akile Ijebu</strong><br>
+        Member financial statement<br>
+        @isset($member){{ $member->full_name }} · {{ $member->membership_number }}<br>@endisset
+        Period {{ $from->format('j M Y') }} to {{ $to->format('j M Y') }} · produced {{ \App\Support\Format::dateTime(now()) }} (WAT)
+    </div>
+</header>
 <dl class="stats">
     <div><dt>Opening position ({{ $from->format('j M Y') }})</dt><dd><x-money :kobo="$statement['opening']" /></dd></div>
     <div><dt>Charges in period</dt><dd><x-money :kobo="$statement['totals']['debits']" /></dd></div>
@@ -30,6 +39,7 @@
     <dt>Outstanding dues and levies</dt><dd><x-money :kobo="$statement['as_at']['outstanding']" /></dd>
     <dt>Unallocated credit</dt><dd><x-money :kobo="$statement['as_at']['unallocated_credit']" /></dd>
 </dl>
+<p class="print-only small">Amounts are in Nigerian naira. A positive position is owed to the association; a negative position is a credit. This statement reflects verified payments only. Queries: contact the treasurer.</p>
 @if ($statement['pending']->isNotEmpty())
     <p class="small muted">Not yet included: {{ $statement['pending']->count() }} payment(s) totalling {{ \App\Support\Money::format((int) $statement['pending']->sum('amount_kobo')) }} awaiting verification.</p>
 @endif

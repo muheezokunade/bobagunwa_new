@@ -28,6 +28,10 @@ class SecurityHeaders
         if (! $headers->has('Content-Security-Policy')) {
             $headers->set('Content-Security-Policy', "default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; font-src 'self'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'self'; object-src 'none'");
         }
+        // Pages reached from one-time links never send a Referer.
+        if ($request->is('account/*', 'account')) {
+            $headers->set('Referrer-Policy', 'no-referrer');
+        }
         if (config('boba.force_https')) {
             $headers->set('Strict-Transport-Security', 'max-age=31536000');
         }

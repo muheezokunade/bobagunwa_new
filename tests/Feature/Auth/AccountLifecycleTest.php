@@ -43,7 +43,9 @@ class AccountLifecycleTest extends TestCase
         $this->assertSame(hash('sha256', $token), AccountToken::where('user_id', $user->id)->value('token_hash'));
         $this->post(route('login.attempt'), ['email' => $member->email, 'password' => self::PASSWORD])->assertSessionHasErrors('email');
 
-        $this->get(route('account.activate', $token))->assertOk()->assertSee('Choose a password');
+        $this->get(route('account.activate', $token))->assertRedirect(route('account.activate.form'))->assertHeader('Referrer-Policy', 'no-referrer');
+        $page = $this->get(route('account.activate.form'))->assertOk()->assertSee('Choose a password')->assertHeader('Cache-Control', 'no-store, private');
+        $this->assertStringNotContainsString($token, $page->getContent(), 'The token must not be written into the page');
         $this->post(route('account.activate.store'), ['token' => $token, 'password' => 'short', 'password_confirmation' => 'short'])->assertSessionHasErrors('domain');
         $this->post(route('account.activate.store'), ['token' => $token, 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertRedirect(route('portal.dashboard'));
         $this->assertAuthenticatedAs($user->fresh());
@@ -51,7 +53,7 @@ class AccountLifecycleTest extends TestCase
         $this->post(route('logout'));
 
         // Replay is refused.
-        $this->get(route('account.activate', $token))->assertOk()->assertSee('cannot be used');
+        $this->followingRedirects()->get(route('account.activate', $token))->assertOk()->assertSee('cannot be used');
         $this->post(route('account.activate.store'), ['token' => $token, 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasErrors('domain');
         $this->post(route('login.attempt'), ['email' => strtoupper($member->email), 'password' => self::PASSWORD])->assertRedirect(route('portal.dashboard'));
         $this->assertDatabaseHas('security_events', ['event' => 'activation.rejected', 'user_id' => $user->id]);
@@ -102,7 +104,9 @@ class AccountLifecycleTest extends TestCase
         $this->post(route('password.update'), ['token' => $expired['token'], 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasErrors('domain');
 
         $link = $accounts->issue($user, 'password_reset', 'admin', null);
-        $this->get(route('password.reset', $link['token']))->assertOk()->assertSee('Save new password');
+        $this->followingRedirects()->get(route('password.reset', $link['token']))->assertOk()->assertSee('Save new password')->assertDontSee($link['token']);
+        // The session-held token completes the reset without the token in the form.
+        $this->post(route('password.update'), ['password' => 'x', 'password_confirmation' => 'y'])->assertSessionHasErrors('password');
         $this->post(route('password.update'), ['token' => $link['token'], 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertRedirect(route('login'));
         $this->assertSame(0, DB::table('sessions')->where('user_id', $user->id)->count());
         $this->post(route('password.update'), ['token' => $link['token'], 'password' => self::PASSWORD.'x', 'password_confirmation' => self::PASSWORD.'x'])->assertSessionHasErrors('domain');
@@ -156,5 +160,32 @@ class AccountLifecycleTest extends TestCase
         $this->actingAs($officer)->get(route('admin.account'))->assertOk();
         $this->actingAs($officer)->post(route('admin.account.password'), ['current_password' => 'synthetic-password-123', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertSessionHasNoErrors();
         $this->assertTrue(Hash::check(self::PASSWORD, $officer->fresh()->password));
+    }
+
+    public function test_link_token_moves_to_session_and_completes_without_appearing_in_the_form(): void
+    {
+        $member = $this->member();
+        $token = $this->issueActivation($member);
+        $this->get(route('account.activate', $token))->assertRedirect(route('account.activate.form'));
+        $this->post(route('account.activate.store'), ['password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD])->assertRedirect(route('portal.dashboard'));
+        $this->assertAuthenticatedAs($member->fresh()->user);
+        $this->assertNull(session('account.activation_token'), 'Token is removed from the session after use');
+    }
+
+    public function test_passwords_previously_shown_for_demonstrations_are_refused(): void
+    {
+        // Retired demonstration passwords are listed only as SHA-256 hashes; their plain values are never kept in Git.
+        $denied = config('boba.accounts.denied_password_sha256');
+        $this->assertNotEmpty($denied);
+        foreach ($denied as $hash) {
+            $this->assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $hash);
+        }
+        $retired = 'Synthetic-Retired-Sample-'.random_int(1000, 9999);
+        config(['boba.accounts.denied_password_sha256' => array_merge($denied, [hash('sha256', $retired)])]);
+        $member = $this->member();
+        $token = $this->issueActivation($member);
+        $this->post(route('account.activate.store'), ['token' => $token, 'password' => $retired, 'password_confirmation' => $retired])
+            ->assertSessionHasErrors(['domain' => 'This password has been shown publicly and cannot be used. Choose another.']);
+        $this->assertGuest();
     }
 }

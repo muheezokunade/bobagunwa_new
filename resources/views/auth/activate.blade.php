@@ -12,7 +12,6 @@
             <p>Welcome, {{ $user->name }}. Choose a password to activate your account.</p>
             <form method="post" action="{{ route('account.activate.store') }}" class="panel">
                 @csrf
-                <input type="hidden" name="token" value="{{ $token }}">
                 <input type="text" name="username" value="{{ $user->email }}" autocomplete="username" hidden>
                 <x-field name="password" label="New password" type="password" required autocomplete="new-password" hint="At least {{ config('boba.accounts.password_min_length') }} characters. A short sentence you will remember works well." />
                 <x-field name="password_confirmation" label="Confirm new password" type="password" required autocomplete="new-password" />

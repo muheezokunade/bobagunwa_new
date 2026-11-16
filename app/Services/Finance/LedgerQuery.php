@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\DB;
  *                        = effective obligations − verified payments
  *   pending              = Σ payments awaiting verification (not counted anywhere above)
  *
+ * Period boundaries are Lagos calendar days (WAT, UTC+1); timestamps are stored in UTC.
+ *
  * Member statements, member summaries and treasury reports all use these
  * same queries, and a dedicated test reconciles them against raw SQL totals.
  */
@@ -127,7 +129,7 @@ SQL;
         foreach (DB::select("SELECT reference, received_on AS d, amount_kobo, method, external_reference FROM payments WHERE member_id = ? AND status IN ('verified', 'reversed')", [$memberId]) as $r) {
             $events->push(['date' => $r->d, 'order' => 3, 'type' => 'Payment received', 'reference' => $r->reference, 'description' => str_replace('_', ' ', $r->method).($r->external_reference ? " · {$r->external_reference}" : ''), 'debit' => 0, 'credit' => (int) $r->amount_kobo]);
         }
-        foreach (DB::select("SELECT r.reference, DATE(r.created_at) AS d, r.amount_kobo, r.reason, p.reference AS payment_reference FROM financial_reversals r JOIN payments p ON p.id = r.payment_id WHERE p.member_id = ? AND r.kind = 'payment'", [$memberId]) as $r) {
+        foreach (DB::select("SELECT r.reference, DATE(CONVERT_TZ(r.created_at, '+00:00', '+01:00')) AS d, r.amount_kobo, r.reason, p.reference AS payment_reference FROM financial_reversals r JOIN payments p ON p.id = r.payment_id WHERE p.member_id = ? AND r.kind = 'payment'", [$memberId]) as $r) {
             $events->push(['date' => $r->d, 'order' => 4, 'type' => 'Payment reversed', 'reference' => $r->reference, 'description' => "Reversal of {$r->payment_reference}: {$r->reason}", 'debit' => (int) $r->amount_kobo, 'credit' => 0]);
         }
         $events = $events->sortBy([['date', 'asc'], ['order', 'asc'], ['reference', 'asc']])->values();
@@ -142,7 +144,8 @@ SQL;
             $lines[] = $e + ['balance' => $running];
         }
 
-        $endOfDay = $to->endOfDay()->utc()->toDateTimeString();
+        // End of the statement day in Lagos (WAT, UTC+1, no daylight saving), expressed in UTC.
+        $endOfDay = CarbonImmutable::parse($to->toDateString(), config('boba.display_timezone'))->endOfDay()->utc()->toDateTimeString();
         $asAt = DB::selectOne('SELECT
             (SELECT COALESCE(SUM(amount_kobo), 0) FROM member_obligations WHERE member_id = ? AND effective_on <= ?)
               + (SELECT COALESCE(SUM(amount_kobo), 0) FROM obligation_adjustments WHERE member_id = ? AND effective_on <= ?) AS effective,
@@ -204,7 +207,7 @@ SQL;
             });
 
         $collections = DB::selectOne("SELECT COUNT(*) AS n, COALESCE(SUM(amount_kobo), 0) AS total FROM payments WHERE status IN ('verified', 'reversed') AND received_on BETWEEN ? AND ?", [$f, $t]);
-        $reversed = DB::selectOne("SELECT COUNT(*) AS n, COALESCE(SUM(r.amount_kobo), 0) AS total FROM financial_reversals r WHERE r.kind = 'payment' AND DATE(r.created_at) BETWEEN ? AND ?", [$f, $t]);
+        $reversed = DB::selectOne("SELECT COUNT(*) AS n, COALESCE(SUM(r.amount_kobo), 0) AS total FROM financial_reversals r WHERE r.kind = 'payment' AND DATE(CONVERT_TZ(r.created_at, '+00:00', '+01:00')) BETWEEN ? AND ?", [$f, $t]);
         $byMethod = DB::select("SELECT method, COUNT(*) AS n, SUM(amount_kobo) AS total FROM payments WHERE status IN ('verified', 'reversed') AND received_on BETWEEN ? AND ? GROUP BY method ORDER BY method", [$f, $t]);
         $adjustments = DB::select('SELECT kind, COUNT(*) AS n, SUM(amount_kobo) AS total FROM obligation_adjustments WHERE effective_on BETWEEN ? AND ? GROUP BY kind ORDER BY kind', [$f, $t]);
 

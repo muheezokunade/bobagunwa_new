@@ -63,8 +63,19 @@ class PaymentController extends Controller
             'idempotency_key' => ['required', 'string'],
             'evidence' => ['nullable', 'file', 'max:'.config('boba.uploads.document_max_kb')],
         ]);
-        $evidence = $request->hasFile('evidence') ? $uploads->storePrivate($request->file('evidence'), 'payment_evidence', $request->user())->id : null;
-        [$payment, $replayed] = $this->payments->record($data, $request->user(), $data['idempotency_key'], $evidence);
+        $evidence = $request->hasFile('evidence') ? $uploads->storePrivate($request->file('evidence'), 'payment_evidence', $request->user()) : null;
+        try {
+            [$payment, $replayed] = $this->payments->record($data, $request->user(), $data['idempotency_key'], $evidence?->id);
+        } catch (\Throwable $e) {
+            // The payment was refused, so the just-uploaded evidence belongs to nothing: remove it.
+            if ($evidence) {
+                $uploads->deletePrivate($evidence);
+            }
+            throw $e;
+        }
+        if ($replayed && $evidence && $payment->evidence_file_id !== $evidence->id) {
+            $uploads->deletePrivate($evidence);
+        }
 
         return redirect()->route('admin.finance.payments.show', $payment)->with('status', $replayed ? 'This payment was already recorded; it was not duplicated.' : 'Payment recorded. It now needs verification before it counts.');
     }

@@ -77,6 +77,38 @@ class UploadService
         return $record;
     }
 
+    /** Remove a private file that no record references. Refuses referenced files. */
+    public function deletePrivate(PrivateFile $file): bool
+    {
+        $referenced = \App\Models\Payment::where('evidence_file_id', $file->id)->exists() || \App\Models\Document::where('private_file_id', $file->id)->exists();
+        if ($referenced) {
+            return false;
+        }
+        @unlink($this->privatePath($file));
+        $file->delete();
+
+        return true;
+    }
+
+    /** Daily housekeeping: unreferenced private files older than a day. */
+    public function pruneOrphans(): int
+    {
+        $count = 0;
+        PrivateFile::where('created_at', '<', now()->subDay())
+            ->whereNotIn('id', \App\Models\Payment::whereNotNull('evidence_file_id')->select('evidence_file_id'))
+            ->whereNotIn('id', \App\Models\Document::select('private_file_id'))
+            ->each(function (PrivateFile $file) use (&$count) {
+                if ($this->deletePrivate($file)) {
+                    $count++;
+                }
+            });
+        if ($count) {
+            Audit::record('files.orphans_pruned', "{$count} unreferenced private file(s) removed");
+        }
+
+        return $count;
+    }
+
     public function privatePath(PrivateFile $file): string
     {
         return storage_path('app/private/files/'.$file->path);

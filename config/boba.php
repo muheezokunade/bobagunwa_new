@@ -21,6 +21,12 @@ return [
         'reset_token_minutes' => 60,
         'password_min_length' => 12,
         'login_attempts_per_minute' => 5,
+        // SHA-256 of passwords that have been displayed for local demonstrations.
+        // They can never be chosen for a real account.
+        'denied_password_sha256' => [
+            'e60c259aaf21a9d85150a658e144a3b0ca281429d23021aeac9e9d1a1991562e',
+            'd1b56cfab152ed9402db08fd642d7530c396ab3835f81286713207439184f1a2',
+        ],
     ],
 
     'privacy_notice_version' => 'draft-2026-11',
