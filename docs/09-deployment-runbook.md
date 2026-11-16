@@ -2,89 +2,104 @@
 
 **Authorisation required.** The earlier approval covered only an isolated compatibility harness. Deploying this full application to staging needs **explicit approval**; production cutover needs **separate explicit approval, a verified backup and a rehearsed rollback** (decisions D-017, D-018). Use synthetic data only on staging.
 
-## 0. Build the release (developer machine or CI)
+## 0. Build and verify the release (developer machine or CI)
 
 ```bash
-deploy/build-release.sh
+deploy/build-release.sh                              # release/bobagunwa-<rev>.zip, .zip.sha256, .MANIFEST.sha256
+deploy/verify-release.sh release/bobagunwa-<rev>.zip # proves the package matches the commit; scans for secrets
 ```
-Produces `release/bobagunwa-<revision>.zip` and its `.sha256`. Requires a clean Git tree.
+Requires a clean Git tree. The package contains `MANIFEST.sha256` (every file) and `RELEASE.json` (commit, tree, lock-file hash).
 
-## 1. Prepare cPanel (staging)
+## 1. Prepare cPanel (staging only)
 
-1. **Domains**: confirm `v2-staging.bobagunwa.com` document root is `/home/<user>/bobagunwa-v2-webcheck/public` (do not change the main domain or WordPress).
-2. **MultiPHP Manager**: PHP 8.3 for the staging domain only. **MultiPHP INI Editor**: apply `deploy/user.ini.example` values for that domain.
-3. **MySQL Databases**: create database `<user>_bobastg` and user `<user>_bobastg`, strong password, add user to that database only with **ALL PRIVILEGES** (includes TRIGGER).
-4. **SSL/TLS Status**: run AutoSSL for the staging host; continue only when a valid certificate is installed (see `16-namecheap-hosting-compatibility.md`).
+1. **SSL/TLS Status**: the staging host must show a **valid** certificate before anyone signs in through a browser (`36-staging-installation-plan.md`, gate G3). The server-side steps below may run before that.
+2. **Domains**: confirm the document root of `v2-staging.bobagunwa.com` is `~/bobagunwa-v2-webcheck/public`. Do not change the main domain or WordPress.
+3. **MultiPHP Manager**: PHP 8.3 for the staging domain only. **MultiPHP INI Editor**: apply `deploy/user.ini.example` (upload limits 12M/16M, memory 256M, execution 60 s).
+4. **MySQL Databases**: a new database and user for staging, **ALL PRIVILEGES** on that database only (includes TRIGGER). Generate the password in cPanel; never paste it into chat or documents. For restore drills, create a second empty database for the same user.
+5. **Private configuration** (File Manager or SSH), outside every web root:
+   ```bash
+   mkdir -p ~/bobagunwa-config && chmod 700 ~/bobagunwa-config
+   # staging.env from deploy/env.staging.example: APP_ENV=staging, APP_DEBUG=false,
+   # APP_URL=https://v2-staging.bobagunwa.com, MAIL_MAILER=log, DB_* for the staging database,
+   # BOBA_BACKUP_PATH=/home/<user>/bobagunwa-backups/staging. Leave APP_KEY empty: the script generates it once.
+   chmod 600 ~/bobagunwa-config/staging.env
+   # staging-protection.htaccess: the EXISTING 403/IP or Directory Privacy rules, with the ACME allowance, e.g.
+   #   <If "%{REQUEST_URI} !~ m#^/\.well-known/acme-challenge/#">
+   #       Require ip <allowed address>
+   #   </If>
+   ```
 
-## 2. Upload and unpack (SSH, port 21098)
+## 2. Upload and deploy (SSH on port 21098, or cPanel → Terminal)
 
 ```bash
-ssh -p 21098 <user>@<server>
-mkdir -p ~/releases && cd ~/releases
-# upload bobagunwa-<rev>.zip and .sha256 with scp -P 21098 or File Manager, then:
-sha256sum -c bobagunwa-<rev>.zip.sha256
-mkdir bobagunwa-<rev> && cd bobagunwa-<rev> && unzip -q ../bobagunwa-<rev>.zip
+mkdir -p ~/releases       # upload bobagunwa-<rev>.zip and .zip.sha256 here
+cd ~ && unzip -o -j ~/releases/bobagunwa-<rev>.zip deploy/staging-deploy.sh deploy/staging-rollback.sh -d ~ && chmod 700 ~/staging-*.sh
+ls /opt/cpanel/            # find the PHP 8.3 CLI, e.g. /opt/cpanel/ea-php83/root/usr/bin/php
+BOBA_DRY_RUN=1 BOBA_PHP=/opt/cpanel/ea-php83/root/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
+BOBA_PHP=/opt/cpanel/ea-php83/root/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
 ```
 
-## 3. Configure
+The script (`deploy/staging-deploy.sh`) does, in order, and stops before the switch on any failure:
 
+1. **Guards.** It refuses to run when:
+   - it is run as root;
+   - the target is in `public_html` or is the home directory;
+   - `staging.env` is not mode 600 or has the wrong settings: `APP_ENV`, `APP_DEBUG`, `APP_URL`, or a mail transport other than `log`/`array`;
+   - the protection snippet is missing;
+   - the checksum does not match;
+   - PHP is older than 8.3.
+2. **Snapshot** of the existing staging directory (`.env` excluded) and its `.htaccess` into `~/bobagunwa-deploy-logs/<STAMP>/`.
+3. **Unpack** to `~/releases/…-<STAMP>`, verify `MANIFEST.sha256`, copy `.env`, and generate `APP_KEY` once (stored only in `staging.env`).
+4. **`boba:preflight`**. Any failed required check aborts the run; output goes to `preflight.txt` and `preflight.json`.
+5. **`migrate --force`** and **`boba:ledger:verify`** (35 triggers, zero exceptions).
+6. **Protection**: the protection rules are placed at the top of `public/.htaccess`.
+7. **Switch** by renaming within the home filesystem. The previous directory is kept as `~/bobagunwa-v2-webcheck.previous-<STAMP>`.
+8. **Caches are built in the final location** (they store absolute paths; building them before the rename makes every page fail). Then **`boba:smoke`** sends internal requests to 13 pages and checks status codes and security headers. **If it fails, the previous site is restored automatically.**
+
+Record the STAMP the script prints.
+
+## 3. Cron (cPanel → Cron Jobs, staging only)
+
+```
+*/15 * * * * cd /home/<user>/bobagunwa-v2-webcheck && /opt/cpanel/ea-php83/root/usr/bin/php artisan schedule:run >> /dev/null 2>&1
+```
+If preflight reports `proc_open` disabled, replace it with direct entries: `boba:ledger:verify` daily, `boba:backup:create --keep=14` daily, and the hourly overdue and prune tasks.
+
+## 4. Administration
+
+* The **real first administrator** is provisioned only after the association names the person (D-021):
+  `php artisan boba:admin:create <email> "<name>" --role=system_admin` prints a single-use link to the SSH terminal; send it privately.
+* **Synthetic acceptance officers**:
+  `php artisan boba:staging:prepare --confirm-synthetic --links-file=~/bobagunwa-config/acceptance-links.json`
+  creates one officer per role at `@staging-synthetic.invalid` with single-use links (no passwords exist). Copy the file privately to the computer running the acceptance script, then delete both copies. Refused in production; preflight fails in production if such accounts exist.
+* Two-factor enforcement stays **off** until D-024.
+
+## 5. Acceptance (only with a valid certificate)
+
+On the computer that runs it (a clone of the repository, not the server):
 ```bash
-cp deploy/env.staging.example .env
-chmod 600 .env
-nano .env        # database credentials, APP_URL, BOBA_BACKUP_PATH (outside public_html), BOBA_BACKUP_PUBLIC_KEY
-php83 artisan key:generate --force      # use the PHP 8.3 CLI path for this account
-mkdir -p ~/bobagunwa-backups/staging && chmod 700 ~/bobagunwa-backups ~/bobagunwa-backups/staging
+npm ci && npx playwright install chromium
+node tests/browser/staging-acceptance.cjs https://v2-staging.bobagunwa.com acceptance-links.json staging-acceptance.json
+# STAGING_HTTP_USER / STAGING_HTTP_PASS if the protection is cPanel Directory Privacy
 ```
+Run it from an allowed address. It refuses invalid HTTPS and reproduces workflows W1–W7 (the web part of W7), role restrictions, the integrity check, an event, an enquiry (ModSecurity check) and responsive rendering.
 
-## 4. Verify the host
-
+Then run the **restore drill** on the server, into the empty second database:
 ```bash
-php83 artisan boba:preflight
+php artisan boba:backup:restore ~/bobagunwa-backups/staging/<file>.bobabk --key-file=<custodian or test key pair file> --target=<empty restore db> --confirm-isolated
 ```
-All required checks must PASS. Record the output in `docs/19-test-evidence.md`.
+Record results in `37-staging-deployment-evidence.md`.
 
-## 5. Migrate and cache
+## 6. Smoke test by eye
 
-```bash
-php83 artisan migrate --force          # schema, 35 integrity triggers, reference data
-php83 artisan boba:ledger:verify
-php83 artisan config:cache && php83 artisan route:cache && php83 artisan view:cache
-```
-
-## 6. Switch the document root to this release (no symlink needed)
-
-The staging docroot is `~/bobagunwa-v2-webcheck/public`. Keep the previous version for rollback:
-
-```bash
-cd ~
-[ -d bobagunwa-v2-webcheck ] && mv bobagunwa-v2-webcheck bobagunwa-v2-webcheck.previous-$(date +%Y%m%d%H%M)
-mv ~/releases/bobagunwa-<rev> ~/bobagunwa-v2-webcheck
-```
-(`mv` within one filesystem is atomic.) Re-apply the existing staging 403 protection to `public/.htaccess` (IP allow-list or password protection via cPanel **Directory Privacy**), keeping the `.well-known/acme-challenge` allowance for certificate renewal.
-
-## 7. Provision the first administrator
-
-```bash
-php83 artisan boba:admin:create admin.officer@example.org "Officer Name" --role=system_admin
-```
-Send the printed one-time link privately. That administrator then creates the other officers in Administration → Officers and access.
-
-## 8. Cron (cPanel → Cron Jobs)
-
-```
-*/15 * * * * cd /home/<user>/bobagunwa-v2-webcheck && /path/to/php83 artisan schedule:run >> /dev/null 2>&1
-```
-
-## 9. Smoke test (record results)
-
-Home, Membership, Apply (synthetic), Track application, Contact (synthetic), Login, activation of a synthetic officer, Administration overview, Reports, Backups → Create encrypted backup, then a restore drill into an empty `<user>_restoredrill` database (`10-backup-and-recovery.md`). Confirm HTTPS shows a valid certificate and the `Secure` session cookie is set. Then enable the HTTPS redirect in `public/.htaccess`.
+Confirm a valid certificate and the padlock, the `Secure` session cookie, and that a non-allowed address still gets 403. Only then enable the HTTPS redirect in `public/.htaccess`.
 
 ## Rollback
 
 ```bash
-cd ~ && mv bobagunwa-v2-webcheck bobagunwa-v2-webcheck.failed-$(date +%Y%m%d%H%M) && mv bobagunwa-v2-webcheck.previous-<stamp> bobagunwa-v2-webcheck
+~/staging-rollback.sh <STAMP>   # restores the kept previous directory (or the snapshot); the failed release is kept as .failed-<time>
 ```
-Database migrations in this release are additive from an empty database; for later releases take an encrypted backup before `migrate` and restore it into a fresh database if a rollback of schema is required.
+The staging database is not changed by a rollback. Migrations in this release are additive from an empty database. For later releases, take an encrypted backup before deploying, and restore it into a fresh database if a schema rollback is needed.
 
 ## Production (only after separate approval)
 

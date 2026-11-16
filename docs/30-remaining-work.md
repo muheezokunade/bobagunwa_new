@@ -6,7 +6,8 @@ Review of the project against `03-requirements-traceability.md` and the original
 
 | P | Item | Ref |
 |---|---|---|
-| P0 | Written approval to deploy the full application to protected staging | D-017 |
+| ~~P0~~ | ~~Written approval to deploy the full application to protected staging~~ — **received 16 Nov 2026** | D-017 |
+| P0 | Valid SSL for `v2-staging.bobagunwa.com` (still `*.web-hosting.com` on 16 Nov) and running the deployment from the maintainer's computer | `37` §1 |
 | P0 | Authorise a request to Namecheap support for the free SSL certificate on `v2-staging.bobagunwa.com` | — |
 | P0 | Name the first administrator | D-021 |
 | P0 | Grant hosting access (cPanel + SSH) to the named deployer for staging only | — |

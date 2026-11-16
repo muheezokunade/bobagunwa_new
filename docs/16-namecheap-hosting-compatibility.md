@@ -19,7 +19,7 @@ The application has instead been verified against the same software versions loc
 | SSH | port 21098 | Needed for migrations, cron set-up, restore drills | `ssh -p 21098` |
 | Cron | available with restrictions | One entry every 15 min (or the shortest allowed) runs `schedule:run`; tasks are daily/hourly | cPanel Cron Jobs |
 | Staging host | `v2-staging.bobagunwa.com`, docroot `/home/bobakkgn/bobagunwa-v2-webcheck/public`, protected with HTTP 403 rules | Laravel's `public/` maps directly onto this docroot | cPanel Domains |
-| SSL | Free certificate **not issued** as of the last check (8 Nov); server presented `*.web-hosting.com` | **Blocks** secure cookies and therefore safe staging login | cPanel SSL/TLS Status; Namecheap support |
+| SSL | Free certificate **not issued**: re-checked **16 Nov 2026**, the server still presents `CN=*.web-hosting.com` (SSL.com TLS Issuing RSA CA R1, valid 3 Nov 2026 – 20 May 2027) | **Blocks** secure cookies and therefore safe staging login | cPanel SSL/TLS Status; Namecheap support |
 | Account 2FA | Enabled | — | — |
 
 ## Requirements matrix (verified locally)
@@ -31,6 +31,17 @@ The application has instead been verified against the same software versions loc
 | No `exec()`, `mysqldump`, symlinks, Redis, queue worker or Node at runtime | Backups are pure PHP; public path is configurable; release ships compiled assets and `vendor/` |
 | Upload limits | Recommend `upload_max_filesize=12M`, `post_max_size=16M` via `deploy/user.ini.example` |
 | Release reproducibility | `deploy/build-release.sh` → zip + SHA-256; deployed into a clean directory and database, migrated, preflighted and served successfully |
+
+## Preflight coverage (16 Nov 2026)
+
+`boba:preflight` now also checks:
+- that it runs on an empty database before migrations;
+- CHECK-constraint enforcement and transaction rollback;
+- trigger creation **and** enforcement, and READ COMMITTED isolation;
+- `proc_open` (the scheduler starts commands with it) and the web execution limit;
+- `.env` outside the webroot.
+
+Verified in a simulated cPanel account (44 PASS, 0 FAIL); not yet on Namecheap.
 
 ## Known hosting risks
 

@@ -1,0 +1,17 @@
++---------------------+----------+--------+----------------------------------------------------------------------------------+
+| Path                | Expected | Result | Detail                                                                           |
++---------------------+----------+--------+----------------------------------------------------------------------------------+
+| /                   | 200      | PASS   | HTTP 200                                                                         |
+| /membership         | 200      | PASS   | HTTP 200                                                                         |
+| /membership/apply   | 200      | PASS   | HTTP 200                                                                         |
+| /membership/status  | 200      | PASS   | HTTP 200                                                                         |
+| /contact            | 200      | PASS   | HTTP 200                                                                         |
+| /login              | 200      | PASS   | HTTP 200                                                                         |
+| /account/recover    | 200      | PASS   | HTTP 200                                                                         |
+| /privacy            | 200      | PASS   | HTTP 200                                                                         |
+| /sitemap.xml        | 200      | PASS   | HTTP 200                                                                         |
+| /portal             | 302      | PASS   | HTTP 302 AuthenticationException: Unauthenticated.                               |
+| /admin              | 302      | PASS   | HTTP 302 AuthenticationException: Unauthenticated.                               |
+| /admin/finance      | 302      | PASS   | HTTP 302 AuthenticationException: Unauthenticated.                               |
+| /no-such-page-smoke | 404      | PASS   | HTTP 404 NotFoundHttpException: The route no-such-page-smoke could not be found. |
++---------------------+----------+--------+----------------------------------------------------------------------------------+

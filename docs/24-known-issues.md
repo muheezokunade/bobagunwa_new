@@ -3,9 +3,10 @@
 ## Release-blocking for staging / production (external)
 
 1. **No hosting access** from the build environment: Namecheap staging compatibility, PHP 8.3 web execution, cron, ModSecurity behaviour and SSL are **unverified on the server** (`16-namecheap-hosting-compatibility.md`).
-2. **Staging SSL certificate** for `v2-staging.bobagunwa.com` was not issued at the last recorded check; secure login must not be tested over an invalid certificate.
+2. **Staging SSL certificate** for `v2-staging.bobagunwa.com` is still not issued (re-checked 16 Nov 2026: the server presents `*.web-hosting.com`). Secure login must not be tested over an invalid certificate.
 3. **Authorisations and policies** in `23-client-decisions.md` (deployment approvals, number format, roles, amounts, custodians, legal review, content).
 4. **Off-site backup custody** not yet established (no custodian holds a key).
+5. **Staging evidence is simulated.** Deployment, preflight, smoke, acceptance (19/19) and the restore drill were run in a simulated cPanel account, not on Namecheap. ModSecurity, LiteSpeed/Apache behaviour, the real PHP 8.3 web SAPI and cron are unverified until the real deployment (`37-staging-deployment-evidence.md`).
 
 ## Engineering limitations (accepted, documented)
 

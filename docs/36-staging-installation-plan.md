@@ -1,6 +1,6 @@
 # Protected staging installation plan — `v2-staging.bobagunwa.com`
 
-**Nothing in this plan has been carried out.** Running any step on Namecheap needs the association's written approval to deploy the full application to protected staging (D-017) **and** hosting access given to the person doing it. The earlier authorisation covered only the isolated compatibility harness. Production is out of scope (D-018). WordPress, the main domain, DNS, existing SSL certificates and mailboxes must not be touched.
+**Status 16 Nov 2026:** D-017 approved (staging only). The plan has not yet been carried out on Namecheap. It was rehearsed end to end in a simulated cPanel account with `deploy/staging-deploy.sh`, `boba:smoke`, `boba:staging:prepare` and `tests/browser/staging-acceptance.cjs` (`37-staging-deployment-evidence.md`). Originally: Running any step on Namecheap needs the association's written approval to deploy the full application to protected staging (D-017) **and** hosting access given to the person doing it. The earlier authorisation covered only the isolated compatibility harness. Production is out of scope (D-018). WordPress, the main domain, DNS, existing SSL certificates and mailboxes must not be touched.
 
 Detailed commands: [09-deployment-runbook.md](09-deployment-runbook.md). Hosting facts and risks: [16-namecheap-hosting-compatibility.md](16-namecheap-hosting-compatibility.md).
 
@@ -8,7 +8,7 @@ Detailed commands: [09-deployment-runbook.md](09-deployment-runbook.md). Hosting
 
 | # | Gate | Evidence to record |
 |---|---|---|
-| G1 | Written approval D-017 for full-application staging deployment | message/date in `23-client-decisions.md` |
+| G1 | Written approval D-017 for full-application staging deployment | **Met 16 Nov 2026** (`23-client-decisions.md`) |
 | G2 | Hosting access for the deployer (cPanel + SSH on port 21098) granted by the account owner | who, when, scope |
 | G3 | **Valid TLS certificate** for `v2-staging.bobagunwa.com`: cPanel → SSL/TLS Status shows it as valid, and `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com </dev/null 2>/dev/null \| openssl x509 -noout -subject -issuer -dates` names the staging host, not `*.web-hosting.com` | command output in `19-test-evidence.md` |
 | G4 | Release package built from the latest `main` and its SHA-256 verified | file name + hash |

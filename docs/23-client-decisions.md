@@ -20,7 +20,7 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-014 | Backup custodians, off-site location, schedule, retention | Pending | Daily encrypted backups once a public key is set; 14 kept on server; off-site custody not established |
 | D-015 | Official public content | Pending | See content table below; nothing unapproved is published by default |
 | D-016 | Privacy notice, terms, retention periods, NDPA obligations (legal review) | Pending | Working drafts shown with a "awaiting review" banner |
-| D-017 | Deploy the full application to protected staging | Pending | Not deployed |
+| D-017 | Deploy the full application to protected staging | **Approved** by Mr Ibrahim (16 Nov 2026) — `v2-staging.bobagunwa.com` only; no production, WordPress, DNS, email or cutover | Deployment tooling verified in a simulation; Namecheap deployment pending SSL (B1) and server access (B2) — `37-staging-deployment-evidence.md` |
 | D-018 | Production cutover (domain route, WordPress coexistence, date) | Pending | Not deployed; WordPress untouched |
 | D-019 | Verified existing-member roster (86 provisional names) and identity fields | Pending | Not imported; **gate** `approval.member_import` |
 | D-020 | Historical financial records, cut-off date and source documents | Pending | None imported; **gate** `approval.historical_finance` |

@@ -1,0 +1,115 @@
+{
+  "summary": {
+    "executed_at": "2026-11-16T12:12:35.723Z",
+    "base": "http://127.0.0.1:8020",
+    "run": "MWJ843LN",
+    "https": false,
+    "steps": 19,
+    "failed": 0,
+    "facts": {
+      "import_batch": "/admin/imports/members/9",
+      "application": "BOB-APP-2026-CL6E23",
+      "activation_url": "(redacted)",
+      "membership_number": "BOB-000015",
+      "assessment": "/admin/finance/assessments/3",
+      "payment": "/admin/finance/payments/3"
+    }
+  },
+  "results": [
+    {
+      "step": "HTTPS, security headers and cookie flags",
+      "result": "pass",
+      "detail": "HTTP 200; 12 compiled assets served; CSP, X-Frame-Options, nosniff; session cookie HttpOnly; SameSite=Lax"
+    },
+    {
+      "step": "Activate synthetic system_admin through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Activate synthetic membership_officer through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Activate synthetic secretariat through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Activate synthetic treasurer through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Activate synthetic payment_verifier through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Activate synthetic executive through its single-use link",
+      "result": "pass",
+      "detail": "password_reset completed; signed in"
+    },
+    {
+      "step": "Server-side role restrictions",
+      "result": "pass",
+      "detail": "System Administrator→finance 403; Treasurer→member imports 403; Secretariat→payments 403; anonymous→sign-in"
+    },
+    {
+      "step": "W1 Existing-member CSV import (preview, commit, duplicate detection)",
+      "result": "pass",
+      "detail": "2 members imported without login accounts; re-upload flagged 2 duplicates and was cancelled"
+    },
+    {
+      "step": "W2 Membership application, tracking and approval",
+      "result": "pass",
+      "detail": "application BOB-APP-2026-CL6E23 tracked and approved; one-time activation link shown once"
+    },
+    {
+      "step": "W3 Member account activation and portal",
+      "result": "pass",
+      "detail": "activated; portal shows BOB-000015; admin 403; link refused on reuse"
+    },
+    {
+      "step": "W4 Dues assessment ₦50,000 (draft, post, no double posting)",
+      "result": "pass",
+      "detail": "category created; assessment posted to 1 member; cannot be posted again"
+    },
+    {
+      "step": "W5 Manual ₦20,000 payment with separate verification, allocation and reversal",
+      "result": "pass",
+      "detail": "recorded pending; verified by a different officer; over-allocation refused; allocated, reversed and re-allocated"
+    },
+    {
+      "step": "W6 Member statement and treasury reports reconcile (₦50,000 − ₦20,000 = ₦30,000)",
+      "result": "pass",
+      "detail": "statement 50,000 / 20,000 / 30,000; print button present; balances CSV reconciles"
+    },
+    {
+      "step": "Ledger integrity check from the alerts page",
+      "result": "pass",
+      "detail": "manual check run recorded as passed"
+    },
+    {
+      "step": "W7 Encrypted backup created from the web (restore is a server-side step)",
+      "result": "pass",
+      "detail": "backup created and registered; run the isolated restore on the server (docs/36 §6)"
+    },
+    {
+      "step": "Event draft → published and visible publicly",
+      "result": "pass",
+      "detail": "draft created, published, visible on /events"
+    },
+    {
+      "step": "Contact enquiry reaches the secretariat queue",
+      "result": "pass",
+      "detail": "submitted (incl. SQL/HTML-like words, ModSecurity check) and listed for the secretariat"
+    },
+    {
+      "step": "Responsive rendering 375 / 768 / 1440 px without horizontal overflow",
+      "result": "pass",
+      "detail": "30 page views clean"
+    }
+  ]
+}

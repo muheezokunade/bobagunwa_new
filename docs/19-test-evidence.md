@@ -18,7 +18,7 @@ Raw artefacts in `docs/evidence/`:
 
 | Check | Result |
 |---|---|
-| PHPUnit full suite on MariaDB 11.4.13 | **151 passed, 0 failed (3,288 assertions)**, 74 s — `evidence/test-run-2026-11-16-hardening.txt` |
+| PHPUnit full suite on MariaDB 11.4.13 | **153 passed, 0 failed (3,322 assertions)**, 72 s — `evidence/test-run-2026-11-16-staging.txt` (latest; adds `DeploymentChecksTest`); hardening-phase run: 151/151 in `test-run-2026-11-16-hardening.txt` |
 | Seven mandatory workflows together | **Pass** — all 7 `"result": "pass"` in `acceptance-evidence-2026-11-16.json` |
 | Admin mutation HTTP matrix | **56 routes × 7 roles + anonymous**: 302 for anonymous, 403 exactly where the role lacks the permission, no 403/404/405/500 where it holds it; **419** for all 56 without a CSRF token (`AdminMutationMatrixTest`, 507 assertions) |
 | Admin mutation behaviour | every one of the 56 routes has a route-specific HTTP test (`docs/34-admin-endpoint-coverage.md`); 158/158 named routes are called by at least one HTTP test (`docs/35-route-catalogue.md`) |
@@ -40,6 +40,10 @@ Raw artefacts in `docs/evidence/`:
 | Release package | rebuilt from the final pushed revision with `deploy/build-release.sh`; SHA-256 recorded alongside |
 
 Per-class counts: Unit 22 (Money 16, Normalize/CSV 6) · MandatoryWorkflows 1 · AccountLifecycle 12 · TwoFactor 7 · BackupRestore 6 · Concurrency 6 · IntegrityTriggers 9 · RouteCatalogueSync 2 · HistoricalImport 3 · LedgerService 14 · AdminMutationBehaviour 14 · AdminMutationMatrix 2 · AdminViewsRender 1 · AuthorisationMatrix 7 · ContentAndUploadSecurity 4 · Performance 3 · PublicSite 5 · RemainingRoutes 8 · ApplicationWorkflow 5 · ManualMember 5 · MemberImport 8 · IntegrityAlert 7.
+
+## Staging deployment rehearsal (simulated cPanel account, 16 Nov 2026)
+
+Guarded deployment and rollback scripts, preflight (44 PASS, 0 FAIL), internal smoke check (13/13), automatic and manual rollback, the HTTP acceptance script (**19/19**, including all seven workflows) and an isolated restore drill ("Restore verified"). The rehearsal found and fixed a defect that would have made every staging page return 500 (caches built before the directory switch). Details: [37-staging-deployment-evidence.md](37-staging-deployment-evidence.md); raw files in `evidence/staging-simulation-2026-11-16/`. **Not Namecheap evidence.**
 
 ## The seven mandatory workflows (`MandatoryWorkflowsTest`)
 

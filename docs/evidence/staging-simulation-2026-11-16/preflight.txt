@@ -1,0 +1,50 @@
++-----------------------------------------------------------------------------------------------------+--------+------------------------------------------------------------------------------------+
+| Check                                                                                               | Result | Detail                                                                             |
++-----------------------------------------------------------------------------------------------------+--------+------------------------------------------------------------------------------------+
+| PHP version ≥ 8.3                                                                                   | PASS   | 8.3.6 (cli; web requests must also use 8.3 — confirm in cPanel MultiPHP Manager)   |
+| Extension pdo_mysql                                                                                 | PASS   | loaded                                                                             |
+| Extension sodium                                                                                    | PASS   | loaded                                                                             |
+| Extension gd                                                                                        | PASS   | loaded                                                                             |
+| Extension intl                                                                                      | PASS   | loaded                                                                             |
+| Extension mbstring                                                                                  | PASS   | loaded                                                                             |
+| Extension fileinfo                                                                                  | PASS   | loaded                                                                             |
+| Extension openssl                                                                                   | PASS   | loaded                                                                             |
+| Extension ctype                                                                                     | PASS   | loaded                                                                             |
+| Extension tokenizer                                                                                 | PASS   | loaded                                                                             |
+| Extension xml                                                                                       | PASS   | loaded                                                                             |
+| Extension curl                                                                                      | PASS   | loaded                                                                             |
+| libsodium secretstream + sealed boxes                                                               | PASS   | required for encrypted backups                                                     |
+| GD JPEG/PNG support                                                                                 | PASS   | required to re-encode uploaded images                                              |
+| Memory limit ≥ 128M                                                                                 | PASS   | -1                                                                                 |
+| Upload size ≥ 10M                                                                                   | WARN   | upload_max_filesize=2M, post_max_size=8M                                           |
+| APP_KEY set                                                                                         | PASS   | set                                                                                |
+| Debug disabled outside local                                                                        | PASS   | APP_DEBUG=false, APP_ENV=staging                                                   |
+| Secure session cookies                                                                              | PASS   | SESSION_SECURE_COOKIE=true                                                         |
+| Database connection                                                                                 | PASS   | 11.4.13-MariaDB-ubu2404                                                            |
+| MariaDB ≥ 10.6 (11.4 expected)                                                                      | PASS   | 11.4.13-MariaDB-ubu2404                                                            |
+| InnoDB default engine                                                                               | PASS   | InnoDB                                                                             |
+| Binary logging (trigger privilege implications)                                                     | PASS   | OFF                                                                                |
+| Transaction isolation READ COMMITTED                                                                | PASS   | READ-COMMITTED                                                                     |
+| CHECK constraints enforced                                                                          | PASS   | negative amount rejected                                                           |
+| Transactions roll back                                                                              | PASS   | insert inside a rolled-back transaction left no row                                |
+| CREATE TRIGGER privilege and enforcement                                                            | PASS   | trigger created, blocked a delete, dropped                                         |
+| No demonstration accounts                                                                           | PASS   | none                                                                               |
+| Demo seeder disabled here                                                                           | PASS   | boba:demo:seed refuses this environment                                            |
+| Ledger integrity triggers installed                                                                 | PASS   | 35 installed                                                                       |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/storage/framework/sessions | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/storage/framework/views    | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/storage/logs               | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/storage/app/private        | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/bootstrap/cache            | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/public/media               | PASS   | ok                                                                                 |
+| Writable: /home/bobasim/bobagunwa-backups/staging                                                   | PASS   | ok                                                                                 |
+| Private storage outside webroot                                                                     | PASS   | /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/storage             |
+| Backup path outside webroot                                                                         | PASS   | /home/bobasim/bobagunwa-backups/staging                                            |
+| Backup public key configured                                                                        | WARN   | not set — backups disabled                                                         |
+| Symbolic links (informational)                                                                      | PASS   | supported                                                                          |
+| Built assets present                                                                                | PASS   | public/build/manifest.json                                                         |
+| Scheduler can start commands (proc_open)                                                            | PASS   | available — one cron entry running schedule:run is enough                          |
+| Web max_execution_time ≥ 60 s (CLI is unlimited)                                                    | PASS   | CLI: unlimited; check the web value in cPanel MultiPHP INI Editor (60 recommended) |
+| .env outside webroot                                                                                | PASS   | /home/bobasim/releases/bobagunwa-19c6a66c0ef0-20261116T120414Z/.env                |
+| exec() available (informational)                                                                    | PASS   | available (not required)                                                           |
++-----------------------------------------------------------------------------------------------------+--------+------------------------------------------------------------------------------------+

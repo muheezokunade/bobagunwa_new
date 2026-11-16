@@ -1,0 +1,128 @@
+# Staging deployment evidence — `v2-staging.bobagunwa.com`
+
+**Authorisation:** Mr Ibrahim approved deploying the complete application to the protected staging site `v2-staging.bobagunwa.com` (recorded 16 Nov 2026, D-017). This does **not** cover the main website, WordPress, DNS, existing certificates, email, production records or cutover.
+
+**Status on 16 Nov 2026:**
+- **Not yet deployed on Namecheap**, because of the two external blockers below.
+- **Staging deployment tooling:** built and verified end to end in a simulated cPanel account (§3).
+- **Next step:** continue in a Claude Code session on the maintainer's own computer, which can use the logged-in Namecheap tab or SSH. Use the prompt kept with this document (§7).
+
+## 1. Blockers (exact)
+
+| # | Blocker | Evidence | Who resolves |
+|---|---|---|---|
+| B1 | **No valid certificate for the staging host.** The server presents Namecheap's shared certificate `CN=*.web-hosting.com` (SAN `*.web-hosting.com`, `web-hosting.com`; issuer SSL.com TLS Issuing RSA CA R1; valid 3 Nov 2026 – 20 May 2027). `curl` reports "no alternative certificate subject name matches target host name 'v2-staging.bobagunwa.com'". Same finding as 8 Nov. | `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com`, run 16 Nov 2026 from the build environment | Maintainer: cPanel → SSL/TLS Status → AutoSSL for the staging host only, keeping the `/.well-known/acme-challenge/` allowance; if validation still fails, ask Namecheap support for the free certificate. Never buy one, never disable the protection globally, never accept an invalid certificate. |
+| B2 | **No server access from the cloud build environment.** Its proxy carries HTTPS on port 443 only. SSH (port 21098) and cPanel (port 2083) are not possible, and no computer was linked to the session. The maintainer's Namecheap login is in a browser on their own computer, which a cloud session cannot see. | network policy response (CONNECT 403 before the host was allowed; non-443 ports unsupported) | Run the deployment from a Claude Code session on the maintainer's computer (Desktop app with Claude in Chrome, or SSH). |
+
+Until B1 is resolved, nobody signs in to the staging application in a browser. Server-side preflight, deployment behind the protection and the internal smoke check may proceed.
+
+## 2. Release integrity
+
+| Check | Result |
+|---|---|
+| Revision | `19c6a66c0ef08abd21c0d1dc2362b83acb62d890` (`main`, pushed) |
+| Package | `bobagunwa-19c6a66c0ef0.zip`, SHA-256 `e0c28026621febe3864b9518b3fd1cb2fa123fae254dee994476289f2228c102` |
+| `deploy/verify-release.sh` | package hash OK; per-file `MANIFEST.sha256` OK; every tracked file identical to the commit; only documented exclusions absent; no `.env`, keys, dumps, logs, tests or `node_modules`; no private-key or token patterns anywhere, `vendor/` included |
+| Finding fixed on the way | the package carried a vendor library's own test fixtures, including dummy SSH keys (`league/flysystem/test_files`); `build-release.sh` now strips them |
+| Rollback package | the deploy script tars the existing staging directory (without `.env`) and keeps the previous directory for an instant switch back |
+
+## 3. Simulated cPanel deployment (executed, synthetic)
+
+Environment: an unprivileged Linux user `bobasim` with its own home directory and a database user limited to its own database (MariaDB 11.4.13), PHP 8.3.6. The existing staging site was represented by a "compatibility harness" folder with a 403 protection `.htaccess`. Commands were run exactly as on Namecheap:
+
+```bash
+unzip -p bobagunwa-19c6a66c0ef0.zip deploy/staging-deploy.sh > ~/staging-deploy.sh
+BOBA_DRY_RUN=1 BOBA_PHP=<php83> ./staging-deploy.sh ~/releases/bobagunwa-19c6a66c0ef0.zip
+BOBA_PHP=<php83> ./staging-deploy.sh ~/releases/bobagunwa-19c6a66c0ef0.zip
+./staging-rollback.sh <STAMP>
+```
+
+| Check | Result |
+|---|---|
+| Guards: run as root / target in `public_html` / `MAIL_MAILER=smtp` / wrong `APP_URL` / no protection snippet / tampered checksum / `staging.env` not mode 600 | **all refused**; existing site untouched |
+| Preflight (`evidence/staging-simulation-2026-11-16/preflight.txt`) | **44 PASS, 0 FAIL**, 2 advisory: upload limit 2M (set 12M via MultiPHP INI), backup key not set |
+| Migrations, 35 triggers, ledger verification | pass |
+| Protection rules placed at the top of `public/.htaccess` | yes (with the ACME allowance) |
+| Internal smoke check `boba:smoke` (13 pages: status codes and security headers) | **13/13 PASS** |
+| Forced smoke failure | **automatic rollback** to the previous site; failed release kept for diagnosis |
+| Manual rollback, then redeploy | pass |
+
+### Defects found by the simulation and fixed before any real deployment
+
+| Defect | Impact if deployed | Fix |
+|---|---|---|
+| `config:cache`, `route:cache` and `view:cache` were built in `~/releases/…` and the folder was then renamed; Laravel caches absolute paths | **every page HTTP 500** on staging after the first deployment (also present in the original runbook) | caches cleared before the switch and built in the final location; `boba:smoke` and auto-rollback added |
+| `boba:preflight` queried `users` on an empty database | preflight-before-migrate (the documented order) failed | unmigrated database reported as informational; new probes: CHECK constraints, transaction rollback, trigger enforcement, READ COMMITTED, `proc_open` for the scheduler, web execution time, `.env` outside the webroot |
+| Deploy target normalisation mishandled a missing parent folder | wrong path in an error message (still refused) | `realpath -m` |
+
+## 4. Acceptance over HTTP (simulation)
+
+`tests/browser/staging-acceptance.cjs` drives the real forms in Chromium. On staging it refuses to run unless HTTPS has a valid certificate. The local simulation used `http://127.0.0.1` with `STAGING_ALLOW_HTTP=1`, so Secure-cookie and HSTS checks were not applicable there. Synthetic officers came from `boba:staging:prepare` (single-use links, `.invalid` addresses, random in-memory passwords). Result: **19/19 steps passed** (`evidence/staging-simulation-2026-11-16/acceptance.json`).
+
+| Step | Result |
+|---|---|
+| Compiled CSS/JS served, JavaScript runs, CSP, X-Frame-Options, nosniff, session cookie HttpOnly + SameSite=Lax | pass (12 assets) |
+| 6 synthetic officers activated or reset through single-use links; token removed from the address bar; `Referrer-Policy: no-referrer` | pass |
+| Role restrictions: System Administrator → finance 403; Treasurer → member import 403; Secretariat → payments 403; anonymous → sign-in | pass |
+| **W1** CSV import of 2 members, no login accounts, re-upload flags 2 duplicates | pass |
+| **W2** application → receipt → status "Received" → System Administrator 403 → under review → approved → one-time link | pass |
+| **W3** activation → portal shows number → admin 403 → link refused on reuse | pass |
+| **W4** category, ₦50,000 assessment previewed and posted; cannot post twice | pass |
+| **W5** ₦20,000 recorded (pending; recorder not offered verification), verified by another officer, over-allocation refused, allocated, allocation reversed, re-allocated | pass |
+| **W6** member statement ₦50,000 / ₦20,000 / ₦30,000; Print button; balances CSV reconciles | pass |
+| Integrity check from the alerts page | passed run recorded |
+| **W7** encrypted backup from the web | pass |
+| Event draft → published → on `/events`; contact enquiry (with SQL/HTML-like words) → secretariat queue | pass |
+| Responsive 375 / 768 / 1440 px, 30 page views without horizontal overflow | pass |
+
+Two script defects were found and fixed while validating it:
+- it measured page width before the stylesheet had loaded;
+- it read "this link cannot be used" on reuse as a failure.
+
+A simulation artefact (a router that did not serve static files) was also found and replaced with Laravel's server router. The script now checks that compiled assets are served, which will catch a real `.htaccess` problem too.
+
+### Isolated restore drill (W7, server side, simulation)
+
+```bash
+php artisan boba:backup:restore <file>.bobabk --key-file=<test key pair> --target=<empty restore db> --confirm-isolated
+```
+
+Result: **"Restore verified."**
+- 15/15 members;
+- 35 triggers restored;
+- financial totals identical (allocated ₦60,000 and outstanding ₦90,000 across the three acceptance runs);
+- 148 audit events.
+
+The key pair was generated for the test only and is not the custodian key.
+
+## 5. Financial acceptance figures (what staging must reproduce)
+
+| Figure | Expected |
+|---|---|
+| Assessment for the W2 member | ₦50,000.00 (one obligation) |
+| Payment | ₦20,000.00 bank transfer, pending until verified by a **different** officer |
+| Allocation after reversal and re-allocation | ₦20,000.00 active; one reversed allocation in history |
+| Member outstanding | ₦30,000.00 (statement, portal, balances CSV and raw ledger agree) |
+| Ledger exceptions / integrity check | none / passed |
+
+## 6. Client acceptance checklist — for Mr Ibrahim (after B1 and B2 are resolved)
+
+Use only made-up names and amounts. Tick each item, or note what went wrong.
+
+- [ ] The address bar shows a padlock for `https://v2-staging.bobagunwa.com` (no certificate warning).
+- [ ] The site is not visible from an address outside the allowed list (protection still on).
+- [ ] Home, About, Membership, Events, News, Gallery and Contact pages look right on a phone and on a computer.
+- [ ] A made-up application can be submitted, and its private tracking code shows "Received".
+- [ ] The membership officer approves it and receives a one-time link; the link works once only.
+- [ ] The new member signs in and sees their membership number and statement.
+- [ ] The treasurer records ₦20,000; it shows "awaiting verification" until the verifier (a different person) verifies it.
+- [ ] After allocation, the member's statement shows ₦50,000 charged, ₦20,000 paid and ₦30,000 outstanding, and prints neatly.
+- [ ] The System Administrator cannot open any finance page.
+- [ ] "Integrity alerts → Run the check now" shows a passed check.
+- [ ] A backup can be created, and the technical maintainer confirms the restore drill passed.
+- [ ] An event can be drafted and published, and it appears on the Events page.
+- [ ] Decisions still needed are listed in `29-approval-packet.md` (items 4–24).
+
+## 7. Continuing on Namecheap
+
+Run the steps in [36-staging-installation-plan.md](36-staging-installation-plan.md) from a session on the maintainer's computer, using the commands in [09-deployment-runbook.md](09-deployment-runbook.md). Then record real results in §3–§4 style tables under a new heading **"Namecheap results"** here. Mark capabilities as *Staging verified* in `28-release-readiness-report.md` only for steps actually observed on Namecheap.
