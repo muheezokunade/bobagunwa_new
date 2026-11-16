@@ -33,6 +33,7 @@
 | 27 | [Production release checklist](27-production-release-checklist.md) | maintainer, executive |
 | 28 | [Release-readiness report](28-release-readiness-report.md) | everyone |
 | 29 | [Approval packet](29-approval-packet.md) | Mr Ibrahim |
+| 30 | [Remaining work — prioritised](30-remaining-work.md) | executive, maintainer |
 | — | [Evidence](evidence/) | reviewers |
 | — | [Historical V1 documentation](historical/v1/README.md) — *reference only, not evidence* | maintainers |
 

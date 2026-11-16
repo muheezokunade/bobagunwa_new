@@ -57,6 +57,10 @@ States: **Implemented** · **Locally tested** · **Staging verified** · **Await
 4. Officer acceptance on staging with synthetic data.
 5. Production decisions (D-004 … D-022), backup custodians, legal review, then **D-018** cutover approval with a verified backup and rehearsed rollback.
 
+## Remaining work
+
+Prioritised in [30-remaining-work.md](30-remaining-work.md).
+
 ## Changes from the previous assessment
 
 First assessment for this application (V1's readiness statements in `historical/v1/` do not apply).

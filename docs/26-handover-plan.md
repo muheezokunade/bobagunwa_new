@@ -6,7 +6,7 @@ Goal: another competent engineer — or the association's chosen maintainer — 
 
 | Item | Location |
 |---|---|
-| Source with full Git history | this repository (`main`); private GitHub repository to be created (D-023) |
+| Source with full Git history | private GitHub repository `muheezokunade/bobagunwa_new`, branch `main`; a Git bundle and release ZIP were also supplied as offline backups |
 | Release package + checksum | `deploy/build-release.sh` → `release/` |
 | Documentation | `docs/` (index: `docs/00-index.md`) and `CLAUDE.md` |
 | Test suite and evidence | `tests/`, `docs/evidence/` |

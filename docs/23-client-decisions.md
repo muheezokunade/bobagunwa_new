@@ -26,7 +26,7 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-020 | Historical financial records, cut-off date and source documents | Pending | None imported; **gate** `approval.historical_finance` |
 | D-021 | Initial production administrator(s) | Pending | Provisioned only by `boba:admin:create`; no default account |
 | D-022 | Officer role assignments (treasurer, verifier, secretariat, executive) | Pending | Templates only |
-| D-023 | Private GitHub repository for this codebase | Pending (developer) | Local Git history; see handover plan |
+| D-023 | Private GitHub repository for this codebase | **Decided** | `muheezokunade/bobagunwa_new` (`main`); kept separate from the V1 repository `muheezokunade/bobagunwa`, which is not modified |
 
 ## Content awaiting confirmation (D-015)
 
