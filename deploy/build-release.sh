@@ -23,7 +23,7 @@ COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --prefer-dist --optimize-au
   || COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --prefer-source --optimize-autoloader --classmap-authoritative --no-interaction --no-progress --no-scripts >/dev/null
 find vendor -name .git -type d -prune -exec rm -rf {} +
 # Source installs include each package's own test suites and docs; dist archives would not.
-find vendor -mindepth 3 -maxdepth 4 -type d \( -name tests -o -name Tests -o -name .github -o -name docs \) -prune -exec rm -rf {} +
+find vendor -mindepth 3 -maxdepth 4 -type d \( -name tests -o -name Tests -o -name test_files -o -name .github -o -name docs \) -prune -exec rm -rf {} +
 COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload --no-dev --classmap-authoritative --no-scripts >/dev/null
 npm ci --no-audit --no-fund >/dev/null
 npm run build >/dev/null
