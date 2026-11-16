@@ -104,4 +104,15 @@ First assessment: 103 tests, 18 admin mutation routes without direct HTTP tests,
 
 ## Verification of the pushed revision
 
-Recorded after pushing to `muheezokunade/bobagunwa_new`; see the follow-up commit.
+Revision **`41945d7`** was pushed to `muheezokunade/bobagunwa_new` (`main`). The remote head was confirmed equal to the local head. It was then cloned fresh from GitHub into an empty directory and checked as follows:
+
+| Check in the fresh clone | Result |
+|---|---|
+| `composer install` from the lock file, `npm ci`, `npm run build` | pass |
+| `php artisan test` (MariaDB 11.4.13) | **151 passed, 0 failed (3,288 assertions)**, 76 s |
+| `composer audit` / `npm audit` | 0 advisories / 0 vulnerabilities |
+| `pint --test` | pass |
+| `boba:docs:reference` regenerated in the clone | byte-identical to the committed documents |
+| `.env`, keys, backups, real data, or the retired demo password anywhere in history | none (history search returned 0 commits) |
+
+The commit that records this section changes documentation only. The release package and Git bundle are built from it (`release/`, kept outside Git).

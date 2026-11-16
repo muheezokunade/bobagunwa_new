@@ -36,7 +36,8 @@ Raw artefacts in `docs/evidence/`:
 | `pint --test` | pass |
 | Production asset build | pass (`npm run build`) |
 | Local `boba:preflight` | all required checks PASS; backup public key WARN (not configured locally) — `preflight-local-2026-11-16.json` |
-| Release package | rebuilt from the pushed revision; verified from a fresh clone (see the readiness report) |
+| Fresh clone of pushed revision `41945d7` | dependencies installed from lock files, assets built, **151/151 tests pass**, audits clean, generated docs identical (`28-release-readiness-report.md`) |
+| Release package | rebuilt from the final pushed revision with `deploy/build-release.sh`; SHA-256 recorded alongside |
 
 Per-class counts: Unit 22 (Money 16, Normalize/CSV 6) · MandatoryWorkflows 1 · AccountLifecycle 12 · TwoFactor 7 · BackupRestore 6 · Concurrency 6 · IntegrityTriggers 9 · RouteCatalogueSync 2 · HistoricalImport 3 · LedgerService 14 · AdminMutationBehaviour 14 · AdminMutationMatrix 2 · AdminViewsRender 1 · AuthorisationMatrix 7 · ContentAndUploadSecurity 4 · Performance 3 · PublicSite 5 · RemainingRoutes 8 · ApplicationWorkflow 5 · ManualMember 5 · MemberImport 8 · IntegrityAlert 7.
 
