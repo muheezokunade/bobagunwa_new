@@ -3,7 +3,9 @@
 namespace App\Services;
 
 use App\Exceptions\DomainRuleException;
+use App\Models\Document;
 use App\Models\Media;
+use App\Models\Payment;
 use App\Models\PrivateFile;
 use App\Models\User;
 use App\Support\Audit;
@@ -80,7 +82,7 @@ class UploadService
     /** Remove a private file that no record references. Refuses referenced files. */
     public function deletePrivate(PrivateFile $file): bool
     {
-        $referenced = \App\Models\Payment::where('evidence_file_id', $file->id)->exists() || \App\Models\Document::where('private_file_id', $file->id)->exists();
+        $referenced = Payment::where('evidence_file_id', $file->id)->exists() || Document::where('private_file_id', $file->id)->exists();
         if ($referenced) {
             return false;
         }
@@ -95,8 +97,8 @@ class UploadService
     {
         $count = 0;
         PrivateFile::where('created_at', '<', now()->subDay())
-            ->whereNotIn('id', \App\Models\Payment::whereNotNull('evidence_file_id')->select('evidence_file_id'))
-            ->whereNotIn('id', \App\Models\Document::select('private_file_id'))
+            ->whereNotIn('id', Payment::whereNotNull('evidence_file_id')->select('evidence_file_id'))
+            ->whereNotIn('id', Document::select('private_file_id'))
             ->each(function (PrivateFile $file) use (&$count) {
                 if ($this->deletePrivate($file)) {
                     $count++;

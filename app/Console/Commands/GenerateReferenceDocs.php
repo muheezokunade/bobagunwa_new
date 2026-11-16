@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Support\PermissionCatalog;
+use App\Support\RouteCatalogue;
 use Illuminate\Console\Command;
 use Illuminate\Routing\Route;
 use Illuminate\Support\Facades\DB;
@@ -71,7 +73,8 @@ class GenerateReferenceDocs extends Command
     {
         $this->writeSchema();
         $this->writeRoutes();
-        $this->info('Regenerated docs/04-database-schema.md and docs/17-route-inventory.md');
+        $this->writeCatalogue();
+        $this->info('Regenerated docs/04-database-schema.md, docs/17-route-inventory.md, docs/34-admin-endpoint-coverage.md and docs/35-route-catalogue.md');
 
         return self::SUCCESS;
     }
@@ -151,4 +154,288 @@ class GenerateReferenceDocs extends Command
         }
         file_put_contents(base_path('docs/17-route-inventory.md'), $out);
     }
+
+    /** @return array<string, Route> */
+    public static function documentedRoutes(): array
+    {
+        $routes = [];
+        foreach (Router::getRoutes()->getRoutes() as $r) {
+            if ($r->getName() && ! str_starts_with($r->uri(), '_') && $r->uri() !== 'up' && ! str_starts_with($r->getName(), 'storage.')) {
+                $routes[$r->getName()] = $r;
+            }
+        }
+
+        return $routes;
+    }
+
+    /** Roles allowed through the route's middleware, derived from PermissionCatalog. */
+    public static function rolesFor(Route $r): string
+    {
+        $mw = collect($r->gatherMiddleware())->filter(fn ($m) => is_string($m));
+        $permission = $mw->first(fn ($m) => str_starts_with($m, 'permission:'));
+        $roles = PermissionCatalog::roles();
+        $names = fn (callable $filter) => collect($roles)->filter($filter)->map(fn ($role) => $role['name'])->values()->implode(', ');
+        if ($permission) {
+            $needed = explode('|', substr($permission, 11));
+
+            return '`'.implode('` or `', $needed).'` → '.$names(fn ($role) => $role['is_staff'] && array_intersect($needed, $role['permissions']));
+        }
+
+        return match (true) {
+            $mw->contains('staff') => 'Any active officer → '.$names(fn ($role) => $role['is_staff']),
+            $mw->contains('member') => 'Signed-in member, own records only',
+            $mw->contains('guest') => 'Signed-out visitors',
+            $mw->contains('auth') => 'Any signed-in account',
+            default => 'Public',
+        };
+    }
+
+    public static function securityFor(Route $r): string
+    {
+        $mw = collect($r->gatherMiddleware())->filter(fn ($m) => is_string($m));
+        $out = [];
+        if ($mw->contains('auth')) {
+            $out[] = 'authenticated session (database sessions)';
+        }
+        if ($mw->contains('two-factor')) {
+            $out[] = 'two-factor enrolment gate when enforcement is on';
+        }
+        if ($p = $mw->first(fn ($m) => str_starts_with($m, 'permission:'))) {
+            $out[] = 'server-side permission check (403 otherwise)';
+        }
+        if ($t = $mw->first(fn ($m) => str_starts_with($m, 'throttle:'))) {
+            $out[] = 'rate limit `'.substr($t, 9).'`';
+        }
+        if (array_intersect(['POST', 'PUT', 'PATCH', 'DELETE'], $r->methods())) {
+            $out[] = 'CSRF token + Origin check (419 otherwise)';
+        }
+        if ($mw->contains('auth') || str_starts_with($r->uri(), 'account')) {
+            $out[] = '`Cache-Control: no-store`';
+        }
+        if (str_starts_with($r->uri(), 'account')) {
+            $out[] = '`Referrer-Policy: no-referrer`';
+        }
+        $out[] = 'strict CSP and security headers';
+
+        return implode('; ', $out);
+    }
+
+    /** Field names validated by the handler (and private helpers it calls), read from its source. */
+    public static function validationFor(Route $r): string
+    {
+        [$class, $method] = array_pad(explode('@', $r->getActionName()), 2, null);
+        if (! $method || ! class_exists($class) || ! method_exists($class, $method)) {
+            return 'None (no handler input).';
+        }
+        $source = self::methodSource($class, $method);
+        if (preg_match_all('/\$this->(\w+)\(/', $source, $calls)) {
+            foreach (array_unique($calls[1]) as $helper) {
+                if (method_exists($class, $helper) && (new \ReflectionMethod($class, $helper))->isPrivate()) {
+                    $source .= self::methodSource($class, $helper);
+                }
+            }
+        }
+        $fields = [];
+        $offset = 0;
+        while (($pos = strpos($source, 'validate([', $offset)) !== false) {
+            $body = self::bracketed($source, $pos + strlen('validate('));
+            $offset = $pos + strlen($body) + 10;
+            foreach (self::topLevelSplit(substr($body, 1, -1)) as $entry) {
+                if (preg_match("/^\\s*'([A-Za-z0-9_.*]+)'\\s*=>\\s*(.+)$/s", $entry, $m)) {
+                    $rules = trim(preg_replace('/\s+/', ' ', $m[2]));
+                    $rules = preg_replace('/Rule::(\w+)\([^)]*\)(->\w+\([^)]*\))*/', 'Rule::$1', $rules);
+                    $rules = preg_replace("/'\\s*\\.\\s*config\\('([^']+)'\\)/", '{$1}', $rules);
+                    $rules = trim(str_replace(["'", '"'], '', $rules), '[] ');
+                    $fields[$m[1]] = '`'.$m[1].'`: '.str_replace('|', ', ', $rules);
+                }
+            }
+        }
+        if (isset($fields['idempotency_key']) || str_contains($source, 'Idempotency::')) {
+            $fields['idempotency_key'] = '`idempotency_key`: required exactly-once key (a replay returns the first result)';
+        }
+        if ($fields === [] && preg_match('/validate\(\s*(array_filter\()?\$/', $source)) {
+            return 'Rules assembled per content type or per setting inside `'.class_basename($class).'@'.$method.'` and validated server-side before any write.';
+        }
+        if ($fields === []) {
+            return in_array('GET', $r->methods(), true) ? 'Read-only; route parameters resolved by model binding.' : 'No body fields; acts on the bound record.';
+        }
+
+        return implode('<br>', $fields);
+    }
+
+    private static function bracketed(string $s, int $open): string
+    {
+        $depth = 0;
+        $quote = null;
+        for ($i = $open, $n = strlen($s); $i < $n; $i++) {
+            $c = $s[$i];
+            if ($quote) {
+                if ($c === '\\') {
+                    $i++;
+                } elseif ($c === $quote) {
+                    $quote = null;
+                }
+
+                continue;
+            }
+            if ($c === "'" || $c === '"') {
+                $quote = $c;
+            } elseif ($c === '[' || $c === '(') {
+                $depth++;
+            } elseif ($c === ']' || $c === ')') {
+                if (--$depth === 0) {
+                    return substr($s, $open, $i - $open + 1);
+                }
+            }
+        }
+
+        return substr($s, $open);
+    }
+
+    /** @return list<string> */
+    private static function topLevelSplit(string $s): array
+    {
+        $parts = [];
+        $depth = 0;
+        $quote = null;
+        $current = '';
+        for ($i = 0, $n = strlen($s); $i < $n; $i++) {
+            $c = $s[$i];
+            if ($quote) {
+                $current .= $c;
+                if ($c === '\\' && $i + 1 < $n) {
+                    $current .= $s[++$i];
+                } elseif ($c === $quote) {
+                    $quote = null;
+                }
+
+                continue;
+            }
+            if ($c === "'" || $c === '"') {
+                $quote = $c;
+            } elseif ($c === '[' || $c === '(') {
+                $depth++;
+            } elseif ($c === ']' || $c === ')') {
+                $depth--;
+            } elseif ($c === ',' && $depth === 0) {
+                $parts[] = $current;
+                $current = '';
+
+                continue;
+            }
+            $current .= $c;
+        }
+        if (trim($current) !== '') {
+            $parts[] = $current;
+        }
+
+        return $parts;
+    }
+
+    private static function methodSource(string $class, string $method): string
+    {
+        $ref = new \ReflectionMethod($class, $method);
+        $lines = file($ref->getFileName());
+
+        return implode('', array_slice($lines, $ref->getStartLine() - 1, $ref->getEndLine() - $ref->getStartLine() + 1));
+    }
+
+    /** @return array<string, list<string>> route name => ["File::test_method", ...] */
+    public static function testReferences(array $names): array
+    {
+        $refs = array_fill_keys($names, []);
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path('tests/Feature')));
+        foreach ($files as $file) {
+            if (! str_ends_with($file->getFilename(), 'Test.php')) {
+                continue;
+            }
+            $code = file_get_contents($file->getPathname());
+            $class = basename($file->getFilename(), '.php');
+            $parts = preg_split('/(?=public function (test_\w+)\()/', $code);
+            foreach ($parts as $part) {
+                if (! preg_match('/^public function (test_\w+)\(/', $part, $tm)) {
+                    continue;
+                }
+                $found = preg_match_all("/route\\(\\s*'([a-z0-9._-]+)'/", $part, $m) ? $m[1] : [];
+                // Loops such as foreach ([...names...] as $name) { route($name) } — count quoted route names in the method.
+                if (preg_match('/route\\(\\s*\\$\\w+/', $part) && preg_match_all("/'([a-z0-9._-]+)'/", $part, $q)) {
+                    $found = array_merge($found, $q[1]);
+                }
+                if ($found) {
+                    foreach (array_unique($found) as $name) {
+                        if (isset($refs[$name])) {
+                            $refs[$name][] = $class.'::'.$tm[1];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $refs;
+    }
+
+    private function writeCatalogue(): void
+    {
+        $routes = self::documentedRoutes();
+        $catalogue = RouteCatalogue::all();
+        $refs = self::testReferences(array_keys($routes));
+        $mutatingAdmin = array_filter($routes, fn (Route $r) => str_starts_with($r->getName(), 'admin.') && array_intersect(['POST', 'PUT', 'PATCH', 'DELETE'], $r->methods()));
+        $matrix = 'AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token';
+        $date = now()->toDateString();
+
+        // Endpoint coverage matrix for administrative mutations.
+        $out = "# Administrative endpoint coverage matrix\n\n_Generated by `php artisan boba:docs:reference` on {$date} from the live router and the test sources — do not edit by hand._\n\n";
+        $out .= 'Every administrative route that accepts POST, PUT, PATCH or DELETE is listed. Two generic HTTP tests call **every** one of them: '
+            .'`AdminMutationMatrixTest` posts as each of the '.count(PermissionCatalog::roles()).' roles and anonymously (asserting 302 to sign-in, 403 exactly where the role lacks the permission, and no 403/404/405/500 where it holds it) and posts again with forgery protection active (asserting 419). '
+            .'The “Behaviour tests” column lists the HTTP tests that call the route by name and assert its effect (state change, audit row, validation failure without side effects, duplicate-submission handling or ownership). '
+            ."Lower-level service tests are not counted.\n\n";
+        $out .= '**'.count($mutatingAdmin).' administrative mutation routes.** ';
+        $without = array_filter(array_keys($mutatingAdmin), fn ($n) => $refs[$n] === []);
+        $out .= count($mutatingAdmin) - count($without).' have route-specific HTTP behaviour tests; '.count($without)." rely on the generic matrix only.\n\n";
+        $out .= "| Route | Method · path | Permission | Matrix (roles + CSRF) | Behaviour tests |\n|---|---|---|---|---|\n";
+        foreach ($mutatingAdmin as $name => $r) {
+            $perm = collect($r->gatherMiddleware())->first(fn ($m) => is_string($m) && str_starts_with($m, 'permission:'));
+            $tests = $refs[$name] ? implode('<br>', array_map(fn ($t) => '`'.$t.'`', array_unique($refs[$name]))) : '**none — matrix only**';
+            $out .= "| `{$name}` | POST `/{$r->uri()}` | ".($perm ? '`'.str_replace('|', '` or `', substr($perm, 11)).'`' : 'any active officer').' | yes | '.$tests." |\n";
+        }
+        file_put_contents(base_path('docs/34-admin-endpoint-coverage.md'), $out);
+
+        // Per-route catalogue.
+        $out = "# Route catalogue\n\n_Generated by `php artisan boba:docs:reference` on {$date} — do not edit by hand. Meaning comes from `App\\Support\\RouteCatalogue`; roles, security, validation fields and tests are derived from the code. `tests/Feature/Docs/RouteCatalogueSyncTest` fails if a route is undocumented._\n\n";
+        $out .= 'Status values: **Implemented · HTTP-tested** (at least one feature test calls or asserts the route), **Implemented · not directly HTTP-tested** (behaviour is exercised only through other routes or services — listed honestly in [24-known-issues.md](24-known-issues.md)).'."\n\n";
+        $out .= '**'.count($routes).' routes.**'."\n\n";
+        $untested = [];
+        foreach ($routes as $name => $r) {
+            $meta = $catalogue[$name] ?? ['p' => '_Undocumented_', 'd' => '', 'a' => ''];
+            $isRead = ! array_intersect(['POST', 'PUT', 'PATCH', 'DELETE'], $r->methods());
+            $public = ! collect($r->gatherMiddleware())->contains(fn ($m) => in_array($m, ['auth', 'staff', 'member'], true));
+            $tests = array_unique($refs[$name]);
+            if (isset($mutatingAdmin[$name])) {
+                array_unshift($tests, $matrix);
+            }
+            $status = $tests ? 'Implemented · HTTP-tested' : 'Implemented · not directly HTTP-tested';
+            if (! $tests) {
+                $untested[] = $name;
+            }
+            $out .= "## `{$name}`\n\n";
+            $out .= '| | |'."\n|---|---|\n";
+            $out .= '| Method · path | '.implode('|', array_diff($r->methods(), ['HEAD'])).' `/'.ltrim($r->uri(), '/')."` |\n";
+            $out .= '| Handler | `'.class_basename(explode('@', $r->getActionName())[0]).'@'.(explode('@', $r->getActionName())[1] ?? '')."` |\n";
+            $out .= '| Purpose | '.$meta['p']." |\n";
+            $out .= '| Roles / permission | '.self::rolesFor($r)." |\n";
+            $out .= '| Validation | '.self::validationFor($r)." |\n";
+            $out .= '| Data | '.$meta['d']." |\n";
+            $out .= '| Success | '.($meta['s'] ?? self::READ_SUCCESS_TEXT)." |\n";
+            $out .= '| Failure states | '.($meta['f'] ?? ($isRead ? ($public ? RouteCatalogue::PUBLIC_FAILURE : RouteCatalogue::READ_FAILURE) : 'Validation errors re-shown; business-rule refusals shown on the form.'))." |\n";
+            $out .= '| Security controls | '.self::securityFor($r)." |\n";
+            $out .= '| Acceptance criterion | '.$meta['a']." |\n";
+            $out .= '| Tests | '.($tests ? implode('<br>', array_map(fn ($t) => '`'.$t.'`', $tests)) : '—')." |\n";
+            $out .= "| Status | {$status} |\n\n";
+        }
+        $summary = "## Routes without a direct HTTP test\n\n".($untested ? implode(', ', array_map(fn ($n) => "`{$n}`", $untested)) : 'None.')."\n\n";
+        $out = str_replace('**'.count($routes).' routes.**'."\n\n", '**'.count($routes).' routes**, '.(count($routes) - count($untested)).' HTTP-tested.'."\n\n".$summary, $out);
+        file_put_contents(base_path('docs/35-route-catalogue.md'), $out);
+    }
+
+    private const READ_SUCCESS_TEXT = RouteCatalogue::READ_SUCCESS;
 }
