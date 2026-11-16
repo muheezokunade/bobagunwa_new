@@ -105,8 +105,8 @@ log "Preflight: no required check failed ($WARNS advisory warning(s)) — $RUN/p
 # ---- 5. Database ------------------------------------------------------------
 "$PHP" artisan migrate --force --no-ansi >> "$RUN/deploy.log" 2>&1 || die "migration failed (nothing was switched)"
 "$PHP" artisan boba:ledger:verify --trigger=manual --no-ansi >> "$RUN/deploy.log" 2>&1 || die "ledger verification failed (nothing was switched)"
-"$PHP" artisan config:cache --no-ansi >/dev/null && "$PHP" artisan route:cache --no-ansi >/dev/null && "$PHP" artisan view:cache --no-ansi >/dev/null
-log "Migrated; integrity triggers and ledger verified; caches built"
+"$PHP" artisan optimize:clear --no-ansi >/dev/null
+log "Migrated; integrity triggers and ledger verified (caches are built after the switch: they store absolute paths)"
 
 # ---- 6. Keep staging protected --------------------------------------------
 { echo "# --- staging protection (from $CONFIG/staging-protection.htaccess, $STAMP) ---"
@@ -125,5 +125,17 @@ if [ -d "$ROOT" ]; then PREV="$ROOT.previous-$STAMP"; mv "$ROOT" "$PREV"; fi
 mv "$REL" "$ROOT"
 echo "$PREV" > "$RUN/previous-path"
 log "Switched: $ROOT now serves the new release${PREV:+; previous kept at $PREV}"
+
+# ---- 8. Caches in the final location, then an internal smoke check ---------
+cd "$ROOT"
+if ! { "$PHP" artisan config:cache --no-ansi >/dev/null && "$PHP" artisan route:cache --no-ansi >/dev/null && "$PHP" artisan view:cache --no-ansi >/dev/null \
+       && "$PHP" artisan boba:smoke --no-ansi > "$RUN/smoke.txt" 2>&1; }; then
+  log "Smoke check FAILED after the switch — rolling back automatically (see $RUN/smoke.txt)"
+  cd "$HOME"
+  mv "$ROOT" "$ROOT.failed-$STAMP"
+  if [ -n "$PREV" ]; then mv "$PREV" "$ROOT"; else mkdir -p "$ROOT/public" && cp "$CONFIG/staging-protection.htaccess" "$ROOT/public/.htaccess"; fi
+  die "deployment rolled back; failed release kept at $ROOT.failed-$STAMP"
+fi
+log "Caches built in place; internal smoke check passed ($RUN/smoke.txt)"
 log "Rollback: deploy/staging-rollback.sh $STAMP"
 log "Next: verify https://v2-staging.bobagunwa.com from an allowed address (valid certificate required), install cron, run the acceptance checks."
