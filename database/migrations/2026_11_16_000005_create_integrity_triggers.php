@@ -13,7 +13,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        foreach (IntegrityTriggers::definitions() as $name => $sql) {
+        foreach (IntegrityTriggers::installable() as $name => $sql) {
             DB::unprepared("DROP TRIGGER IF EXISTS {$name}");
             DB::unprepared($sql);
         }

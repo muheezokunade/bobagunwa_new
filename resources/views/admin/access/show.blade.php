@@ -95,4 +95,14 @@
     </table></div>
     @endif
 </section>
+@if ($user->two_factor_confirmed_at && $user->id !== auth()->id())
+<form class="panel" method="post" action="{{ route('admin.access.two-factor.reset', $user) }}" data-confirm="Reset two-factor sign-in for {{ $user->name }}?">
+    @csrf
+    <h2>Reset two-factor sign-in</h2>
+    <p>Use only when the officer has lost both their phone and recovery codes. Their sessions end and they must set it up again.</p>
+    <x-field name="reason" label="Reason" required prefix="tf-" />
+    <x-check name="confirm_identity" label="I have verified this officer’s identity outside the website." prefix="tf-" />
+    <button class="btn danger" type="submit">Reset two-factor sign-in</button>
+</form>
+@endif
 @endsection

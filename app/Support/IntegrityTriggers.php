@@ -2,6 +2,8 @@
 
 namespace App\Support;
 
+use Illuminate\Support\Facades\Schema;
+
 /**
  * MariaDB trigger definitions that enforce ledger, register and audit
  * invariants at the database level.
@@ -40,6 +42,11 @@ final class IntegrityTriggers
             'boba_application_events_block_update' => $block('application_events', 'UPDATE', 'REGISTER: application history is append-only'),
             'boba_application_events_block_delete' => $block('application_events', 'DELETE', 'REGISTER: application history is append-only'),
             'boba_users_block_delete' => $block('users', 'DELETE', 'REGISTER: user accounts are disabled, never deleted'),
+            'boba_integrity_check_runs_block_update' => $block('integrity_check_runs', 'UPDATE', 'REGISTER: integrity check history is append-only'),
+            'boba_integrity_check_runs_block_delete' => $block('integrity_check_runs', 'DELETE', 'REGISTER: integrity check history is append-only'),
+            'boba_system_alerts_block_delete' => $block('system_alerts', 'DELETE', 'REGISTER: alerts are resolved, never deleted'),
+            'boba_alert_notifications_block_update' => $block('alert_notifications', 'UPDATE', 'REGISTER: alert delivery records are append-only'),
+            'boba_alert_notifications_block_delete' => $block('alert_notifications', 'DELETE', 'REGISTER: alert delivery records are append-only'),
 
             // ---------------------------------------------------------------
             // Membership numbers: issued once, never changed, never reused.
@@ -300,6 +307,21 @@ SQL,
             'boba_financial_reversals_block_update' => $block('financial_reversals', 'UPDATE', 'LEDGER: reversals are append-only'),
             'boba_financial_reversals_block_delete' => $block('financial_reversals', 'DELETE', 'LEDGER: reversals are append-only'),
         ];
+    }
+
+    /**
+     * Definitions whose table already exists — used by the original trigger
+     * migration so a fresh install can run migrations in order.
+     *
+     * @return array<string, string>
+     */
+    public static function installable(): array
+    {
+        return array_filter(self::definitions(), function (string $sql) {
+            preg_match('/ ON ([a-z_]+) FOR EACH ROW/', $sql, $m);
+
+            return Schema::hasTable($m[1]);
+        });
     }
 
     /** @return list<string> */

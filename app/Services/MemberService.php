@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Exceptions\DomainRuleException;
 use App\Models\Member;
 use App\Models\User;
+use App\Services\Finance\Ledger;
 use App\Support\Audit;
+use App\Support\Idempotency;
 use App\Support\Normalize;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -61,6 +63,64 @@ class MemberService
             });
         } catch (UniqueConstraintViolationException $e) {
             throw new DomainRuleException('Another member record already uses that email address or phone number.');
+        }
+    }
+
+    /**
+     * Add one existing member by hand. Email/phone duplicates are refused; a
+     * same-name match is allowed only when the officer confirms the person is
+     * different and records how (audited). No login account is created.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array{0: Member, 1: bool}
+     */
+    public function createManual(array $data, User $officer, bool $confirmDistinct, ?string $distinguishingNote, ?string $idempotencyKey): array
+    {
+        if (! $officer->hasPermission('members.manage')) {
+            throw new DomainRuleException('You do not have permission to add members.');
+        }
+        $name = Normalize::text($data['full_name']);
+        $email = Normalize::email($data['email'] ?? null);
+        $phone = Normalize::phone($data['phone'] ?? null);
+        if ($phone !== null && ! Normalize::isPlausiblePhone($phone)) {
+            throw new DomainRuleException('Enter a valid phone number.');
+        }
+        $provided = isset($data['membership_number']) && trim((string) $data['membership_number']) !== '' ? strtoupper(trim($data['membership_number'])) : null;
+
+        try {
+            return Ledger::guard(fn () => Idempotency::run('member.create', $idempotencyKey, [$name, $email, $phone, $provided], function () use ($data, $officer, $confirmDistinct, $distinguishingNote, $name, $email, $phone, $provided) {
+                if ($email && Member::where('email_normalized', $email)->exists()) {
+                    throw new DomainRuleException('Another member already uses this email address.');
+                }
+                if ($phone && Member::where('phone_normalized', $phone)->exists()) {
+                    throw new DomainRuleException('Another member already uses this phone number.');
+                }
+                $sameName = Member::where('name_normalized', Normalize::name($name))->pluck('membership_number');
+                if ($sameName->isNotEmpty()) {
+                    if (! $confirmDistinct || mb_strlen(trim((string) $distinguishingNote)) < 10) {
+                        throw new DomainRuleException('A member with the same name already exists ('.$sameName->implode(', ').'). If this is a different person, tick the confirmation and explain how you verified they are different (at least 10 characters).');
+                    }
+                }
+                $number = app(MembershipNumberService::class)->issue($provided, $officer->id);
+                $notes = trim((string) ($data['admin_notes'] ?? ''));
+                if ($sameName->isNotEmpty()) {
+                    $notes = trim('Confirmed different person from '.$sameName->implode(', ').': '.trim((string) $distinguishingNote)."\n".$notes);
+                }
+                $member = Member::create([
+                    'membership_number' => $number, 'full_name' => $name, 'name_normalized' => Normalize::name($name),
+                    'preferred_name' => Normalize::text($data['preferred_name'] ?? null),
+                    'email' => $email, 'email_normalized' => $email, 'phone' => $phone ? trim($data['phone']) : null, 'phone_normalized' => $phone,
+                    'date_of_birth' => $data['date_of_birth'] ?? null, 'joined_on' => $data['joined_on'] ?? null,
+                    'ijebu_town' => Normalize::text($data['ijebu_town'] ?? null), 'city' => Normalize::text($data['city'] ?? null),
+                    'occupation' => Normalize::text($data['occupation'] ?? null), 'address' => Normalize::text($data['address'] ?? null),
+                    'admin_notes' => $notes ?: null, 'status' => 'active', 'origin' => 'manual', 'created_by' => $officer->id,
+                ]);
+                Audit::record('member.created_manually', "Member {$number} added by hand", $member, ['same_name_confirmed' => $sameName->all(), 'reason' => $data['reason'] ?? null]);
+
+                return $member;
+            }, Member::class));
+        } catch (UniqueConstraintViolationException $e) {
+            throw new DomainRuleException('Another member already uses that email address or phone number.');
         }
     }
 

@@ -2,35 +2,36 @@
 
 namespace App\Console\Commands;
 
-use App\Services\Finance\LedgerQuery;
-use App\Support\Audit;
-use App\Support\IntegrityTriggers;
+use App\Services\IntegrityMonitor;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Scheduled daily (routes/console.php). Records the run, raises or clears
+ * integrity alerts and exits non-zero on failure so cron mail (if any) shows it.
+ */
 class LedgerVerify extends Command
 {
-    protected $signature = 'boba:ledger:verify';
+    protected $signature = 'boba:ledger:verify {--trigger=schedule : schedule|manual|restore}';
 
-    protected $description = 'Check that integrity triggers are installed and no ledger invariant is violated';
+    protected $description = 'Check integrity triggers and ledger invariants; raise or clear integrity alerts';
 
-    public function handle(LedgerQuery $ledger): int
+    public function handle(IntegrityMonitor $monitor): int
     {
-        $installed = collect(DB::select('SELECT TRIGGER_NAME AS n FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()'))->pluck('n')->all();
-        $missing = array_diff(IntegrityTriggers::names(), $installed);
-        $exceptions = array_filter($ledger->exceptions());
-        foreach ($missing as $name) {
+        $trigger = in_array($this->option('trigger'), ['schedule', 'manual', 'restore'], true) ? $this->option('trigger') : 'schedule';
+        $run = $monitor->run($trigger);
+        foreach ($run->missing_triggers ?? [] as $name) {
             $this->error("Missing trigger: {$name}");
         }
-        foreach ($exceptions as $label => $rows) {
-            $this->error("{$label}: ".count($rows));
+        foreach ($run->exception_counts ?? [] as $label => $n) {
+            $this->error("{$label}: {$n}");
         }
-        if ($missing || $exceptions) {
-            Audit::record('ledger.verification_failed', 'Ledger verification found problems', null, ['missing_triggers' => array_values($missing), 'exceptions' => array_map('count', $exceptions)]);
-
+        if ($run->status === 'error') {
+            $this->error('The integrity check could not complete: '.$run->error);
+        }
+        if ($run->status !== 'passed') {
             return self::FAILURE;
         }
-        $this->info('Ledger verified: '.count($installed).' triggers installed, no invariant exceptions.');
+        $this->info("Ledger verified: {$run->triggers_installed} triggers installed, no invariant exceptions.");
 
         return self::SUCCESS;
     }

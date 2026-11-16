@@ -40,6 +40,7 @@ final class PermissionCatalog
 
             'access.manage' => ['group' => 'Administration', 'description' => 'Manage officer accounts, role assignments and account recovery'],
             'audit.read' => ['group' => 'Administration', 'description' => 'Read audit and security history'],
+            'integrity.alerts' => ['group' => 'Administration', 'description' => 'See, acknowledge and resolve integrity alerts (check names and counts only; no financial records)'],
             'settings.manage' => ['group' => 'Administration', 'description' => 'Manage organisation settings and launch approvals'],
             'backups.manage' => ['group' => 'Administration', 'description' => 'Create and review encrypted backups'],
         ];
@@ -59,7 +60,7 @@ final class PermissionCatalog
                 'name' => 'System Administrator',
                 'description' => 'Technical administration. Has no membership-approval or treasury powers.',
                 'is_staff' => true,
-                'permissions' => ['access.manage', 'audit.read', 'settings.manage', 'backups.manage'],
+                'permissions' => ['access.manage', 'audit.read', 'settings.manage', 'backups.manage', 'integrity.alerts'],
             ],
             'membership_officer' => [
                 'name' => 'Membership Officer',
@@ -77,19 +78,19 @@ final class PermissionCatalog
                 'name' => 'Treasurer',
                 'description' => 'Assessments, payment recording, allocation, adjustments and reports. Cannot verify own entries or reverse.',
                 'is_staff' => true,
-                'permissions' => ['members.read', 'finance.read', 'finance.categories.manage', 'finance.assessments.manage', 'finance.payments.record', 'finance.allocate', 'finance.adjust', 'finance.import', 'finance.reports.export'],
+                'permissions' => ['members.read', 'finance.read', 'finance.categories.manage', 'finance.assessments.manage', 'finance.payments.record', 'finance.allocate', 'finance.adjust', 'finance.import', 'finance.reports.export', 'integrity.alerts'],
             ],
             'payment_verifier' => [
                 'name' => 'Payment Verifier',
                 'description' => 'Independently verifies or rejects recorded payments and authorises reversals.',
                 'is_staff' => true,
-                'permissions' => ['members.read', 'finance.read', 'finance.payments.verify', 'finance.reverse'],
+                'permissions' => ['members.read', 'finance.read', 'finance.payments.verify', 'finance.reverse', 'integrity.alerts'],
             ],
             'executive' => [
                 'name' => 'Executive (read-only oversight)',
                 'description' => 'Read-only register, finance and audit oversight.',
                 'is_staff' => true,
-                'permissions' => ['members.read', 'finance.read', 'finance.reports.export', 'audit.read'],
+                'permissions' => ['members.read', 'finance.read', 'finance.reports.export', 'audit.read', 'integrity.alerts'],
             ],
         ];
     }

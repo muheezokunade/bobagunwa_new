@@ -43,7 +43,7 @@ class MemberImportController extends Controller
     {
         abort_unless($batch->kind === 'members', 404);
         $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Confirm that the source list has been approved for import.']);
-        $result = $this->imports->commit($batch, $request->user());
+        $result = $this->imports->commit($batch, $request->user(), $request->boolean('confirm_same_names'));
 
         return redirect()->route('admin.imports.members.show', $batch)->with('status', $result['replayed'] ? 'This import was already completed; no records were changed.' : "Import completed: {$result['batch']->row_count} members added. No login accounts were created.");
     }

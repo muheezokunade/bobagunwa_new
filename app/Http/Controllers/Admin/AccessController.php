@@ -10,6 +10,7 @@ use App\Models\Role;
 use App\Models\SecurityEvent;
 use App\Models\User;
 use App\Services\AccountService;
+use App\Services\TwoFactorService;
 use App\Support\Audit;
 use App\Support\Normalize;
 use Illuminate\Http\RedirectResponse;
@@ -150,6 +151,14 @@ class AccessController extends Controller
         $message = $this->accounts->prepareLinkMessage($user, $purpose, $link['url'], $link['record']);
 
         return redirect()->route('admin.access.show', $user)->with('one_time_link', ['url' => $link['url'], 'label' => ucfirst(str_replace('_', ' ', $purpose))." link for {$user->name}", 'message_id' => $message->id, 'expires' => $purpose === 'activation' ? 'in '.config('boba.accounts.activation_token_days').' days' : 'in '.config('boba.accounts.reset_token_minutes').' minutes']);
+    }
+
+    public function twoFactorReset(Request $request, User $user, TwoFactorService $twoFactor): RedirectResponse
+    {
+        $data = $request->validate(['reason' => ['required', 'string', 'min:5', 'max:255'], 'confirm_identity' => ['accepted']], ['confirm_identity.accepted' => 'Confirm that you have verified this person’s identity.']);
+        $twoFactor->adminReset($user, $request->user(), $data['reason']);
+
+        return redirect()->route('admin.access.show', $user)->with('status', 'Two-factor sign-in reset. The officer must set it up again at their next sign-in.');
     }
 
     public function recovery(Request $request, RecoveryRequest $recovery): RedirectResponse

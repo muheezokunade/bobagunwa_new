@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin;
 use App\Http\Controllers\Auth\AccountController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\TwoFactorChallengeController;
 use App\Http\Controllers\Portal\PortalController;
 use App\Http\Controllers\Public\ApplicationController;
 use App\Http\Controllers\Public\ContactController;
@@ -50,6 +51,8 @@ Route::post('/membership/status/respond', [ApplicationController::class, 'respon
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'show'])->name('login');
     Route::post('/login', [LoginController::class, 'login'])->middleware('throttle:logins')->name('login.attempt');
+    Route::get('/login/two-factor', [TwoFactorChallengeController::class, 'show'])->name('login.two-factor');
+    Route::post('/login/two-factor', [TwoFactorChallengeController::class, 'verify'])->middleware('throttle:two-factor')->name('login.two-factor.verify');
     Route::get('/account/recover', [AccountController::class, 'recoverForm'])->name('password.request');
     Route::post('/account/recover', [AccountController::class, 'recover'])->middleware('throttle:recovery')->name('password.email');
 });
@@ -88,10 +91,26 @@ Route::middleware(['auth', 'member'])->prefix('portal')->name('portal.')->contro
 | Administration — authorised officers; each area checks a named permission
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'staff'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'staff', 'two-factor'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [Admin\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/account', [Admin\AccountController::class, 'show'])->name('account');
     Route::post('/account/password', [Admin\AccountController::class, 'password'])->name('account.password');
+    Route::post('/account/two-factor/start', [Admin\AccountController::class, 'twoFactorStart'])->name('account.two-factor.start');
+    Route::post('/account/two-factor/confirm', [Admin\AccountController::class, 'twoFactorConfirm'])->name('account.two-factor.confirm');
+    Route::post('/account/two-factor/recovery-codes', [Admin\AccountController::class, 'twoFactorRecovery'])->name('account.two-factor.recovery');
+    Route::post('/account/two-factor/disable', [Admin\AccountController::class, 'twoFactorDisable'])->name('account.two-factor.disable');
+
+    Route::middleware('permission:integrity.alerts')->controller(Admin\AlertController::class)->group(function () {
+        Route::get('/alerts', 'index')->name('alerts.index');
+        Route::post('/alerts/check', 'check')->name('alerts.check');
+        Route::get('/alerts/{alert}', 'show')->whereNumber('alert')->name('alerts.show');
+        Route::post('/alerts/{alert}/acknowledge', 'acknowledge')->whereNumber('alert')->name('alerts.acknowledge');
+        Route::post('/alerts/{alert}/resolve', 'resolve')->whereNumber('alert')->name('alerts.resolve');
+    });
+    Route::middleware('permission:settings.manage')->controller(Admin\AlertController::class)->group(function () {
+        Route::post('/alerts/email/test', 'emailTest')->name('alerts.email.test');
+        Route::post('/alerts/email/verify', 'emailVerify')->name('alerts.email.verify');
+    });
 
     Route::middleware('permission:applications.review')->controller(Admin\ApplicationController::class)->group(function () {
         Route::get('/applications', 'index')->name('applications.index');
@@ -109,6 +128,8 @@ Route::middleware(['auth', 'staff'])->prefix('admin')->name('admin.')->group(fun
     Route::controller(Admin\MemberController::class)->group(function () {
         Route::get('/members', 'index')->middleware('permission:members.read')->name('members.index');
         Route::get('/members/export', 'export')->middleware('permission:members.export')->name('members.export');
+        Route::get('/members/create', 'create')->middleware('permission:members.manage')->name('members.create');
+        Route::post('/members', 'store')->middleware('permission:members.manage')->name('members.store');
         Route::get('/members/{member}', 'show')->middleware('permission:members.read')->name('members.show');
         Route::post('/members/{member}', 'update')->middleware('permission:members.manage')->name('members.update');
         Route::post('/members/{member}/status', 'status')->middleware('permission:members.manage')->name('members.status');
@@ -213,6 +234,7 @@ Route::middleware(['auth', 'staff'])->prefix('admin')->name('admin.')->group(fun
         Route::post('/access/users/{user}/roles', 'roles')->name('access.roles');
         Route::post('/access/users/{user}/status', 'status')->name('access.status');
         Route::post('/access/users/{user}/link', 'link')->name('access.link');
+        Route::post('/access/users/{user}/two-factor-reset', 'twoFactorReset')->name('access.two-factor.reset');
         Route::post('/access/recovery/{recovery}', 'recovery')->name('access.recovery');
     });
 

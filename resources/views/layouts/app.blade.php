@@ -34,6 +34,9 @@
         @include($area === 'admin' ? 'partials.admin-nav' : 'partials.portal-nav')
     </nav>
     <main class="app-main" id="main" tabindex="-1">
+        @if ($area === 'admin')
+            @include('partials.integrity-banner')
+        @endif
         @include('partials.flash')
         @yield('content')
     </main>

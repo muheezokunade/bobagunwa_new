@@ -55,6 +55,36 @@ class MemberController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        return view('admin.members.create');
+    }
+
+    public function store(Request $request, MemberService $members): RedirectResponse
+    {
+        $data = $request->validate([
+            'full_name' => ['required', 'string', 'min:3', 'max:190'],
+            'preferred_name' => ['nullable', 'string', 'max:120'],
+            'email' => ['nullable', 'email:rfc', 'max:190'],
+            'phone' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+()\-\s]{7,40}$/'],
+            'date_of_birth' => ['nullable', 'date_format:Y-m-d', 'before:today'],
+            'joined_on' => ['nullable', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'membership_number' => ['nullable', 'string', 'max:32'],
+            'ijebu_town' => ['nullable', 'string', 'max:120'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'occupation' => ['nullable', 'string', 'max:120'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'admin_notes' => ['nullable', 'string', 'max:3000'],
+            'reason' => ['required', 'string', 'min:5', 'max:255'],
+            'confirm_distinct_person' => ['nullable', 'boolean'],
+            'distinguishing_note' => ['nullable', 'string', 'max:500'],
+            'idempotency_key' => ['required', 'string'],
+        ]);
+        [$member, $replayed] = $members->createManual($data, $request->user(), $request->boolean('confirm_distinct_person'), $data['distinguishing_note'] ?? null, $data['idempotency_key']);
+
+        return redirect()->route('admin.members.show', $member)->with('status', $replayed ? 'This member was already added; nothing was duplicated.' : "Member {$member->membership_number} added. No login account has been created.");
+    }
+
     public function update(Request $request, Member $member, MemberService $members): RedirectResponse
     {
         $data = $request->validate([

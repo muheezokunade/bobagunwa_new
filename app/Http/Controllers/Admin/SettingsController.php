@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\MembershipNumberService;
+use App\Services\TwoFactorService;
 use App\Support\Audit;
 use App\Support\Settings;
 use Illuminate\Http\RedirectResponse;
@@ -32,13 +33,13 @@ class SettingsController extends Controller
                 'int' => ['required', 'integer', 'min:3', 'max:10'],
                 'email' => ['nullable', 'email', 'max:190'],
                 'string' => ['nullable', 'string', 'max:255'],
-                'approval' => [],
+                'approval', 'internal' => [],
             };
         }
         $data = $request->validate(array_filter($rules));
         $changed = [];
         foreach (Settings::definitions() as $key => $def) {
-            if ($def['type'] === 'approval') {
+            if (in_array($def['type'], ['approval', 'internal'], true)) {
                 continue;
             }
             $field = str_replace('.', '__', $key);
@@ -49,6 +50,12 @@ class SettingsController extends Controller
             };
             if ($key === 'membership.number_prefix' && $value !== null && ! preg_match('/^[A-Z0-9\/-]{0,12}$/', $value)) {
                 return back()->withInput()->withErrors(['membership__number_prefix' => 'Use up to 12 capital letters, digits, “-” or “/”.']);
+            }
+            if ($key === 'security.require_two_factor' && $value === true && Settings::get($key) !== true) {
+                $missing = TwoFactorService::privilegedOfficersWithoutTwoFactor();
+                if ($missing->isNotEmpty()) {
+                    return back()->withInput()->withErrors(['security__require_two_factor' => 'Two-factor sign-in cannot be required yet: these privileged officers have not enrolled: '.$missing->pluck('name')->implode(', ').'. Enforcing it now would lock them out.']);
+                }
             }
             if (Settings::get($key) !== $value) {
                 $changed[$key] = ['from' => Settings::get($key), 'to' => $value];

@@ -4,6 +4,7 @@ use App\Exceptions\DomainRuleException;
 use App\Http\Middleware\EnsureActiveAccount;
 use App\Http\Middleware\EnsureMember;
 use App\Http\Middleware\EnsureStaff;
+use App\Http\Middleware\EnsureTwoFactorEnrolled;
 use App\Http\Middleware\RequirePermission;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
             'permission' => RequirePermission::class,
             'staff' => EnsureStaff::class,
             'member' => EnsureMember::class,
+            'two-factor' => EnsureTwoFactorEnrolled::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->member_id ? route('portal.dashboard') : route('admin.dashboard'));

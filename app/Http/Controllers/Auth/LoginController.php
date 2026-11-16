@@ -41,10 +41,24 @@ class LoginController extends Controller
             return back()->withInput(['email' => $data['email']])->withErrors(['email' => 'This account is not active. Contact the secretariat for help.']);
         }
 
+        if ($user->two_factor_confirmed_at) {
+            // Password accepted; the session is not authenticated until the second factor succeeds.
+            $request->session()->regenerate();
+            $request->session()->put('two_factor.login', ['user_id' => $user->id, 'expires' => time() + 300, 'attempts' => 0]);
+            Audit::security('login.awaiting_two_factor', $user->id);
+
+            return redirect()->route('login.two-factor');
+        }
+
+        return $this->complete($request, $user, false);
+    }
+
+    public function complete(Request $request, User $user, bool $usedTwoFactor): RedirectResponse
+    {
         Auth::login($user);
         $request->session()->regenerate();
         $user->forceFill(['last_login_at' => now()])->save();
-        Audit::security('login.succeeded', $user->id);
+        Audit::security('login.succeeded', $user->id, ['two_factor' => $usedTwoFactor]);
 
         if ($user->member_id && ! $user->isStaff()) {
             return redirect()->intended(route('portal.dashboard'));

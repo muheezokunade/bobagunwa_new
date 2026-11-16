@@ -69,7 +69,7 @@ class MemberImportService
         $evaluated = $this->evaluate($parsed['rows']);
 
         return DB::transaction(function () use ($file, $officer, $sha, $parsed, $evaluated) {
-            $counts = array_count_values(array_column($evaluated, 'status')) + ['valid' => 0, 'invalid' => 0, 'duplicate' => 0];
+            $counts = array_count_values(array_column($evaluated, 'status')) + ['valid' => 0, 'invalid' => 0, 'duplicate' => 0, 'name_match' => 0];
             $batch = ImportBatch::create([
                 'reference' => $this->reference(),
                 'kind' => 'members',
@@ -80,6 +80,7 @@ class MemberImportService
                 'valid_count' => $counts['valid'],
                 'invalid_count' => $counts['invalid'],
                 'duplicate_count' => $counts['duplicate'],
+                'name_match_count' => $counts['name_match'],
                 'summary' => ['unknown_columns' => $parsed['unknown'], 'columns' => $parsed['headers']],
                 'created_by' => $officer->id,
             ]);
@@ -163,7 +164,7 @@ class MemberImportService
 
             foreach (['email' => $n['email'], 'phone' => $n['phone_normalized'], 'number' => $n['membership_number'], 'name' => $names[$i]] as $key => $value) {
                 if ($value && isset($seen[$key][$value])) {
-                    $duplicates[] = "Same {$key} as row {$seen[$key][$value]} in this file.";
+                    $duplicates[] = $key === 'name' ? "Same name as row {$seen[$key][$value]} in this file." : "Same {$key} as row {$seen[$key][$value]} in this file.";
                 } elseif ($value) {
                     $seen[$key][$value] = $rowNumber;
                 }
@@ -181,11 +182,13 @@ class MemberImportService
                 $duplicates[] = "Name matches existing member {$existingNames[$names[$i]]}.";
             }
 
+            // A conflict that is ONLY a same-name match may be confirmed by the officer as different people.
+            $onlyNames = $duplicates && collect($duplicates)->every(fn ($d) => str_starts_with($d, 'Same name as row') || str_starts_with($d, 'Name matches existing member'));
             $out[] = [
                 'row_number' => $rowNumber,
                 'raw' => $row,
                 'normalized' => $n,
-                'status' => $errors ? 'invalid' : ($duplicates ? 'duplicate' : 'valid'),
+                'status' => $errors ? 'invalid' : ($duplicates ? ($onlyNames ? 'name_match' : 'duplicate') : 'valid'),
                 'messages' => array_merge($errors, $duplicates),
             ];
         }
@@ -194,7 +197,7 @@ class MemberImportService
     }
 
     /** @return array{batch: ImportBatch, replayed: bool} */
-    public function commit(ImportBatch $batch, User $officer): array
+    public function commit(ImportBatch $batch, User $officer, bool $confirmSameNames = false): array
     {
         if ($batch->kind !== 'members') {
             throw new DomainRuleException('This is not a member import.');
@@ -202,7 +205,7 @@ class MemberImportService
         Settings::requireApproval('approval.member_import', 'Importing existing members');
 
         try {
-            return DB::transaction(function () use ($batch, $officer) {
+            return DB::transaction(function () use ($batch, $officer, $confirmSameNames) {
                 $locked = ImportBatch::lockForUpdate()->findOrFail($batch->id);
                 if ($locked->status === 'committed') {
                     return ['batch' => $locked, 'replayed' => true];
@@ -213,10 +216,13 @@ class MemberImportService
                 if ($locked->invalid_count > 0 || $locked->duplicate_count > 0) {
                     throw new DomainRuleException('Correct every invalid or duplicate row and upload the file again before importing.');
                 }
+                if ($locked->name_match_count > 0 && ! $confirmSameNames) {
+                    throw new DomainRuleException("{$locked->name_match_count} row(s) share a name with another member or row. Confirm that you have verified they are different people before importing.");
+                }
                 $rows = $locked->rows()->get();
                 // Re-check against the register as it is now: it may have changed since preview.
                 $recheck = $this->evaluate($rows->map(fn ($r) => $r->raw)->all());
-                $problems = array_filter($recheck, fn ($r) => $r['status'] !== 'valid');
+                $problems = array_filter($recheck, fn ($r) => ! ($r['status'] === 'valid' || ($r['status'] === 'name_match' && $confirmSameNames)));
                 if ($problems) {
                     $first = reset($problems);
                     throw new DomainRuleException("The register changed since this preview (row {$first['row_number']}: {$first['messages'][0]}). Upload the file again.");
@@ -247,7 +253,7 @@ class MemberImportService
                     $row->update(['result_type' => 'Member', 'result_id' => $member->id]);
                 }
                 $locked->update(['status' => 'committed', 'committed_by' => $officer->id, 'committed_at' => now()]);
-                Audit::record('member_import.committed', "Member import {$locked->reference} committed: {$rows->count()} members created, no login accounts", $locked, ['members_created' => $rows->count()]);
+                Audit::record('member_import.committed', "Member import {$locked->reference} committed: {$rows->count()} members created, no login accounts", $locked, ['members_created' => $rows->count(), 'same_name_rows_confirmed' => $locked->name_match_count]);
 
                 return ['batch' => $locked->fresh(), 'replayed' => false];
             });

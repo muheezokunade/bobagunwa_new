@@ -14,9 +14,9 @@ use Illuminate\Support\Collection;
  */
 class User extends Authenticatable
 {
-    protected $guarded = ['id', 'password', 'remember_token'];
+    protected $guarded = ['id', 'password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes', 'two_factor_confirmed_at', 'two_factor_last_step'];
 
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'];
 
     /** @var Collection<int, string>|null */
     private ?Collection $permissionCache = null;
@@ -28,6 +28,9 @@ class User extends Authenticatable
             'last_login_at' => 'datetime',
             'password_changed_at' => 'datetime',
             'password' => 'hashed',
+            'two_factor_secret' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
+            'two_factor_confirmed_at' => 'datetime',
         ];
     }
 

@@ -59,6 +59,10 @@
                 @csrf
                 <h2>Complete the import</h2>
                 <p>All {{ $batch->row_count }} rows passed the checks.@if ($isMembers) No login accounts will be created.@endif</p>
+                @if (($batch->name_match_count ?? 0) > 0)
+                    <div class="alert warning">{{ $batch->name_match_count }} row(s) share a name with an existing member or another row (marked “Name match” below). Import them only if you have verified they are different people.</div>
+                    <x-check name="confirm_same_names" label="I have verified that the rows marked “Name match” are different people from the members they share a name with." />
+                @endif
                 <x-check name="confirm" :label="$isMembers ? 'I confirm this list is the association’s approved source and has been checked.' : 'I confirm the source records are approved and the totals above have been reconciled.'" />
                 <button class="btn" type="submit">Complete import</button>
             </form>

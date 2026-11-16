@@ -14,7 +14,7 @@
         @csrf
         <h2>Organisation settings</h2>
         @foreach ($definitions as $group => $items)
-            @php $items = collect($items)->reject(fn ($d) => $d['type'] === 'approval'); @endphp
+            @php $items = collect($items)->reject(fn ($d) => in_array($d['type'], ['approval', 'internal'], true)); @endphp
             @continue($items->isEmpty())
             <fieldset>
                 <legend>{{ $group }}</legend>

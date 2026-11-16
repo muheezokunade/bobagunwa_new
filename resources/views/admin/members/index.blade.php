@@ -1,6 +1,9 @@
 @extends('layouts.app', ['area' => 'admin', 'title' => 'Member register'])
 @section('content')
 <x-page-head title="Member register" subtitle="Every member record, ordered by membership number. Records are never deleted.">
+    @if (auth()->user()->hasPermission('members.manage'))
+        <a class="btn" href="{{ route('admin.members.create') }}">Add a member</a>
+    @endif
     @if (auth()->user()->hasPermission('members.export'))
         <a class="btn secondary" href="{{ route('admin.members.export', array_filter(['status' => $filters['status'] ?? null])) }}">Export register (CSV)</a>
     @endif

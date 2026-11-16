@@ -35,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
             ->response($tooMany('Too many messages have been sent from this connection. Please try again later.')));
         RateLimiter::for('recovery', fn (Request $request) => Limit::perHour(5)->by('recover:'.$request->ip())
             ->response($tooMany('Too many requests. Please try again later.')));
+        RateLimiter::for('two-factor', fn (Request $request) => Limit::perMinute(6)->by('2fa:'.(string) data_get($request->session()->get('two_factor.login'), 'user_id', $request->ip()))
+            ->response($tooMany('Too many attempts. Wait a minute and try again.')));
         RateLimiter::for('tokens', fn (Request $request) => Limit::perMinute(10)->by('token:'.$request->ip())
             ->response($tooMany('Too many attempts. Wait a minute and try again.')));
 

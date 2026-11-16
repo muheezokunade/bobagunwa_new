@@ -27,10 +27,11 @@
     @if ($u->hasPermission('events.manage')) {!! $link('admin.events.index', 'Events', 'admin.events.*') !!} @endif
     @if ($u->hasPermission('enquiries.manage')) {!! $link('admin.enquiries.index', 'Enquiries', 'admin.enquiries.*') !!} @endif
 @endif
-@if ($u->hasAnyPermission('access.manage', 'audit.read', 'settings.manage', 'backups.manage'))
+@if ($u->hasAnyPermission('access.manage', 'audit.read', 'settings.manage', 'backups.manage', 'integrity.alerts'))
     <h2>System</h2>
     @if ($u->hasPermission('access.manage')) {!! $link('admin.access.index', 'Officers and access', 'admin.access.*') !!} @endif
     @if ($u->hasPermission('audit.read')) {!! $link('admin.audit.index', 'Audit history', 'admin.audit.*') !!} @endif
+    @if ($u->hasPermission('integrity.alerts')) {!! $link('admin.alerts.index', 'Integrity alerts', 'admin.alerts.*') !!} @endif
     @if ($u->hasPermission('settings.manage')) {!! $link('admin.settings.index', 'Settings', 'admin.settings.*') !!} @endif
     @if ($u->hasPermission('backups.manage')) {!! $link('admin.backups.index', 'Backups', 'admin.backups.*') !!} @endif
 @endif
