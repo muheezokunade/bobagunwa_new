@@ -43,7 +43,7 @@ class EnquiryService
         if (! in_array($status, self::STATUSES, true)) {
             throw new DomainRuleException('Unknown enquiry status.');
         }
-        if ($assignee && ! User::whereKey($assignee)->where('status', 'active')->exists()) {
+        if ($assignee && ! User::whereKey($assignee)->where('status', 'active')->whereHas('roles', fn ($q) => $q->where('is_staff', true))->exists()) {
             throw new DomainRuleException('Choose an active officer.');
         }
         $changes = [];

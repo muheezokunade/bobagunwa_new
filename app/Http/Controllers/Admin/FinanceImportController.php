@@ -56,6 +56,7 @@ class FinanceImportController extends Controller
 
     public function commit(Request $request, ImportBatch $batch): RedirectResponse
     {
+        abort_unless(in_array($batch->kind, ['finance_transactions', 'opening_balances'], true), 404);
         $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Confirm that the source records are approved and the totals have been reconciled.']);
         $result = $this->imports->commit($batch, $request->user());
 
@@ -64,6 +65,7 @@ class FinanceImportController extends Controller
 
     public function cancel(Request $request, ImportBatch $batch, MemberImportService $members): RedirectResponse
     {
+        abort_unless(in_array($batch->kind, ['finance_transactions', 'opening_balances'], true), 404);
         $members->cancel($batch, $request->user());
 
         return redirect()->route('admin.finance.imports.index')->with('status', 'Preview cancelled.');

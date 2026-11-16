@@ -39,6 +39,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
             return back()->withInput($request->except(['password', 'password_confirmation', 'current_password', 'token']))->withErrors(['domain' => $e->getMessage()]);
         });
+        $exceptions->dontReport([DomainRuleException::class]);
         $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'token']);
     })->create();
 

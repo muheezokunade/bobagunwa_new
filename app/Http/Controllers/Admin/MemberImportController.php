@@ -43,6 +43,7 @@ class MemberImportController extends Controller
 
     public function commit(Request $request, ImportBatch $batch): RedirectResponse
     {
+        abort_unless($batch->kind === 'members', 404);
         $request->validate(['confirm' => ['accepted']], ['confirm.accepted' => 'Confirm that the source list has been approved for import.']);
         $result = $this->imports->commit($batch, $request->user());
 
@@ -51,6 +52,7 @@ class MemberImportController extends Controller
 
     public function cancel(Request $request, ImportBatch $batch): RedirectResponse
     {
+        abort_unless($batch->kind === 'members', 404);
         $this->imports->cancel($batch, $request->user());
 
         return redirect()->route('admin.imports.members.index')->with('status', 'Preview cancelled. No records were changed.');

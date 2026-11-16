@@ -1,7 +1,7 @@
 @props(['value'])
 @php
     $map = [
-        'ok' => ['active', 'approved', 'verified', 'published', 'posted', 'eligible', 'committed', 'resolved', 'succeeded', 'delivered_manually', 'accepted_by_mail_server', 'attending', 'issued'],
+        'ok' => ['valid', 'active', 'approved', 'verified', 'published', 'posted', 'eligible', 'committed', 'resolved', 'succeeded', 'delivered_manually', 'accepted_by_mail_server', 'attending', 'issued'],
         'warn' => ['pending', 'submitted', 'under_review', 'changes_requested', 'flagged', 'draft', 'previewed', 'pending_activation', 'in_progress', 'new', 'maybe'],
         'danger' => ['suspended', 'rejected', 'reversed', 'cancelled', 'failed', 'invalid', 'duplicate', 'disabled', 'closed_spam', 'not_attending'],
     ];

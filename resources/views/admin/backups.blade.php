@@ -50,9 +50,9 @@
                     {{ $d['ok'] ? 'All checks passed.' : 'Problems found:' }}
                     @if (! empty($d['problems']) && is_array($d['problems']))<ul>@foreach ($d['problems'] as $problem)<li>{{ $problem }}</li>@endforeach</ul>@endif
                 @endif
-                @isset($d['rows']){{ number_format((int) $d['rows']) }} rows@endisset
-                @isset($d['tables']) in {{ $d['tables'] }} tables@endisset
-                @isset($d['triggers'])· {{ $d['triggers'] }} integrity triggers@endisset
+                @isset($d['rows']){{ number_format((int) $d['rows']) }} rows @endisset
+                @isset($d['tables']) in {{ $d['tables'] }} tables @endisset
+                @isset($d['triggers'])· {{ $d['triggers'] }} integrity triggers @endisset
                 @if (isset($fin['verified_payments']) || isset($fin['outstanding']))
                     <br>Verified payments <x-money :kobo="$fin['verified_payments'] ?? 0" /> · outstanding <x-money :kobo="$fin['outstanding'] ?? 0" />
                 @endif

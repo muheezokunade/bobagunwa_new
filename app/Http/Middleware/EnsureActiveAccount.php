@@ -14,7 +14,8 @@ class EnsureActiveAccount
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
-        if ($user && ! $user->isActive()) {
+        // Re-read status from the database so a suspension takes effect on the very next request.
+        if ($user && ! $user->fresh(['member'])?->isActive()) {
             Audit::security('session.ended_inactive_account', $user->id);
             Auth::logout();
             $request->session()->invalidate();
