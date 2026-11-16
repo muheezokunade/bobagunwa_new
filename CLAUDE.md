@@ -10,7 +10,7 @@ Laravel 13 / PHP 8.3 / MariaDB 11.4 (InnoDB) membership, finance and website pla
 
 1. **No new recurring cost.** Do not add paid services, CDNs, external fonts/scripts or SaaS APIs.
 2. **Money is integer kobo.** Parse naira only with `App\Support\Money::parse`. Never use floats. Never store balances — derive them in `App\Services\Finance\LedgerQuery`.
-3. **Posted financial records are immutable.** Corrections are adjustments or reversals. Never edit, delete, or work around the 30 triggers in `App\Support\IntegrityTriggers`; schema changes reinstall them via migration. Run `php artisan boba:ledger:verify` after any finance change.
+3. **Posted financial records are immutable.** Corrections are adjustments or reversals. Never edit, delete, or work around the 35 triggers in `App\Support\IntegrityTriggers`; schema changes reinstall them via migration. Run `php artisan boba:ledger:verify` after any finance change.
 4. **Permissions are checked server-side** with `permission:` middleware **and** inside services for money/membership decisions (`Ledger::authorise`). The System Administrator role must never gain treasury or approval permissions. Update `PermissionCatalog`, `docs/15-roles-and-permissions.md` and `AuthorisationMatrixTest` together.
 5. **Every state-changing financial/import form carries an idempotency key** (`<x-idem />`) and runs inside `Idempotency::run` or a locked transaction.
 6. **Strict CSP**: no inline `<script>`, no `style=` attributes, no `{!! !!}` on user data. Markdown via `Content::markdown` only.

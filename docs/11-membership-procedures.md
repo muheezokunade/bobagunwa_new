@@ -28,6 +28,7 @@ One transaction locks the application, re-checks duplicates against the register
 * Corrections use optimistic locking (version) and require a reason; each change records old and new values in the audit history.
 * Status: active, suspended, inactive, each with a reason; non-active status ends the member's sessions and blocks login.
 * Possible duplicates (same normalised name) are listed on the member page.
+* A single existing member can be added by hand (**Members → Add a member**). Email/phone duplicates are refused. A same-name match requires the officer's confirmation and a distinguishing note of at least 10 characters, recorded in admin notes and the audit history (decision D-026). The same confirmation applies to **Name match** rows in an import.
 * Members are never deleted.
 
 ## Account delivery

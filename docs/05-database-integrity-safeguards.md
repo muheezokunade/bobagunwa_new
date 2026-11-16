@@ -1,6 +1,6 @@
 # Database integrity safeguards
 
-The ledger, register and audit history are protected **in MariaDB itself**, not only in Laravel code, so that a defect, a mistaken script or direct SQL cannot silently corrupt them. Definitions live in `app/Support/IntegrityTriggers.php` and are installed by migration `2026_11_16_000005`. `php artisan boba:ledger:verify` (scheduled daily at 01:30) and `php artisan boba:preflight` confirm all 30 triggers are present; a restore is rejected if any is missing.
+The ledger, register and audit history are protected **in MariaDB itself**, not only in Laravel code, so that a defect, a mistaken script or direct SQL cannot silently corrupt them. Definitions live in `app/Support/IntegrityTriggers.php` and are installed by migration `2026_11_16_000005`. `php artisan boba:ledger:verify` (scheduled daily at 01:30) and `php artisan boba:preflight` confirm all 35 triggers are present; a restore is rejected if any is missing.
 
 ## Layers
 
@@ -38,6 +38,7 @@ The ledger, register and audit history are protected **in MariaDB itself**, not 
 | R2 | Members and users are never hard-deleted | `boba_members_block_delete`, `boba_users_block_delete` | `IntegrityTriggersTest` |
 | R3 | Audit, security and application history are append-only | `boba_audit_events_block_*`, `boba_security_events_block_*`, `boba_application_events_block_*` | `IntegrityTriggersTest` |
 | R4 | One open application per email and per phone | generated `active_email_key`/`active_phone_key` + unique | `ApplicationWorkflowTest::test_validation_duplicates…` |
+| R5 | Integrity check runs and alert notification records are append-only; alerts are never deleted (status changes only) | `boba_integrity_check_runs_block_update/delete`, `boba_alert_notifications_block_update/delete`, `boba_system_alerts_block_delete`; one unresolved alert per fingerprint via generated `open_fingerprint` + unique | `IntegrityAlertTest`, `IntegrityTriggersTest` |
 | T1 | A failed multi-record operation leaves no partial records | InnoDB transactions | `IntegrityTriggersTest::test_failed_multi_record_transaction_rolls_back_completely` |
 
 ## Concurrency model

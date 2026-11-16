@@ -340,4 +340,23 @@ class LedgerServiceTest extends TestCase
         $this->expectException(DomainRuleException::class);
         $this->payments->record(['amount' => '200'] + $data, $t, $this->key());
     }
+
+    public function test_reversal_period_boundaries_follow_lagos_calendar_days(): void
+    {
+        $m = $this->member();
+        $p = $this->verifiedPayment($m, '1000');
+        // 23:30 UTC on 28 Feb is 00:30 on 1 Mar in Lagos (WAT, UTC+1).
+        $this->travelTo(CarbonImmutable::parse('2026-02-28 23:30:00', 'UTC'));
+        app(PaymentService::class)->reversePayment($p, 'Boundary check (synthetic)', $this->officer('payment_verifier'), $this->key());
+        $this->travelBack();
+        $ledger = app(LedgerQuery::class);
+        $february = $ledger->periodReport(CarbonImmutable::parse('2026-02-01'), CarbonImmutable::parse('2026-02-28'));
+        $march = $ledger->periodReport(CarbonImmutable::parse('2026-03-01'), CarbonImmutable::parse('2026-03-31'));
+        $this->assertSame([0, 1], [$february['reversals']['count'], $march['reversals']['count']]);
+        $line = collect($ledger->statement($m->id, CarbonImmutable::parse('2026-01-01'), CarbonImmutable::parse('2026-12-31'))['lines'] ?? [])->firstWhere('type', 'Payment reversed');
+        $this->assertNotNull($line);
+        $this->assertSame('2026-03-01', (string) $line['date']);
+        $this->actingAs($this->officer('treasurer'))->get(route('admin.finance.reports.index', ['from' => '2026-03-01', 'to' => '2026-03-31']))->assertOk()->assertSee('Boundary check (synthetic)');
+        $this->actingAs($this->officer('treasurer'))->get(route('admin.finance.reports.index', ['from' => '2026-02-01', 'to' => '2026-02-28']))->assertOk()->assertDontSee('Boundary check (synthetic)');
+    }
 }

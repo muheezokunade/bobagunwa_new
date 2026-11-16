@@ -154,6 +154,8 @@ Open a member ledger from **Member balances** on the reports page (press the mem
 - **Obligations** lists each charge with **Original**, **Adjustments**, **Allocated** and **Outstanding**. **Payments** lists every payment and its status.
 - Under **Statement**, set **From** and **To** and press **Show period** (the default is the last twelve months). The statement shows the **Opening position**, **Charges in period**, **Payments in period** and **Closing position**, each transaction with its running **Position**, and **Position at** the end date split into **Outstanding dues and levies** and **Unallocated credit**. Payments awaiting verification are listed underneath but not included.
 - **Download statement CSV** gives the same lines with opening and closing positions.
+- **Print statement** opens the browser's print dialog with a clean layout (association name, member, period and printing time; menus and buttons hidden). Choose “Save as PDF” to keep a copy. Members can print their own statement from **My finances** in the same way.
+- Period dates are Nigerian (Lagos) calendar days: a payment received at 00:30 on 1 March counts in March.
 
 ## Reports and reconciliation
 
@@ -198,8 +200,9 @@ The same file cannot be imported twice, and pressing **Complete import** again c
 
 ## If something goes wrong
 
+- **An integrity alert banner appears** at the top of every administration page: follow the escalation steps on the alert (`20-administrator-guide.md` → Integrity alerts). Acknowledge it, tell the Executive, and do not correct anything until the cause is known.
 - **A reconciliation exception appears** (a red "Reconciliation exceptions found" banner, an Overview tile, or a check without **No exceptions**): stop. Do not try to fix it by editing or by entering balancing records. Tell the Treasurer and the Executive, and escalate to the technical maintainer with the check name and the time you saw it. Once the cause is known, corrections are made only through adjustments or reversals.
-- **A payment was recorded with wrong details:** if still pending, the Payment Verifier rejects it with the reason; if already verified, the Payment Verifier reverses it. You can then record it again correctly. A **rejected** payment releases its bank or receipt reference, so the corrected record can use the real reference. A **reversed** payment keeps its reference (it once counted); never invent a substitute reference — ask the technical maintainer if a reversed payment must be re-entered.
+- **A payment was recorded with wrong details:** if still pending, the Payment Verifier rejects it with the reason; if already verified, the Payment Verifier reverses it. You can then record it again correctly. A **rejected** payment releases its bank or receipt reference, so the corrected record can use the real reference; its evidence file is kept as the record of why it was rejected. If a new payment is refused (for example, a duplicate reference), its uploaded evidence file is removed automatically. A **reversed** payment keeps its reference (it once counted); never invent a substitute reference — ask the technical maintainer if a reversed payment must be re-entered.
 - **Money was allocated to the wrong charge:** the Payment Verifier reverses that allocation, then you allocate again.
 - **A charge is wrong:** use **Record adjustment**; never post a second assessment to cancel the first.
 - **You see an error you do not understand:** take a note of the exact message and contact the technical maintainer before trying again.

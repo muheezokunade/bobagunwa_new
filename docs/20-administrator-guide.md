@@ -37,6 +37,7 @@ Notes:
 - Five wrong attempts in a minute cause a short lock-out. Wait a minute and try again.
 - "This account is not active" means your account has been suspended or disabled. Ask another administrator.
 - To change your own password, open **My account → Password and sessions** in the administration menu. If you have forgotten it, use **Forgotten your password?** on the sign-in page and press **Request help**; the request joins the recovery queue for another administrator (see "Account recovery queue").
+- If you have set up **two-factor sign-in**, after your password you are asked for the six-digit **Code** from your authenticator app (or one of your recovery codes). Five wrong codes, or waiting more than five minutes, send you back to the sign-in page.
 - Passwords must be 12 to 128 characters, must not contain your email address, membership number or the words "bobagunwa" or "password", and must use at least five different characters.
 
 ## The Overview page
@@ -122,6 +123,19 @@ If someone else changed the record while you were editing, reload the page and t
 
 The member must have an email address on record, and must be Active.
 
+## Adding one existing member by hand
+
+Open **Members → Add a member** (needs `members.manage`). Use it for a single verified existing member; new applicants apply on the website, and lists go through **Import members**.
+
+1. Fill in **Full name** and, where known, **Email address**, **Phone number**, **Date of birth**, **Existing membership number (if any)**, **Date joined**, town, city, occupation and address. Leave the membership number empty to issue the next number.
+2. Under **Source of these details**, say where the information came from (e.g. "2025 roster checked by the secretary").
+3. Press **Add member**.
+
+* The same email address or phone number as an existing member is always refused.
+* If another member already has the **same full name**, the form stops and lists them. If you have checked that this is a different person, tick **I have verified this is a different person from the existing member(s) with the same name.** and explain under **How you verified they are different** (at least 10 characters). The note is stored in the officer notes and the audit history.
+* No login account is created. Issue an activation link afterwards (see “Issuing an activation or password reset link”).
+* Pressing the button twice does not create two members.
+
 ## Importing existing members
 
 Open **Import members**.
@@ -129,7 +143,7 @@ Open **Import members**.
 1. Choose **Download the CSV template** and fill in one row per member. Only **full_name** is required. Optional columns: email, phone, date_of_birth, membership_number, joined_on, ijebu_town, city, occupation, address. Write dates as YYYY-MM-DD or DD/MM/YYYY. Leave membership_number empty to issue the next number. At most 2,000 rows; save as CSV (UTF-8).
 2. Under **Upload a file for preview**, choose the **CSV file** and press **Preview import**. Nothing is saved yet.
 3. Read the counts (**Rows**, **Valid**, **Invalid**, **Duplicates**) and the **Messages** column for each row. Duplicates include the same email, phone, number or name repeated in the file or already in the register.
-4. If any row is invalid or duplicate, the file cannot be imported. Press **Cancel preview**, correct those rows in the original file and upload it again. There is no override for a row flagged as a duplicate.
+4. If any row is invalid or duplicate, the file cannot be imported. Press **Cancel preview**, correct those rows in the original file and upload it again. Rows with the same email, phone or number as an existing member have no override. Rows whose **name only** matches an existing member are shown as **Name match**. If you have checked they are different people, tick the same-name confirmation on the preview before completing the import; this is recorded in the audit history.
 5. When every row passes, tick **I confirm this list is the association's approved source and has been checked.** and press **Complete import**.
 
 Completing an import never creates login accounts; issue activation links later, member by member, after verifying identity. The import is safe to repeat: pressing **Complete import** again changes nothing, and the same file cannot be imported twice. If the register changed after the preview, you will be asked to upload the file again.
@@ -205,6 +219,32 @@ Open **Backups** (System Administrator). The server holds only the off-site cust
 The server also makes a backup automatically each night (02:00 UTC, 03:00 Lagos time) when the key is configured, and keeps only the 14 most recent backup files. Download and hand over the ones the association needs before they are removed.
 
 Restoring is not done from this page. It is a command-line drill carried out by the technical maintainer, with the custodian's key, into a separate empty database (`php artisan boba:backup:restore`), never into the live database. Its result appears here as a **Restore verification** with "All checks passed." or a list of problems.
+
+## Two-factor sign-in
+
+Open **My account → Password and sessions**, section **Two-factor sign-in**.
+
+1. Press **Set up two-factor sign-in**. Add the key shown to a free authenticator app (Google Authenticator, Microsoft Authenticator, Aegis, 2FAS). On a phone, the link opens the app directly.
+2. Enter the six-digit **Code from the app** and press **Confirm and switch on**.
+3. **Your recovery codes — shown once**: print or write them down and keep them privately. Each works once if you lose your phone. **Create new recovery codes** replaces them and needs a current code.
+4. **Switch off** needs your password and a current code. It is refused for finance, access, settings and backup officers while the association requires two-factor sign-in.
+
+**Lost phone.** Another administrator with access management opens your account under **Officers and access**, checks your identity outside the website, ticks the confirmation, gives a reason, and presses **Reset two-factor sign-in**. Your sessions end and you set it up again. Nobody can reset their own.
+
+**Requiring it** (Settings → Security) stays off until the association decides (D-024). The setting refuses to switch on while any finance, access, settings or backup officer has not enrolled, so nobody can be locked out by it. See `32-two-factor-authentication.md`.
+
+## Integrity alerts
+
+Officers with the alerts permission (System Administrator, Treasurer, Payment Verifier, Executive) see a red or amber **banner on every administration page** while an alert is open. It cannot be dismissed. Open **Integrity alerts** in the menu.
+
+* **Run the check now** repeats the financial safeguard and reconciliation checks immediately. They also run automatically every night.
+* Open an alert, read the **Escalation** steps, and **Acknowledge** it with who is investigating. The banner stays.
+* Once the cause has been fixed and a check passes, the alert shows the condition as cleared. Only then can you resolve it with a note of the cause and fix.
+* Alerts show check names and counts only, never members or amounts. The System Administrator can see an alert but still cannot open finance pages.
+* **How officers are told** shows, for each officer, whether the banner has been seen and the email status. **Not configured** means no email was sent. **Accepted by mail server** means the email server took it, which does not prove it arrived.
+* Email is optional. In Settings, switch on “Also email integrity alerts”, then on Integrity alerts press **Send test email**, enter the **Code from the test email** and press **Confirm channel**. Until confirmed, no alert email is sent.
+
+Full detail: `31-integrity-alerting.md`.
 
 ## Initial administrator provisioning
 

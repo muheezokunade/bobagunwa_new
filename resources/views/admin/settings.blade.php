@@ -8,6 +8,7 @@
 @else
     <div class="alert warning" role="status">This is the <strong>{{ $environment }}</strong> environment. Launch approvals are recorded here but only block actions in production, so protected actions are allowed in this environment for testing.</div>
 @endif
+<p class="muted">Web server: PHP {{ PHP_VERSION }} ({{ PHP_SAPI }}) · database {{ \Illuminate\Support\Facades\DB::selectOne('SELECT VERSION() AS v')->v }}</p>
 
 <div class="grid-2">
     <form class="panel" method="post" action="{{ route('admin.settings.update') }}">

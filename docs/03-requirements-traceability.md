@@ -2,7 +2,7 @@
 
 Status vocabulary: **Implemented** · **Locally tested** (automated test executed and passing on MariaDB 11.4) · **Staging verified** · **Awaiting client approval** · **Blocked** · **Production accepted**. Nothing here is staging-verified or production-accepted.
 
-Test abbreviations: `IT` IntegrityTriggersTest · `LS` LedgerServiceTest · `CC` ConcurrencyTest · `AW` ApplicationWorkflowTest · `MI` MemberImportTest · `AL` AccountLifecycleTest · `AM` AuthorisationMatrixTest · `AV` AdminViewsRenderTest · `PS` PublicSiteTest · `CU` ContentAndUploadSecurityTest · `BR` BackupRestoreTest · `HI` HistoricalImportTest · `MW` MandatoryWorkflowsTest · `PF` PerformanceTest · `BA` browser audit (`tests/browser/responsive-a11y.cjs`) · `U` unit tests.
+Test abbreviations: `IT` IntegrityTriggersTest · `LS` LedgerServiceTest · `CC` ConcurrencyTest · `AW` ApplicationWorkflowTest · `MI` MemberImportTest · `AL` AccountLifecycleTest · `AM` AuthorisationMatrixTest · `AV` AdminViewsRenderTest · `PS` PublicSiteTest · `CU` ContentAndUploadSecurityTest · `BR` BackupRestoreTest · `HI` HistoricalImportTest · `MW` MandatoryWorkflowsTest · `AMX` AdminMutationMatrixTest · `AMB` AdminMutationBehaviourTest · `RR` RemainingRoutesTest · `IA` IntegrityAlertTest · `TF` TwoFactorTest · `MM` ManualMemberTest · `DS` RouteCatalogueSyncTest · `PF` PerformanceTest · `BA` browser audit (`tests/browser/responsive-a11y.cjs`) · `U` unit tests.
 
 | Brief § | Requirement | Implementation | Evidence | Status |
 |---|---|---|---|---|
@@ -25,13 +25,17 @@ Test abbreviations: `IT` IntegrityTriggersTest · `LS` LedgerServiceTest · `CC`
 | 13 | No paid email; admin-assisted delivery; attestation separate from issuance; never claim delivery | `MessageService`, `outbound_messages` | AW, AV | Locally tested; channel awaiting approval |
 | 14 | Member portal with own data only; no invented balances | `PortalController` (member from session) | AM (`member_cannot_reach_another…`), MW-6 | Locally tested |
 | 15 | Admin areas operate end to end | `Admin\*` controllers | AV (37 pages), AM | Locally tested |
-| 16 | Explicit RBAC; sysadmin without treasury; membership officers without finance; no escalation; last admin protected; tested via HTTP and services | `PermissionCatalog`, `RequirePermission`, services, `AccessController` | AM, LS (`permissions_are_enforced_inside_finance_services`) | Locally tested; assignments awaiting approval |
+| 16 | Explicit RBAC; sysadmin without treasury; membership officers without finance; no escalation; last admin protected; tested via HTTP and services | `PermissionCatalog`, `RequirePermission`, services, `AccessController` | AM, LS (`permissions_are_enforced_inside_finance_services`), **AMX** (all 56 admin mutation routes × 7 roles + anonymous + CSRF 419), **AMB/RR** (behaviour per endpoint) — matrix in `34-admin-endpoint-coverage.md` | Locally tested; assignments awaiting approval |
+| 16 | Integrity failures alert authorised staff without exposing treasury data to the sysadmin; acknowledgement, history, escalation, honest delivery | `IntegrityMonitor`, `system_alerts`, `alert_notifications`, `alert_receipts`, banner | **IA** (`IntegrityAlertTest`, 7 tests), AMX | Locally tested; email channel awaiting decision (D-025) |
+| 13 | Optional TOTP for privileged officers with lockout prevention (not enforced) | `Totp`, `TwoFactorService`, challenge controller, `EnsureTwoFactorEnrolled` | **TF** (`TwoFactorTest`, RFC 6238 vectors), RR | Locally tested; enforcement awaiting decision (D-024) |
+| 13 | One-time link exposure reduced (clean URL, no-referrer, no-store) | `AccountController::activateLink/resetLink`, `SecurityHeaders` | AL, `33-one-time-link-assessment.md` | Locally tested |
+| 11 | Single existing member added by hand; same-name exception with recorded justification | `MemberService::createManual`, import `name_match` | **MM** (`ManualMemberTest`), MI | Locally tested; procedure awaiting decision (D-026) |
 | 17.1 | Integer kobo; transactions; separated concepts; derived balances | migrations 000003, `LedgerQuery` | U (Money), LS | Locally tested |
 | 17.2 | Authorised, atomic, unique id, auditable, duplicate rejection, concurrency, rollback | services + `Idempotency` + triggers | LS, CC, IT | Locally tested |
 | 17.3 | Recorded ≠ verified; approval-gated configurable policy, safe default | `PaymentService::verify`, trigger L6, setting | LS, IT, MW-5 | Locally tested; policy awaiting approval |
 | 17.4 | Allocation rules (8 bullets) tested by direct DB operations | triggers L8–L12 | IT, CC (incl. direct SQL under RC and RR) | Locally tested |
 | 17.5 | Reversals/adjustments preserve history and consistency; no double reversal | `PaymentService::reverse*`, triggers L13–L16 | IT, LS | Locally tested |
-| 17.6 | Statements reconciling to ledger; print and export | `LedgerQuery::statement`, `partials/statement` | LS, MW-6 | Locally tested |
+| 17.6 | Statements reconciling to ledger; print and export; Lagos calendar-day boundaries | `LedgerQuery::statement`, `partials/statement` (Print statement button, print header) | LS, MW-6, RR (CSV), BA (print emulation) | Locally tested; paper print outstanding |
 | 17.7 | Treasury reports with documented definitions | `ReportController`, `06-financial-rules.md` | LS, MW-6, PF | Locally tested |
 | 17.8 | Guarded historical import with approved source, second-officer confirmation and receipt; no invented history | `FinanceImportService` | HI, AV | Locally tested; records awaiting approval |
 | 18 | Content management with drafts/publish and history | `ContentController`, `page_revisions` | CU | Locally tested |
@@ -43,5 +47,5 @@ Test abbreviations: `IT` IntegrityTriggersTest · `LS` LedgerServiceTest · `CC`
 | 24 | Seven workflows pass together | `MandatoryWorkflowsTest` | MW (90 assertions) | Locally tested |
 | 25 | 17 additional acceptance scenarios | see `19-test-evidence.md` table | various | Locally tested |
 | 26 | Responsive 320–1440 and accessibility checks | CSS, components | BA; manual checks listed as outstanding | Locally tested (automated) |
-| 27 | Documentation set | `docs/` | this matrix | Implemented |
+| 27 | Documentation set, including per-route purpose, roles, validation, data, states, security, acceptance, tests and status | `docs/`, generated `35-route-catalogue.md` from `RouteCatalogue` + router | **DS** (`RouteCatalogueSyncTest`) | Implemented; sync tested |
 | 30 | Namecheap staging deployment | runbook, preflight, release | release check locally | **Blocked** (no access; approval and SSL pending) |

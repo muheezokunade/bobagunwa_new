@@ -19,12 +19,14 @@
 * The live Netlify site could not be viewed (network policy); the design was reconstructed from V1 source (CSS, markup, crest).
 * Browser date inputs show the visitor's locale format (e.g. mm/dd/yyyy in US-configured browsers); the stored value is always ISO.
 
-* No form to add a single member by hand; use a one-row import. An import row whose normalised name matches an existing member is always treated as a duplicate (add a distinguishing middle name or initial).
 * With default roles, a historical financial import needs two people holding the Treasurer role (uploader and confirmer both need `finance.import`) when the two-officer rule is on — policy D-007.
 * Event publication needs only `events.manage` (not `content.publish`) by design, so the events team can publish its own events.
-* A payment refused by a duplicate check after its evidence file was uploaded leaves an unreferenced private file (harmless; not served).
-* Period boundaries for "reversals in period" use UTC midnight while other dates are calendar dates (≤ 1 hour difference at the period edges, Lagos is UTC+1).
+* One-time links: the first request line containing the token is written to the web server's access log, and the link shown to the issuing officer passes through the encrypted session flash for one request (accepted; `33-one-time-link-assessment.md`).
+* Two-factor enforcement is implemented but **off** pending D-024; enrolment shows a manual key and `otpauth://` link (no QR image, to avoid a new dependency).
+* Alert email delivery is recorded as `accepted_by_mail_server`, which is not proof of inbox delivery; it is unverified on the hosting until the association configures the existing mailbox (D-025). The dashboard banner is the guaranteed channel.
+* Test-reference detection in the generated route catalogue (`docs/35`) counts a route as tested when a feature test calls it by name, including inside a loop over quoted route names; it does not judge the depth of each test. Depth for admin mutations is shown in `docs/34`.
+* Rejected-payment evidence files are kept deliberately (they document why the payment was rejected); only files of refused submissions and orphans older than a day are removed (`boba:prune-orphan-files`, daily 03:00).
 
 ## Manual checks outstanding
 
-Screen reader, real devices, Firefox/Safari, printed statements, Lighthouse on the final origin, legal review.
+Screen reader, real devices, Firefox/Safari, printed statements on paper (print layout verified in Chromium print emulation only), Lighthouse on the final origin, legal review, independent penetration test.

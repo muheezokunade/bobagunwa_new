@@ -34,7 +34,13 @@
 | 28 | [Release-readiness report](28-release-readiness-report.md) | everyone |
 | 29 | [Approval packet](29-approval-packet.md) | Mr Ibrahim |
 | 30 | [Remaining work — prioritised](30-remaining-work.md) | executive, maintainer |
+| 31 | [Integrity alerting and escalation](31-integrity-alerting.md) | treasury, administrators |
+| 32 | [Two-factor authentication](32-two-factor-authentication.md) | administrators |
+| 33 | [One-time link exposure assessment](33-one-time-link-assessment.md) | maintainers, reviewers |
+| 34 | [Administrative endpoint coverage matrix](34-admin-endpoint-coverage.md) — *generated* | reviewers |
+| 35 | [Route catalogue (purpose, roles, validation, states, tests)](35-route-catalogue.md) — *generated* | maintainers, reviewers |
+| 36 | [Protected staging installation plan](36-staging-installation-plan.md) | technical maintainer, executive |
 | — | [Evidence](evidence/) | reviewers |
 | — | [Historical V1 documentation](historical/v1/README.md) — *reference only, not evidence* | maintainers |
 
-Regenerate 04 and 17 after schema or route changes: `php artisan boba:docs:reference`.
+Regenerate 04, 17, 34 and 35 after schema, route or test changes: `php artisan boba:docs:reference` (the route meanings live in `app/Support/RouteCatalogue.php`; `RouteCatalogueSyncTest` fails if they drift).

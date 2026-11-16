@@ -6,26 +6,39 @@ Raw artefacts in `docs/evidence/`:
 
 | File | Contents |
 |---|---|
-| `test-run-2026-11-16.txt` | Full PHPUnit output |
+| `test-run-2026-11-16-hardening.txt` | **Latest** full PHPUnit output (151 tests, hardening phase) |
+| `test-run-2026-11-16.txt` | Earlier full PHPUnit output (103 tests, before hardening) — superseded |
+| `admin-mutation-matrix-2026-11-16.json` | Status code returned to every role and to anonymous callers for each of the 56 admin mutation routes |
 | `acceptance-evidence-2026-11-16.json` | Machine-readable result of the seven mandatory workflows |
 | `responsive-a11y-2026-11-16.json` | Every page view of the browser audit with overflow, axe and heading results |
 | `preflight-local-2026-11-16.json` | `boba:preflight` output on the build machine |
-| `screens/*.png` | Representative screenshots (public, portal, administration; desktop and phone) |
+| `screens/*.png` | Representative screenshots (public, portal, administration; desktop and phone); `statement-print-media.png` is the member statement rendered with print media |
 
-## Summary
+## Summary (latest run, hardening phase, 16 Nov 2026 ≈ 11:20–11:30 UTC)
 
 | Check | Result |
 |---|---|
-| PHPUnit full suite on MariaDB 11.4 | **103 passed, 0 failed (1,289 assertions)**, ~46 s |
-| Seven mandatory workflows together | **Pass** (90 assertions, one database, real routes) |
-| Concurrency (forked processes) | **6/6 pass** |
+| PHPUnit full suite on MariaDB 11.4.13 | **151 passed, 0 failed (3,288 assertions)**, 74 s — `evidence/test-run-2026-11-16-hardening.txt` |
+| Seven mandatory workflows together | **Pass** — all 7 `"result": "pass"` in `acceptance-evidence-2026-11-16.json` |
+| Admin mutation HTTP matrix | **56 routes × 7 roles + anonymous**: 302 for anonymous, 403 exactly where the role lacks the permission, no 403/404/405/500 where it holds it; **419** for all 56 without a CSRF token (`AdminMutationMatrixTest`, 507 assertions) |
+| Admin mutation behaviour | every one of the 56 routes has a route-specific HTTP test (`docs/34-admin-endpoint-coverage.md`); 158/158 named routes are called by at least one HTTP test (`docs/35-route-catalogue.md`) |
+| Integrity alerting | 7/7 (`IntegrityAlertTest`): passing run, missing trigger, reconciliation failure and recurrence, overdue and errored checks, verified email accepted without sensitive content, failed delivery recorded, unconfigured channel refused |
+| Two-factor | 7/7 (`TwoFactorTest`) incl. RFC 6238 vectors, replay rejection, lockout guard, admin reset |
+| Auth lifecycle | 12/12 (`AccountLifecycleTest`) incl. clean-URL token hand-off and demo-password denylist |
+| Concurrency (forked processes) | **6/6 pass** (also re-run on its own: 6 passed, 41 assertions) |
 | Direct-SQL integrity | **9/9 pass** |
-| Browser audit: 42 pages × 5 widths (320, 375, 768, 1024, 1440) | **210 page views, 0 failures**: no horizontal overflow, 0 axe WCAG 2.1 A/AA violations, exactly one `h1`, all inputs labelled, 0 console/CSP errors |
+| Backup/restore | **6/6 pass** |
+| Route documentation sync | **2/2 pass** (`RouteCatalogueSyncTest`) |
+| Browser audit: 45 pages × 5 widths (320, 375, 768, 1024, 1440), incl. `/admin/alerts` (two roles), `/admin/members/create`, `/admin/account` | **225 page views, 0 failures**: no horizontal overflow, 0 axe WCAG 2.1 A/AA violations, exactly one `h1`, all inputs labelled, 0 console/CSP errors — `responsive-a11y-2026-11-16.json` |
 | Keyboard | mobile menu opens with Enter, Escape closes and returns focus, skip link visible on focus, focus ring visible |
+| Printed statement (Chromium print media) | Print statement button shown; print header visible; navigation and controls hidden; table visible |
 | `composer audit` / `npm audit` | **0 advisories / 0 vulnerabilities** |
 | `pint --test` | pass |
 | Production asset build | pass (`npm run build`) |
-| Release package | built from a clean revision, deployed into an empty directory and database, migrated, preflighted, served (HTTP 200) |
+| Local `boba:preflight` | all required checks PASS; backup public key WARN (not configured locally) — `preflight-local-2026-11-16.json` |
+| Release package | rebuilt from the pushed revision; verified from a fresh clone (see the readiness report) |
+
+Per-class counts: Unit 22 (Money 16, Normalize/CSV 6) · MandatoryWorkflows 1 · AccountLifecycle 12 · TwoFactor 7 · BackupRestore 6 · Concurrency 6 · IntegrityTriggers 9 · RouteCatalogueSync 2 · HistoricalImport 3 · LedgerService 14 · AdminMutationBehaviour 14 · AdminMutationMatrix 2 · AdminViewsRender 1 · AuthorisationMatrix 7 · ContentAndUploadSecurity 4 · Performance 3 · PublicSite 5 · RemainingRoutes 8 · ApplicationWorkflow 5 · ManualMember 5 · MemberImport 8 · IntegrityAlert 7.
 
 ## The seven mandatory workflows (`MandatoryWorkflowsTest`)
 
@@ -55,7 +68,16 @@ Raw artefacts in `docs/evidence/`:
 | Expired reset token | Denied | `AccountLifecycleTest::test_reset_tokens_expire…` |
 | Unapproved applicant activation | Denied (no account exists) | `AccountLifecycleTest::test_unapproved_applicant…` |
 | Imported member login without activation | Denied | `AccountLifecycleTest::test_imported_member_cannot_log_in…`, MW-1 |
-| Unauthorised data export | Denied (members, balances) | `AuthorisationMatrixTest::test_unauthorised_exports_are_denied` |
+| Unauthorised data export | Denied (members, balances, statements, audit) | `AuthorisationMatrixTest::test_unauthorised_exports_are_denied`, `RemainingRoutesTest::test_officer_exports_templates_and_forms` |
+| Payment rejected, then verification attempted | Refused; never counts | `AdminMutationBehaviourTest::test_payment_rejection` |
+| Payment reversal replayed with the same key / repeated with a new key | Replay returns the first result; second reversal refused; ledger exceptions empty | `AdminMutationBehaviourTest::test_payment_reversal_with_dependent_allocation_and_replay` |
+| Stale category edit | Refused (version conflict) | `AdminMutationBehaviourTest::test_assessment_discard_and_category_update_with_version_conflict` |
+| Financial batch cancelled through the member-import route (and vice versa) | 404 | `AdminMutationBehaviourTest::test_finance_import_cancel_is_kind_scoped` |
+| Content id edited through another type / revision of another page published | 404 | `AdminMutationBehaviourTest::test_content_update_unpublish_and_gallery_item` |
+| Member changes protected fields via the portal | Ignored; only permitted fields change | `RemainingRoutesTest::test_member_profile_update_is_limited_and_versioned` |
+| RSVP over capacity / to a draft event | Refused / 404 | `RemainingRoutesTest::test_member_rsvp_capacity_and_unpublished_events` |
+| Refused payment with evidence | Uploaded file removed | `AdminMutationBehaviourTest::test_refused_payment_does_not_leave_its_evidence_file` |
+| Integrity failure seen by a System Administrator | Alert visible (counts only); finance still 403 | `IntegrityAlertTest::test_missing_trigger_raises_one_critical_alert…` |
 | Tampered encrypted backup | Rejected before any restore (flipped byte, truncation, missing final block, header change, non-backup) | `BackupRestoreTest` |
 | Wrong decryption key | Rejected | `BackupRestoreTest::test_wrong_key_is_rejected` |
 | Upload with prohibited content | PDF with JavaScript, PHP disguised as JPEG, HTML refused; JPEG with trailing PHP re-encoded and payload removed | `ContentAndUploadSecurityTest` |
@@ -89,7 +111,9 @@ Query counts are constant across volumes (no N+1). Peak memory ≤ 79 MB includi
 | Guides review | No "Record delivery" link after approval; rejected payment blocked its bank reference forever; officers without member record could not change password; leadership group order; gallery uploads lacked rights confirmation | All fixed and tested where applicable |
 | Browser audit | Tables overflowing narrow screens (grid `1fr` minimum, escaping `.sr-only` text), unfocusable scroll regions, header wrapping | CSS fixes; 210/210 views clean |
 | Full-suite run | Concurrency tests leaking committed data | Per-test clean-up |
+| Hardening review | Retired demo password present in plain text in an unpushed test | Test rewritten to use a generated value and the hash-only denylist; string removed from unpushed history before the push |
+| Staging plan review | Settings page did not show which PHP served web requests (needed for staging verification) | PHP version, SAPI and database version shown to `settings.manage` |
 
 ## Not executed
 
-Anything on Namecheap (no access); manual screen-reader and real-device testing; Firefox/Safari; Lighthouse on the final origin; printed statements on paper; SMTP delivery through the association mailbox.
+Anything on Namecheap (no access); manual screen-reader and real-device testing; Firefox/Safari; Lighthouse on the final origin; printed statements on paper; SMTP delivery through the association mailbox (alert email was tested only against Laravel's mail fakes and a failing transport); independent penetration test.

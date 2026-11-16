@@ -27,6 +27,9 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-021 | Initial production administrator(s) | Pending | Provisioned only by `boba:admin:create`; no default account |
 | D-022 | Officer role assignments (treasurer, verifier, secretariat, executive) | Pending | Templates only |
 | D-023 | Private GitHub repository for this codebase | **Decided** | `muheezokunade/bobagunwa_new` (`main`); kept separate from the V1 repository `muheezokunade/bobagunwa`, which is not modified |
+| D-024 | Require two-factor sign-in for privileged officers (finance writers, access, settings, backups) | Pending | Implemented and tested; **enforcement off**; opt-in enrolment available; lockout-guarded (`32-two-factor-authentication.md`) |
+| D-025 | Email channel for integrity alerts (use the existing mailbox?) and who must receive alerts | Pending | Dashboard banner always on for `integrity.alerts` holders; email off until enabled and verified (`31-integrity-alerting.md`) |
+| D-026 | Procedure for genuinely distinct members who share a full name | Pending | Officer must confirm and record a distinguishing note (≥ 10 characters); audited (manual add and import) |
 
 ## Content awaiting confirmation (D-015)
 

@@ -19,10 +19,10 @@ if (!PASSWORD) { console.error('Set BOBA_DEMO_PASSWORD to the password used for 
 const journeys = [
   { role: null, pages: ['/', '/about', '/history', '/leadership', '/membership', '/membership/apply', '/membership/status', '/events', '/news', '/contact', '/privacy', '/login', '/account/recover'] },
   { role: 'applicant@example.test', pages: ['/portal', '/portal/profile', '/portal/finances', '/portal/finances/statement', '/portal/notices', '/portal/events', '/portal/security'] },
-  { role: 'membership@example.test', pages: ['/admin', '/admin/applications?status=all', '/admin/members', 'FIRST:/admin/applications/', 'FIRST:/admin/members/'] },
-  { role: 'treasurer@example.test', pages: ['/admin/finance', '/admin/finance/payments', 'FIRST:/admin/finance/payments/', '/admin/finance/assessments/create', '/admin/finance/reports', 'FIRST:/admin/finance/members/', '/admin/finance/categories'] },
+  { role: 'membership@example.test', pages: ['/admin', '/admin/applications?status=all', '/admin/members', 'FIRST:/admin/applications/', 'FIRST:/admin/members/', '/admin/members/create'] },
+  { role: 'treasurer@example.test', pages: ['/admin/finance', '/admin/finance/payments', 'FIRST:/admin/finance/payments/', '/admin/finance/assessments/create', '/admin/finance/reports', 'FIRST:/admin/finance/members/', '/admin/finance/categories', '/admin/alerts'] },
   { role: 'secretariat@example.test', pages: ['/admin/imports/members', 'FIRST:/admin/imports/members/', '/admin/content', '/admin/events', '/admin/enquiries'] },
-  { role: 'admin@example.test', pages: ['/admin/access', '/admin/settings', '/admin/audit', '/admin/backups', '/admin/account'] },
+  { role: 'admin@example.test', pages: ['/admin/access', '/admin/settings', '/admin/audit', '/admin/backups', '/admin/account', '/admin/alerts'] },
 ];
 
 async function resolveFirst(page, prefix) {
@@ -90,6 +90,27 @@ async function resolveFirst(page, prefix) {
   // Focus indicator is visible on a focused link.
   const focusRing = await p.evaluate(() => getComputedStyle(document.activeElement).boxShadow !== 'none');
   await ctx.close();
+
+  // Printed statement: print media hides navigation and controls and shows the print header.
+  const printCtx = await browser.newContext();
+  const pp = await printCtx.newPage();
+  await pp.goto(BASE + '/login');
+  await pp.fill('input[name=email]', 'applicant@example.test');
+  await pp.fill('input[name=password]', PASSWORD);
+  await Promise.all([pp.waitForNavigation(), pp.click('button[type=submit]')]);
+  await pp.goto(BASE + '/portal/finances/statement', { waitUntil: 'networkidle' });
+  const printButtonShown = await pp.evaluate(() => { const b = document.querySelector('[data-print]'); return !!b && !b.hidden; });
+  await pp.emulateMedia({ media: 'print' });
+  const print = await pp.evaluate(() => {
+    const visible = (el) => !!el && getComputedStyle(el).display !== 'none' && el.getBoundingClientRect().height > 0;
+    return {
+      header_visible: visible(document.querySelector('.print-header')),
+      navigation_hidden: [...document.querySelectorAll('nav, .site-header, .no-print, [data-print]')].every((el) => !visible(el)),
+      table_visible: visible(document.querySelector('main table')),
+    };
+  });
+  if (process.env.PRINT_SCREENSHOT) await pp.screenshot({ path: process.env.PRINT_SCREENSHOT, fullPage: true });
+  await printCtx.close();
   await browser.close();
 
   const failures = results.filter((r) => r.error || r.status !== 200 || r.overflow > 0 || r.h1 !== 1 || r.unlabeled > 0 || (r.violations || []).length);
@@ -97,10 +118,12 @@ async function resolveFirst(page, prefix) {
     executed_at: new Date().toISOString(), base: BASE, widths: WIDTHS, page_views: results.length,
     failures: failures.length, console_errors: consoleErrors.length,
     keyboard: { mobile_menu_opens_with_enter: opened, escape_closes_and_returns_focus: closed, skip_link_visible_on_focus: skipVisible, focus_ring_visible: focusRing },
+    print_statement: { print_button_shown: printButtonShown, ...print },
   };
   fs.mkdirSync(path.dirname(OUT), { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify({ summary, failures, consoleErrors, results }, null, 2));
   console.log(JSON.stringify(summary, null, 2));
   if (failures.length) console.log(JSON.stringify(failures.slice(0, 15), null, 2));
-  process.exit(failures.length || consoleErrors.length ? 1 : 0);
+  const printOk = printButtonShown && print.header_visible && print.navigation_hidden && print.table_visible;
+  process.exit(failures.length || consoleErrors.length || !printOk ? 1 : 0);
 })();

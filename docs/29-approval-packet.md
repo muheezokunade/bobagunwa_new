@@ -9,6 +9,7 @@ Please reply against each numbered item. Where a recommendation is given, "Agree
 1. **Permission to install the new platform on the protected test address** `v2-staging.bobagunwa.com` (made-up data only; the current website and WordPress are not touched). *Recommendation: agree.*
 2. **SSL certificate for the test address** — authorise the developer to ask Namecheap support to issue the free certificate for `v2-staging.bobagunwa.com`. No purchase involved. *Recommendation: agree.*
 3. **First administrator** — name the person who will hold the first administrator account (they set their own password from a one-time link).
+3a. **Hosting access** — who may log in to the Namecheap account (cPanel and SSH) to install the test site? Access is needed only for the protected test address.
 
 ## B. Needed before launch
 
@@ -39,6 +40,11 @@ Please reply against each numbered item. Where a recommendation is given, "Agree
 
 **Launch**
 21. Launch approval: the date, and whether the new platform replaces the current website at `bobagunwa.com` or sits beside it on a sub-address.
+
+**Security and procedures**
+22. **Two-factor sign-in** for officers who handle money, access, settings or backups — require it after a rehearsal on the test site? *Recommendation: agree, after every such officer has enrolled.* (D-024)
+23. **Integrity alert emails** — may the platform email alert notices (no financial details) from the existing association mailbox, and to whom? (D-025)
+24. **Members who share a full name** — agree that an officer may add them after checking they are different people and writing down how they checked? *Recommendation: agree.* (D-026)
 
 ## What is already in place
 

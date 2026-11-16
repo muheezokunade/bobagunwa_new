@@ -30,7 +30,7 @@ Browser ──HTTPS──> Apache/LiteSpeed (cPanel) ──> public/index.php (L
      Finance/AssessmentService · Finance/PaymentService · Finance/LedgerQuery · Finance/FinanceImportService
      UploadService · EnquiryService · BackupService
                                                   │
-  MariaDB 11.4 InnoDB: FKs, CHECKs, generated-column unique keys, 30 integrity triggers
+  MariaDB 11.4 InnoDB: FKs, CHECKs, generated-column unique keys, 35 integrity triggers
   storage/app/private (outside webroot): evidence, documents, encrypted backups
   public/media: re-encoded images only (execution disabled)
 ```

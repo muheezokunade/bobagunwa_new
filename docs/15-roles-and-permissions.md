@@ -2,7 +2,7 @@
 
 Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the database by the reference-data migration. Roles are **templates**; every route checks a named permission (`permission:` middleware) and every financial or membership decision re-checks it inside the service. Hidden menu items are never relied upon. **Final assignments require association approval (decisions D-005, D-007, D-008).**
 
-## Permissions (24)
+## Permissions (25)
 
 | Group | Permission | Allows |
 |---|---|---|
@@ -30,6 +30,7 @@ Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the data
 | | `audit.read` | Audit and security history |
 | | `settings.manage` | Organisation settings and launch approvals |
 | | `backups.manage` | Create and download encrypted backups |
+| | `integrity.alerts` | See integrity alerts (counts and check outcomes only — no member, amount or reference details), run the check, acknowledge and resolve |
 
 ## Role templates
 
@@ -54,6 +55,7 @@ Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the data
 | content.manage / publish | | | | ✓ | | | |
 | events.manage, enquiries.manage | | | | ✓ | | | |
 | access.manage, settings.manage, backups.manage | | ✓ | | | | | |
+| integrity.alerts | | ✓ | | | ✓ | ✓ | ✓ |
 | audit.read | | ✓ | | | | | ✓ |
 
 Members have no permissions; their portal access is scoped to the member record linked to their own account (resolved from the session, never from a URL parameter).
@@ -67,3 +69,11 @@ Members have no permissions; their portal access is scoped to the member record 
 * **Last administrator**: a change that would leave no active account holding `access.manage` is refused; access changes are serialised with a lock.
 * Role changes end the affected officer's sessions so they take effect immediately.
 * `AuthorisationMatrixTest::test_every_role_reaches_exactly_the_admin_pages_it_is_permitted` requests every parameter-free administration page as every role (7 × 25) and asserts 200 only where the permission is held.
+
+## Integrity alerts and the System Administrator
+
+`integrity.alerts` is granted to the System Administrator so that a technical failure (missing trigger, check error, overdue check) is never invisible to the person who maintains the system. It gives **no treasury access**: the alert pages show alert type, severity, counts of exceptions and timestamps only, and every finance route still returns 403 for the System Administrator (`IntegrityAlertTest::test_missing_trigger_raises_one_critical_alert_and_cannot_be_resolved_until_fixed`, `AdminMutationMatrixTest`). Alert emails carry no details at all.
+
+## Two-factor enforcement
+
+Privileged permissions for the optional two-factor requirement (`TwoFactorService::PRIVILEGED`): `access.manage`, `settings.manage`, `backups.manage` and every `finance.*` write permission. See [32-two-factor-authentication.md](32-two-factor-authentication.md).

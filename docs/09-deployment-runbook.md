@@ -46,7 +46,7 @@ All required checks must PASS. Record the output in `docs/19-test-evidence.md`.
 ## 5. Migrate and cache
 
 ```bash
-php83 artisan migrate --force          # schema, 30 integrity triggers, reference data
+php83 artisan migrate --force          # schema, 35 integrity triggers, reference data
 php83 artisan boba:ledger:verify
 php83 artisan config:cache && php83 artisan route:cache && php83 artisan view:cache
 ```

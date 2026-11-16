@@ -6,7 +6,7 @@ Public heritage website, membership applications, member register, member portal
 
 ## Stack
 
-Laravel 13 · PHP 8.3 · MariaDB 11.4 (InnoDB, 30 integrity triggers) · Blade · Vite (CSS/JS compiled at build time) · self-hosted Noto Serif · PHPUnit · Playwright + axe-core.
+Laravel 13 · PHP 8.3 · MariaDB 11.4 (InnoDB, 35 integrity triggers) · Blade · Vite (CSS/JS compiled at build time) · self-hosted Noto Serif · PHPUnit · Playwright + axe-core.
 
 ## Quick start (local, synthetic data)
 
@@ -25,10 +25,10 @@ Demo accounts (local only, refused in staging/production): `admin@`, `membership
 ## Tests
 
 ```bash
-php artisan test        # 103 tests on MariaDB 11.4 (database bobagunwa_test)
+php artisan test        # 151 tests on MariaDB 11.4 (database bobagunwa_test)
 ```
 
-Includes direct-SQL ledger invariants, forked-process concurrency, the seven mandatory end-to-end workflows, encrypted backup/restore with tamper and wrong-key rejection, an authorisation matrix and volume tests. Browser audit: `node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000`.
+Includes direct-SQL ledger invariants, forked-process concurrency, the seven mandatory end-to-end workflows, encrypted backup/restore with tamper and wrong-key rejection, an authorisation matrix, an HTTP matrix of every admin mutation route × role (+ CSRF), integrity alerting, two-factor and volume tests. `php artisan boba:docs:reference` regenerates the schema, route inventory, endpoint coverage matrix and route catalogue. Browser audit: `node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000`.
 
 ## Deploy
 

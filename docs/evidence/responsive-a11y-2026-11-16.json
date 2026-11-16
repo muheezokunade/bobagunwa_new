@@ -1,6 +1,6 @@
 {
   "summary": {
-    "executed_at": "2026-11-16T10:39:06.516Z",
+    "executed_at": "2026-11-16T11:27:36.127Z",
     "base": "http://127.0.0.1:8000",
     "widths": [
       320,
@@ -9,7 +9,7 @@
       1024,
       1440
     ],
-    "page_views": 210,
+    "page_views": 225,
     "failures": 0,
     "console_errors": 0,
     "keyboard": {
@@ -17,6 +17,12 @@
       "escape_closes_and_returns_focus": true,
       "skip_link_visible_on_focus": true,
       "focus_ring_visible": true
+    },
+    "print_statement": {
+      "print_button_shown": true,
+      "header_visible": true,
+      "navigation_hidden": true,
+      "table_visible": true
     }
   },
   "failures": [],
@@ -1273,6 +1279,56 @@
       "unlabeled": 0
     },
     {
+      "role": "membership@example.test",
+      "page": "/admin/members/create",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/create",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/create",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/create",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "membership@example.test",
+      "page": "/admin/members/create",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
       "role": "treasurer@example.test",
       "page": "/admin/finance",
       "width": 320,
@@ -1615,6 +1671,56 @@
     {
       "role": "treasurer@example.test",
       "page": "/admin/finance/categories",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/alerts",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/alerts",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/alerts",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/alerts",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "treasurer@example.test",
+      "page": "/admin/alerts",
       "width": 1440,
       "status": 200,
       "violations": [],
@@ -2115,6 +2221,56 @@
     {
       "role": "admin@example.test",
       "page": "/admin/account",
+      "width": 1440,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/alerts",
+      "width": 320,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/alerts",
+      "width": 375,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/alerts",
+      "width": 768,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/alerts",
+      "width": 1024,
+      "status": 200,
+      "violations": [],
+      "overflow": 0,
+      "h1": 1,
+      "unlabeled": 0
+    },
+    {
+      "role": "admin@example.test",
+      "page": "/admin/alerts",
       "width": 1440,
       "status": 200,
       "violations": [],

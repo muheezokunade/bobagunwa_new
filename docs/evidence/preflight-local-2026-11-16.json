@@ -147,7 +147,7 @@
         "check": "Ledger integrity triggers installed",
         "ok": true,
         "required": true,
-        "detail": "30 installed"
+        "detail": "35 installed"
     },
     {
         "check": "Writable: /home/user/Bobagunwa-Claude/storage/framework/sessions",
