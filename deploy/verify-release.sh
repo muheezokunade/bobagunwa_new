@@ -9,7 +9,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 ZIP=${1:?usage: deploy/verify-release.sh <release.zip>}
 [ -f "$ZIP.sha256" ] && sha256sum -c --quiet "$ZIP.sha256" && echo "PASS package hash ($ZIP.sha256)"
-WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
+WORK=$(mktemp -d); trap 'rm -rf "$WORK" "$WORK.secrets"' EXIT
 unzip -q "$ZIP" -d "$WORK"
 ( cd "$WORK" && sha256sum -c --quiet MANIFEST.sha256 ) && echo "PASS per-file manifest ($(wc -l < "$WORK/MANIFEST.sha256") files)"
 COMMIT=$(php -r 'echo json_decode(file_get_contents($argv[1]), true)["commit"] ?? "";' "$WORK/RELEASE.json")
@@ -29,6 +29,6 @@ done < <(git ls-tree -r "$COMMIT")
 echo "PASS every tracked file in the package is identical to $COMMIT; only documented exclusions are absent"
 bad=$(cd "$WORK" && find . \( -name .env -o -name '*.bobabk' -o -name '*.sql' -o -name '*.key' -o -name '*.pem' -o -name id_rsa -o -name '*.log' -o -path ./node_modules -o -path ./tests -o -name .git \) -print | head -5)
 [ -z "$bad" ] || { echo "FAIL forbidden files: $bad" >&2; exit 1; }
-if grep -rIlE -- '-----BEGIN [A-Z ]*PRIVATE KEY-----|ghp_[A-Za-z0-9]{30,}|AKIA[0-9A-Z]{16}' "$WORK" --exclude-dir=vendor >/dev/null; then echo "FAIL secret-like content found" >&2; exit 1; fi
+if grep -rIlE -e '-----BEGIN [A-Z ]*PRIVATE KEY-----' -e 'ghp_[A-Za-z0-9]{30,}' -e 'AKIA[0-9A-Z]{16}' "$WORK" > "$WORK.secrets" 2>/dev/null; then cat "$WORK.secrets" >&2; echo "FAIL secret-like content found" >&2; exit 1; fi
 grep -q '^APP_KEY=$' "$WORK/.env.example" && echo "PASS no .env, keys, dumps, logs, tests or node_modules; .env.example carries no key"
 echo "OK $ZIP corresponds to $COMMIT"

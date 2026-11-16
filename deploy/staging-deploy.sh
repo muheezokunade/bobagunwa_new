@@ -43,7 +43,7 @@ envval() { grep -E "^$1=" "$CONFIG/staging.env" | tail -1 | cut -d= -f2- | sed -
 
 # ---- 0. Guards -------------------------------------------------------------
 [ "$(id -u)" -ne 0 ] || die "do not run as root"
-ROOT=$(cd "$(dirname "$ROOT")" && pwd)/$(basename "$ROOT")
+ROOT=$(realpath -m "$ROOT")
 case "$ROOT" in
   "$HOME"|"$HOME/"|*public_html*|/) die "refusing target $ROOT (must be the dedicated staging directory, never public_html)";;
 esac

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Support\IntegrityTriggers;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Throwable;
 
 /**
@@ -41,20 +42,50 @@ class Preflight extends Command
             $this->check('InnoDB default engine', strtolower((string) DB::selectOne('SELECT @@default_storage_engine AS e')->e) === 'innodb', DB::selectOne('SELECT @@default_storage_engine AS e')->e);
             $binlog = DB::selectOne('SELECT @@log_bin AS b')->b;
             $this->check('Binary logging (trigger privilege implications)', true, $binlog ? 'ON — trigger creation may need log_bin_trust_function_creators; see docs' : 'OFF');
+            $isolation = (string) DB::selectOne('SELECT @@SESSION.tx_isolation AS i')->i;
+            $this->check('Transaction isolation READ COMMITTED', $isolation === 'READ-COMMITTED', $isolation);
             $probe = 'boba_preflight_'.bin2hex(random_bytes(3));
-            DB::statement("CREATE TABLE {$probe} (id INT PRIMARY KEY) ENGINE=InnoDB");
+            DB::statement("CREATE TABLE {$probe} (id INT PRIMARY KEY, amount BIGINT NOT NULL, CONSTRAINT {$probe}_chk CHECK (amount >= 0)) ENGINE=InnoDB");
             try {
-                DB::unprepared("CREATE TRIGGER {$probe}_t BEFORE DELETE ON {$probe} FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'preflight'");
-                $this->check('CREATE TRIGGER privilege', true, 'trigger created and dropped');
-            } catch (Throwable $e) {
-                $this->check('CREATE TRIGGER privilege', false, mb_substr($e->getMessage(), 0, 160));
+                try {
+                    DB::insert("INSERT INTO {$probe} (id, amount) VALUES (1, -1)");
+                    $this->check('CHECK constraints enforced', false, 'a negative amount was accepted');
+                } catch (Throwable) {
+                    $this->check('CHECK constraints enforced', true, 'negative amount rejected');
+                }
+                DB::beginTransaction();
+                DB::insert("INSERT INTO {$probe} (id, amount) VALUES (2, 5)");
+                DB::rollBack();
+                $this->check('Transactions roll back', (int) DB::selectOne("SELECT COUNT(*) AS n FROM {$probe}")->n === 0, 'insert inside a rolled-back transaction left no row');
+                try {
+                    DB::unprepared("CREATE TRIGGER {$probe}_t BEFORE DELETE ON {$probe} FOR EACH ROW SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'preflight'");
+                    DB::insert("INSERT INTO {$probe} (id, amount) VALUES (3, 1)");
+                    try {
+                        DB::delete("DELETE FROM {$probe} WHERE id = 3");
+                        $this->check('CREATE TRIGGER privilege and enforcement', false, 'trigger created but did not block the delete');
+                    } catch (Throwable) {
+                        $this->check('CREATE TRIGGER privilege and enforcement', true, 'trigger created, blocked a delete, dropped');
+                    }
+                } catch (Throwable $e) {
+                    $this->check('CREATE TRIGGER privilege and enforcement', false, mb_substr($e->getMessage(), 0, 160));
+                }
             } finally {
                 DB::statement("DROP TABLE IF EXISTS {$probe}");
             }
-            if (! app()->environment(['local', 'testing'])) {
+            $migrated = Schema::hasTable('users') && Schema::hasTable('migrations');
+            if (! $migrated) {
+                $this->check('Database migrated', true, 'empty database — run php artisan migrate --force next (checks of accounts and triggers follow after migration)', false);
+            }
+            if ($migrated && ! app()->environment(['local', 'testing'])) {
                 $synthetic = (int) DB::table('users')->where('email', 'like', '%@example.test')->count();
                 $this->check('No demonstration accounts', $synthetic === 0, $synthetic ? "{$synthetic} @example.test account(s) present — remove the demonstration data" : 'none');
-                $this->check('Demo seeder disabled here', ! app()->environment(['local', 'testing']), 'boba:demo:seed refuses this environment');
+                if (app()->environment('production')) {
+                    $staging = (int) DB::table('users')->where('email', 'like', '%.invalid')->count();
+                    $this->check('No staging synthetic accounts in production', $staging === 0, $staging ? "{$staging} synthetic .invalid account(s) present" : 'none');
+                }
+            }
+            if (! app()->environment(['local', 'testing'])) {
+                $this->check('Demo seeder disabled here', true, 'boba:demo:seed refuses this environment');
             }
             $installed = collect(DB::select('SELECT TRIGGER_NAME AS n FROM information_schema.TRIGGERS WHERE TRIGGER_SCHEMA = DATABASE()'))->pluck('n')->all();
             if ($installed) {
@@ -77,6 +108,12 @@ class Preflight extends Command
         @unlink($link);
         $this->check('Symbolic links (informational)', true, $symlinks ? 'supported' : 'not supported — use the directory-switch release method', false);
         $this->check('Built assets present', is_file(public_path('build/manifest.json')), 'public/build/manifest.json');
+        $disabled = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        $procOpen = function_exists('proc_open') && ! in_array('proc_open', $disabled, true);
+        $this->check('Scheduler can start commands (proc_open)', $procOpen, $procOpen ? 'available — one cron entry running schedule:run is enough' : 'disabled — add separate cron entries for boba:ledger:verify, boba:backup:create and the hourly tasks (docs/09)', false);
+        $maxExec = (int) ini_get('max_execution_time');
+        $this->check('Web max_execution_time ≥ 60 s (CLI is unlimited)', PHP_SAPI === 'cli' || $maxExec === 0 || $maxExec >= 60, PHP_SAPI === 'cli' ? 'CLI: '.($maxExec ?: 'unlimited').'; check the web value in cPanel MultiPHP INI Editor (60 recommended)' : $maxExec.' s', false);
+        $this->check('.env outside webroot', ! str_starts_with(realpath(base_path('.env')) ?: base_path('.env'), realpath(public_path()) ?: public_path()), base_path('.env'));
         $this->check('exec() available (informational)', true, function_exists('exec') && ! in_array('exec', array_map('trim', explode(',', (string) ini_get('disable_functions'))), true) ? 'available (not required)' : 'disabled (not required)', false);
 
         if ($this->option('json')) {
