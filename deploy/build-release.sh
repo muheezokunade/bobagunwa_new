@@ -10,6 +10,8 @@ if [ -n "$(git status --porcelain)" ]; then
   exit 1
 fi
 REV=$(git rev-parse --short=12 HEAD)
+FULL_REV=$(git rev-parse HEAD)
+TREE=$(git rev-parse 'HEAD^{tree}')
 OUT="release"
 STAGE=$(mktemp -d)
 trap 'rm -rf "$STAGE"' EXIT
@@ -31,13 +33,19 @@ rm -f .env
 cat > RELEASE.json <<JSON
 {
   "revision": "$REV",
+  "commit": "$FULL_REV",
+  "tree": "$TREE",
+  "repository": "muheezokunade/bobagunwa_new",
   "built_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "php_required": ">=8.3",
   "database_required": "MariaDB 11.4 (InnoDB)",
   "composer_lock_sha256": "$(sha256sum composer.lock | cut -d' ' -f1)"
 }
 JSON
+# Per-file manifest: verify an unpacked copy on the server with `sha256sum -c --quiet MANIFEST.sha256`.
+find . -type f ! -name MANIFEST.sha256 -print0 | LC_ALL=C sort -z | xargs -0 sha256sum > MANIFEST.sha256
 cd - >/dev/null
+cp "$STAGE/MANIFEST.sha256" "$OUT/bobagunwa-$REV.MANIFEST.sha256"
 ( cd "$STAGE" && zip -qr -X "$OLDPWD/$OUT/bobagunwa-$REV.zip" . )
 sha256sum "$OUT/bobagunwa-$REV.zip" | tee "$OUT/bobagunwa-$REV.zip.sha256"
 echo "Release package: $OUT/bobagunwa-$REV.zip"
