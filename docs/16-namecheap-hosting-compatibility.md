@@ -12,7 +12,7 @@ The application has instead been verified against the same software versions loc
 |---|---|---|---|
 | Plan | Namecheap Stellar shared | No daemons, Redis, Node runtime or workers used | — |
 | Database | MariaDB 11.4.13 | **Developed and tested on MariaDB 11.4.13** (identical) | `boba:preflight` |
-| PHP | 8.3 available for staging vhost; account default 8.1 | Requires 8.3 for **web and CLI** | cPanel MultiPHP Manager + `boba:preflight` |
+| PHP | 8.3 available; account default 8.1. **No MultiPHP Manager**: CloudLinux "Select PHP Version" applies account-wide (both `bobagunwa.com` and `v2-staging` show 8.1; per-domain settings disabled because site isolation is denied). Web PHP 8.3 for staging comes from `SetHandler application/x-httpd-alt-php83` in the staging `.htaccess`; CLI is `/opt/alt/php83/usr/bin/php` (confirmed 18 Nov 2026) | Requires 8.3 for **web and CLI** | staging `.htaccess` handler + `boba:preflight` |
 | Memory | ~1 GB physical, 20 entry processes | Measured peak ≤ 75 MB per request/import (1,000-row import) | `boba:preflight` |
 | Storage | 20 GB | Release 72 MB unpacked; backups a few MB each | cPanel |
 | Web server | Apache/LiteSpeed + PHP-FPM | `public/.htaccess` rewrite rules; no other modules required | page load |

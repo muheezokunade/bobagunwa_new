@@ -31,6 +31,13 @@ Requires a clean Git tree. The package contains `MANIFEST.sha256` (every file) a
    password typed by the account holder: never in chat, documents or the repository). Then copy the lines cPanel
    added to that folder's `.htaccess` into `~/bobagunwa-config/staging-protection.htaccess`, e.g.
    ```apache
+   # PHP 8.3 for the website. REQUIRED on Namecheap: CloudLinux "Select PHP Version" has no per-domain
+   # setting on this account (site isolation denied) and the account default is PHP 8.1. The deploy
+   # script refuses a snippet without it (or BOBA_WEB_PHP_OK=1 where the domain is set to 8.3 elsewhere).
+   <FilesMatch "\.(?:html|php)$">
+       SetHandler application/x-httpd-alt-php83
+   </FilesMatch>
+
    AuthType Basic
    AuthName "Bobagunwa staging"
    AuthUserFile "/home/<user>/.htpasswds/bobagunwa-v2-webcheck/public/passwd"

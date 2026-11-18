@@ -12,6 +12,9 @@
 #                       (default ~/bobagunwa-config, mode 700)
 #   BOBA_DEPLOY_LOGS    where snapshots and logs go (default ~/bobagunwa-deploy-logs)
 #   BOBA_DRY_RUN=1      stop after the preflight and migrations check, without switching
+#   BOBA_WEB_PHP_OK=1   only if the domain's web PHP is set to 8.3 elsewhere (MultiPHP / PHP Selector);
+#                       otherwise the protection snippet must carry the PHP 8.3 handler block, because
+#                       on Namecheap (CloudLinux, no per-domain selector) web requests default to PHP 8.1
 #
 # Safety rules enforced here:
 #   * refuses root, refuses any target inside public_html or equal to $HOME,
@@ -53,6 +56,8 @@ esac
 [ -f "$CONFIG/staging.env" ] || die "missing $CONFIG/staging.env"
 [ -f "$CONFIG/staging-protection.htaccess" ] || die "missing $CONFIG/staging-protection.htaccess (staging must stay protected)"
 grep -qE '^[[:space:]]*(Require|Deny|Order|AuthType|RewriteRule)' "$CONFIG/staging-protection.htaccess" || die "protection snippet contains no access rules"
+grep -qiE '^[[:space:]]*(SetHandler|AddHandler)[[:space:]].*php8[.]?3' "$CONFIG/staging-protection.htaccess" || [ "${BOBA_WEB_PHP_OK:-0}" = 1 ] \
+  || die "protection snippet has no PHP 8.3 handler (e.g. SetHandler application/x-httpd-alt-php83): the website would run the account default PHP; add it, or set BOBA_WEB_PHP_OK=1 if the domain is set to 8.3 elsewhere"
 [ "$(stat -c %a "$CONFIG/staging.env")" = 600 ] || die "$CONFIG/staging.env must be mode 600"
 [ "$(envval APP_ENV)" = staging ] || die "staging.env: APP_ENV must be staging"
 [ "$(envval APP_DEBUG)" = false ] || die "staging.env: APP_DEBUG must be false"

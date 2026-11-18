@@ -228,6 +228,23 @@ Use only made-up names and amounts. Tick each item, or note what went wrong.
 - [ ] An event can be drafted and published, and it appears on the Events page.
 - [ ] Decisions still needed are listed in `29-approval-packet.md` (items 4–24).
 
+## 6a. Namecheap results — upgrade to `8db1405` (18 Nov 2026)
+
+Run by the Claude Code session on the maintainer's computer in cPanel; reported here. Nothing secret recorded.
+
+| Step | Result |
+|---|---|
+| Release transfer | the browser download of the 19.9 MB zip arrived truncated (6.6 MB; checksum mismatch, so the deploy was correctly not started). Re-sent as four ≤ 5 MB parts with `parts.sha256`; joined on the server: 19,879,088 bytes, `sha256sum -c` OK |
+| Before the upgrade | staging database exported through phpMyAdmin (kept on the maintainer's computer); restore-drill database `…_v2restore` created, only the staging database user has access; password protection created with Directory Privacy (login `boba-staging`; password typed by the account holder, never seen by Claude); old protection file kept as `staging-protection.htaccess.denied-20261118`; cron `*/15 … /opt/alt/php83/usr/bin/php artisan schedule:run` already present |
+| Dry run | stamp `20261118T214953Z`, exit 0; preflight 44 PASS, 0 FAIL, 1 WARN (backup public key not set) |
+| Deploy | stamp `20261118T215046Z`, exit 0; PHP CLI 8.3.36; snapshot 16 MB (`.env` excluded); manifest verified; "Nothing to migrate"; 35 triggers, no invariant exceptions; protection placed; previous kept at `~/bobagunwa-v2-webcheck.previous-20261118T215046Z`; rollback `staging-rollback.sh 20261118T215046Z` |
+| Smoke (`boba:smoke`) | **13/13 PASS** (9 × 200, `/portal` `/admin` `/admin/finance` 302, probe 404) |
+| Deployed `config/database.php` | `77e87831…ed7cd`, as expected |
+| **Issue 1 — web PHP version** | the new protection snippet (login lines only) had dropped the old snippet's `SetHandler application/x-httpd-alt-php83` block, which is what gives the website PHP 8.3 on this account (no per-domain PHP selector; account default 8.1). Restored by the session in the snippet and the live `public/.htaccess` (backup `public.htaccess.before-php83-handler` in the deploy log folder). Prevention: the runbook snippet now includes the block and `staging-deploy.sh` refuses a snippet without it (from the next release). **Web PHP 8.3 still to be confirmed** on Administration → Settings once the login works |
+| **Issue 2 — 403 instead of a login prompt** | open. Confirmed independently from the build environment: `HTTP/2 403`, `www-authenticate: Basic realm="Bobagunwa staging"`, 33-byte body "Compatibility endpoint is closed." — so the new login rules are read, but a deny rule and an `ErrorDocument` defined **outside** `public/` (a parent `.htaccess` or host-level setting) still apply. Browsers show no login box for a 403, so testers cannot get in yet |
+
+**Not yet verified on Namecheap:** browser login, web PHP 8.3, acceptance (§4 workflows), restore drill, rollback rehearsal.
+
 ## 7. Continuing on Namecheap
 
 **Correction (18 Nov 2026):** staging is an **upgrade to `bobagunwa-8db1405f54af.zip`**, not a first install, using `BOBA_PHP=/opt/alt/php83/usr/bin/php`. Keep the existing database, `staging.env` (with its `APP_KEY`) and `user.ini`. Add only the empty restore-drill database and the password protection (replace `Require all denied` in `staging-protection.htaccess` with the Directory Privacy lines, keeping a copy of the old file). Run the §0a check first.
