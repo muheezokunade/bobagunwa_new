@@ -23,11 +23,22 @@ Requires a clean Git tree. The package contains `MANIFEST.sha256` (every file) a
    # APP_URL=https://v2-staging.bobagunwa.com, MAIL_MAILER=log, DB_* for the staging database,
    # BOBA_BACKUP_PATH=/home/<user>/bobagunwa-backups/staging. Leave APP_KEY empty: the script generates it once.
    chmod 600 ~/bobagunwa-config/staging.env
-   # staging-protection.htaccess: the EXISTING 403/IP or Directory Privacy rules, with the ACME allowance, e.g.
-   #   <If "%{REQUEST_URI} !~ m#^/\.well-known/acme-challenge/#">
-   #       Require ip <allowed address>
-   #   </If>
+   # staging-protection.htaccess: the protection rules, placed by the script at the top of public/.htaccess.
    ```
+   **Chosen for `v2-staging` (18 Nov 2026): password protection** (one shared login for testers; mobile IP
+   addresses change too often for an allow-list). Create it with cPanel → **Directory Privacy** on
+   `bobagunwa-v2-webcheck/public` ("Password protect this directory", a username such as `boba-staging`, a
+   password typed by the account holder: never in chat, documents or the repository). Then copy the lines cPanel
+   added to that folder's `.htaccess` into `~/bobagunwa-config/staging-protection.htaccess`, e.g.
+   ```apache
+   AuthType Basic
+   AuthName "Bobagunwa staging"
+   AuthUserFile "/home/<user>/.htpasswds/bobagunwa-v2-webcheck/public/passwd"
+   Require valid-user
+   ```
+   Check after deployment: without the login the site answers **401**; with it, the home page loads. The
+   certificate (Namecheap SSL, not AutoSSL) needs no `.well-known` allowance; if a later reissue asks for HTTP
+   file validation, add a narrow exception then. IP-based alternative: `Require ip <allowed address>`.
 
 ## 2. Upload and deploy (SSH on port 21098, or cPanel → Terminal)
 

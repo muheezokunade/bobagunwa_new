@@ -32,6 +32,8 @@ The account has no AutoSSL, so the account holder asked Namecheap support, who i
 | Response | HTTP/2 403 from LiteSpeed, body "Compatibility endpoint is closed." — the existing protection is still in place |
 | `/.well-known/acme-challenge/` | 403 (not needed: this certificate was not issued through AutoSSL) |
 
+**Tester access (decided 18 Nov 2026):** password protection (cPanel Directory Privacy, one shared login) rather than an IP allow-list, because testers' mobile and home addresses change. The password is set by the account holder and shared privately; it is never recorded in chat, documents or the repository. The acceptance script takes it from `STAGING_HTTP_USER` / `STAGING_HTTP_PASS`.
+
 **Renewal:** this is not an automatically renewing AutoSSL certificate. Reissue or renew it from the same Namecheap SSL plugin before **4 Jun 2027**, and confirm before then whether the free certificate continues after its first year. Do not buy a certificate without a recorded decision.
 
 ## 2. Release integrity
