@@ -3,10 +3,11 @@
 **Authorisation:** Mr Ibrahim approved deploying the complete application to the protected staging site `v2-staging.bobagunwa.com` (recorded 16 Nov 2026, D-017). This does **not** cover the main website, WordPress, DNS, existing certificates, email, production records or cutover.
 
 **Status on 18 Nov 2026 (corrected):**
-- **Already deployed on Namecheap on 16 Nov 2026**, but from a release this document did not previously know about (§0). The earlier statement "not yet deployed on Namecheap" was wrong.
+- **Already deployed on Namecheap on 16 Nov 2026**, from release `9e805f3`, which is `19c6a66` plus one database setting (§0, §0b). The earlier statement "not yet deployed on Namecheap" was wrong.
+- **Upgrade ready:** release `bobagunwa-8db1405f54af.zip` from `main` carries that setting; the read-only server check found the upgrade compatible, and it was rehearsed in place on the simulated account (§0c).
 - **B1 (SSL) resolved 18 Nov 2026**: the staging host now has a valid certificate (§1a).
 - **B2 (server access) resolved for the maintainer's computer**: the maintainer's Claude Code session reads the server through the logged-in cPanel. The cloud build environment still cannot reach the server directly.
-- **Open:** the deployed commit is not in the repository (§0). Before any acceptance result counts, staging must run a release whose commit is in `main`.
+- **Open:** staging still runs `9e805f3`, whose commit is not in the repository. Acceptance results count only after the upgrade to `8db1405`.
 - **Staging deployment tooling:** built and verified end to end in a simulated cPanel account (§3).
 - **Next step:** continue in a Claude Code session on the maintainer's own computer, which can use the logged-in Namecheap tab or SSH. Use the prompt kept with this document (§7).
 
@@ -23,11 +24,11 @@ Reported by the maintainer from the server (deploy log and `~/bobagunwa-config/`
 | Migrations | "Nothing to migrate" (so the staging database had already been migrated before this run) |
 | Ledger verification | 35 triggers verified |
 | Protection | placed; `staging-protection.htaccess` is currently `Require all denied` (consistent with the 403 "Compatibility endpoint is closed." seen from outside) |
-| Smoke check | passed for `/`, `/membership`, `/membership/apply`, `/membership/status`, `/contact` (5 pages) |
+| Smoke check | **13/13 passed** (corrected 18 Nov 2026: the first report read a truncated log and listed only 5 pages; the other 8 were `/login`, `/account/recover`, `/privacy`, `/sitemap.xml`, `/portal` 302, `/admin` 302, `/admin/finance` 302 and the 404 probe) |
 | Previous version | kept at `~/bobagunwa-v2-webcheck.previous-20261116T123304Z` |
 | Private configuration | `~/bobagunwa-config/` holds `staging.env`, `staging-protection.htaccess` and `user.ini`, all mode 600; a staging database and `APP_KEY` exist |
 
-**Provenance gap.** Commit `9e805f3` is not in `muheezokunade/bobagunwa_new` (checked 18 Nov 2026: not on any branch of the remote, not in the build environment's history or reflog, not among the simulation packages). It was built 27 minutes after `19c6a66`. It is also a different code version from `19c6a66`, whose `boba:smoke` checks 13 pages, not 5. Its contents are therefore unknown to this repository, and nothing observed on it counts as acceptance evidence. The plan is to upgrade staging in place to a release from `main` once the comparison in §0a shows it is safe.
+**Provenance gap.** Commit `9e805f3` is not in `muheezokunade/bobagunwa_new` (checked 18 Nov 2026: not on any branch of the remote, not in the build environment's history or reflog, not among the simulation packages). It was built 27 minutes after `19c6a66`. *(An earlier version of this paragraph called it a different code version because its smoke check seemed to cover 5 pages; that came from a truncated log and is withdrawn.)* The manifest comparison in §0b shows exactly what it contains: `19c6a66` plus one change to `config/database.php`. Who built it is still unrecorded. Nothing observed on it counts as acceptance evidence; staging is upgraded in place to `8db1405` from `main`, which includes the same change.
 
 ### 0a. Upgrade check before replacing `9e805f3` (read-only, on the server)
 
@@ -40,7 +41,7 @@ sort -k2 ~/bobagunwa-v2-webcheck/MANIFEST.sha256 > old.txt
 unzip -p ~/releases/bobagunwa-19c6a66c0ef0.zip MANIFEST.sha256 | sort -k2 > new.txt
 join -1 2 -2 2 -a1 -a2 -e MISSING -o 0,1.1,2.1 old.txt new.txt | awk '$2!=$3' > changed.txt
 wc -l < changed.txt; grep -E 'database/migrations|IntegrityTriggers' changed.txt
-cd ~/bobagunwa-v2-webcheck && <php83> artisan migrate:status --no-ansi
+cd ~/bobagunwa-v2-webcheck && /opt/alt/php83/usr/bin/php artisan migrate:status --no-ansi
 ```
 
 Expected migrations in `19c6a66` (SHA-256 of each file):
@@ -62,6 +63,34 @@ Decision rule:
 - **Only `19c6a66` has extra migrations:** compatible; the deploy script applies them.
 
 Before the upgrade, export the staging database (phpMyAdmin → Export, or `mysqldump`) into `~/bobagunwa-deploy-logs/` (mode 700). The deploy script's snapshot covers files only, not the database.
+
+### 0b. Results of the check (server, 18 Nov 2026 ~19:30 UTC, read-only)
+
+Run by the Claude Code session on the maintainer's computer in cPanel Terminal; reported to this document.
+
+| Item | Result |
+|---|---|
+| Deployed `RELEASE.json` | revision `9e805f3da77e`, commit `9e805f3da77e497744aef075118434416b83759f`, tree `517f1b4a72fb5b04f535b4400910d95d576bd4ab`, built 2026-11-16T12:28:13Z, `composer_lock_sha256` identical to `19c6a66` |
+| Uploaded `19c6a66` package | `sha256sum -c`: OK (the upload page showed "HTTP error 500" at 100 %, but the file arrived complete) |
+| Files that differ, of 8,464 | **2**: `config/database.php` and `RELEASE.json`; none added or removed |
+| Migration and trigger files | all 7 migrations and `IntegrityTriggers.php` identical to the hashes above |
+| `migrate:status` | the seven migrations, all `[1] Ran`, nothing else |
+| The one real difference | `config/database.php` adds to the `mariadb` options `(PHP_VERSION_ID >= 80400 ? Mysql::ATTR_INIT_COMMAND : PDO::MYSQL_ATTR_INIT_COMMAND) => 'SET SESSION default_storage_engine=InnoDB'` (Namecheap's MariaDB may default to MyISAM) |
+| PHP 8.3 CLI | **`/opt/alt/php83/usr/bin/php`**; `/opt/cpanel/ea-php83/` does not exist (runbook corrected) |
+| Server changes made during the check | earlier `19c6a66` files in `~/releases` renamed `old-20261116-…` (nothing deleted); `~/bobagunwa-compare/` (mode 700) created; nothing deployed; `staging.env` not opened |
+
+**Decision:** the database is compatible, but deploying `19c6a66` would remove the InnoDB setting. That setting was added to `main` (commit `8db1405`) and a new release was built from it.
+
+### 0c. New release and upgrade rehearsal (build environment, 18 Nov 2026)
+
+| Check | Result |
+|---|---|
+| Release | `bobagunwa-8db1405f54af.zip`, SHA-256 `33baf5f3e8ce3a2d642ec3c86246f976bd1dee6cbfc6578fa2edc5e0b0b4b501`, commit `8db1405f54af64c707f0e611e60c4d35aad65640` |
+| `deploy/verify-release.sh` | all checks pass (8,471 files; identical to the commit; no secrets) |
+| Application code versus `19c6a66` | only `config/database.php` differs; the rest are deploy scripts, docs and evidence |
+| `config/database.php` SHA-256 | `77e87831451a2f1705f145ec4fd5271a9c822670e0c5ac3978afa0f2154ed7cd` (same setting as `9e805f3`; the comment wording may differ) |
+| InnoDB setting, locally with the server default set to **MyISAM** | application session reports InnoDB, `boba:preflight` passes; a plain client still gets MyISAM. Regression test added (154 tests pass) |
+| **In-place upgrade rehearsal** on the simulated cPanel account (existing database with 15 synthetic members, server default MyISAM) | `staging-deploy.sh` with the file-name-only checksum: preflight no required failure (advisories: upload limit, backup key); "Nothing to migrate"; 35 triggers and ledger verified; switch; **smoke 13/13**; data kept (15 members); 0 non-InnoDB tables (`evidence/staging-upgrade-rehearsal-2026-11-18/`) |
 
 ## 1. Blockers (exact)
 
@@ -201,7 +230,7 @@ Use only made-up names and amounts. Tick each item, or note what went wrong.
 
 ## 7. Continuing on Namecheap
 
-**Correction (18 Nov 2026):** staging is an **upgrade**, not a first install. Keep the existing database, `staging.env` (with its `APP_KEY`) and `user.ini`. Add only the empty restore-drill database and the password protection (replace `Require all denied` in `staging-protection.htaccess` with the Directory Privacy lines, keeping a copy of the old file). Run the §0a check first.
+**Correction (18 Nov 2026):** staging is an **upgrade to `bobagunwa-8db1405f54af.zip`**, not a first install, using `BOBA_PHP=/opt/alt/php83/usr/bin/php`. Keep the existing database, `staging.env` (with its `APP_KEY`) and `user.ini`. Add only the empty restore-drill database and the password protection (replace `Require all denied` in `staging-protection.htaccess` with the Directory Privacy lines, keeping a copy of the old file). Run the §0a check first.
 
 
 Run the steps in [36-staging-installation-plan.md](36-staging-installation-plan.md) from a session on the maintainer's computer, using the commands in [09-deployment-runbook.md](09-deployment-runbook.md). Then record real results in §3–§4 style tables under a new heading **"Namecheap results"** here. Mark capabilities as *Staging verified* in `28-release-readiness-report.md` only for steps actually observed on Namecheap.

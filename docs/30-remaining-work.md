@@ -8,7 +8,7 @@ Review of the project against `03-requirements-traceability.md` and the original
 |---|---|---|
 | ~~P0~~ | ~~Written approval to deploy the full application to protected staging~~ — **received 16 Nov 2026** | D-017 |
 | ~~P0~~ | ~~Valid SSL for `v2-staging.bobagunwa.com`~~ — **installed and verified 18 Nov 2026** | `37` §1a |
-| P0 | Upgrade staging from the unknown commit `9e805f3` to a release from `main`, keeping the existing database and `staging.env`, after the read-only compatibility check (server access now available from the maintainer's computer) | `37` §0a |
+| P0 | Upgrade staging from `9e805f3` to `bobagunwa-8db1405f54af.zip`, keeping the existing database and `staging.env`; add the restore-drill database and password protection (compatibility check passed, upgrade rehearsed) | `37` §0b–§0c, §7 |
 | ~~P0~~ | ~~Authorise a request to Namecheap support for the free SSL certificate~~ — done; certificate 36817201 issued and installed | — |
 | P0 | Name the first administrator | D-021 |
 | P0 | Grant hosting access (cPanel + SSH) to the named deployer for staging only | — |
