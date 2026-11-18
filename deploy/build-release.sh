@@ -47,5 +47,6 @@ find . -type f ! -name MANIFEST.sha256 -print0 | LC_ALL=C sort -z | xargs -0 sha
 cd - >/dev/null
 cp "$STAGE/MANIFEST.sha256" "$OUT/bobagunwa-$REV.MANIFEST.sha256"
 ( cd "$STAGE" && zip -qr -X "$OLDPWD/$OUT/bobagunwa-$REV.zip" . )
-sha256sum "$OUT/bobagunwa-$REV.zip" | tee "$OUT/bobagunwa-$REV.zip.sha256"
+# File name only, so `sha256sum -c` works wherever the pair is uploaded (e.g. ~/releases on the server).
+( cd "$OUT" && sha256sum "bobagunwa-$REV.zip" ) | tee "$OUT/bobagunwa-$REV.zip.sha256"
 echo "Release package: $OUT/bobagunwa-$REV.zip"

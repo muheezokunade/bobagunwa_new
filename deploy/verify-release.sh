@@ -8,7 +8,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 ZIP=${1:?usage: deploy/verify-release.sh <release.zip>}
-[ -f "$ZIP.sha256" ] && sha256sum -c --quiet "$ZIP.sha256" && echo "PASS package hash ($ZIP.sha256)"
+[ -f "$ZIP.sha256" ] && ( cd "$(dirname "$ZIP")" && sha256sum -c --quiet "$(basename "$ZIP").sha256" ) && echo "PASS package hash ($ZIP.sha256)"
 WORK=$(mktemp -d); trap 'rm -rf "$WORK" "$WORK.secrets"' EXIT
 unzip -q "$ZIP" -d "$WORK"
 ( cd "$WORK" && sha256sum -c --quiet MANIFEST.sha256 ) && echo "PASS per-file manifest ($(wc -l < "$WORK/MANIFEST.sha256") files)"

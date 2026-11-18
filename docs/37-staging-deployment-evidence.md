@@ -71,6 +71,7 @@ BOBA_PHP=<php83> ./staging-deploy.sh ~/releases/bobagunwa-19c6a66c0ef0.zip
 |---|---|---|
 | `config:cache`, `route:cache` and `view:cache` were built in `~/releases/…` and the folder was then renamed; Laravel caches absolute paths | **every page HTTP 500** on staging after the first deployment (also present in the original runbook) | caches cleared before the switch and built in the final location; `boba:smoke` and auto-rollback added |
 | `boba:preflight` queried `users` on an empty database | preflight-before-migrate (the documented order) failed | unmigrated database reported as informational; new probes: CHECK constraints, transaction rollback, trigger enforcement, READ COMMITTED, `proc_open` for the scheduler, web execution time, `.env` outside the webroot |
+| The `.zip.sha256` file recorded the path `release/bobagunwa-…zip` (found 18 Nov 2026 while preparing the upload; the simulation had used a regenerated file) | the deploy script's checksum check would refuse the release after upload to `~/releases` | `build-release.sh` writes the file name only; `verify-release.sh` checks from the zip's own folder; the `19c6a66` checksum file was rewritten (hash unchanged, `e0c28026…c102`) and both checks re-run: pass |
 | Deploy target normalisation mishandled a missing parent folder | wrong path in an error message (still refused) | `realpath -m` |
 
 ## 4. Acceptance over HTTP (simulation)
