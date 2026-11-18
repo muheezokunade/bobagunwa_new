@@ -3,6 +3,7 @@
 ## Release-blocking for staging / production (external)
 
 1. **No hosting access** from the build environment: Namecheap staging compatibility, PHP 8.3 web execution, cron, ModSecurity behaviour and SSL are **unverified on the server** (`16-namecheap-hosting-compatibility.md`).
+2a. **Staging runs a release that is not in the repository** — commit `9e805f3` (deployed 16 Nov 2026) is absent from `bobagunwa_new`. Upgrade to a release from `main` after the compatibility check in `37-staging-deployment-evidence.md` §0a; until then, nothing observed on staging counts as acceptance evidence.
 2. ~~**Staging SSL certificate**~~ — **resolved 18 Nov 2026**: valid certificate for `v2-staging.bobagunwa.com` (Namecheap SSL 36817201). It does not renew automatically (no AutoSSL on this account); renew or reissue before 4 Jun 2027.
 3. **Authorisations and policies** in `23-client-decisions.md` (deployment approvals, number format, roles, amounts, custodians, legal review, content).
 4. **Off-site backup custody** not yet established (no custodian holds a key).
