@@ -10,11 +10,11 @@ Detailed commands: [09-deployment-runbook.md](09-deployment-runbook.md). Hosting
 |---|---|---|
 | G1 | Written approval D-017 for full-application staging deployment | **Met 16 Nov 2026** (`23-client-decisions.md`) |
 | G2 | Hosting access for the deployer (cPanel + SSH on port 21098) granted by the account owner | who, when, scope |
-| G3 | **Valid TLS certificate** for `v2-staging.bobagunwa.com`: cPanel → SSL/TLS Status shows it as valid, and `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com </dev/null 2>/dev/null \| openssl x509 -noout -subject -issuer -dates` names the staging host, not `*.web-hosting.com` | command output in `19-test-evidence.md` |
+| G3 | **Valid TLS certificate** for `v2-staging.bobagunwa.com`: cPanel → SSL/TLS Status shows it as valid, and `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com </dev/null 2>/dev/null \| openssl x509 -noout -subject -issuer -dates` names the staging host, not `*.web-hosting.com` | **Met 18 Nov 2026** — `evidence/staging-ssl-2026-11-18/tls-check.txt` |
 | G4 | Release package built from the latest `main` and its SHA-256 verified | file name + hash |
 | G5 | Staging 403/IP or password protection remains in place, with only the `.well-known/acme-challenge` allowance | `.htaccess` excerpt (no secrets) |
 
-**SSL evidence status (16 Nov 2026):** no certificate evidence for the staging host was available to this build environment, and the hosts could not be reached (network policy). The last recorded check (8 Nov) found **no** valid certificate for the staging host: the server presented `*.web-hosting.com`. G3 is therefore **open**. Do not accept an invalid certificate, do not buy one, and do not remove the protection globally to obtain one. Escalate to Namecheap support if AutoSSL domain validation fails.
+**SSL evidence status (18 Nov 2026): G3 met** — valid certificate for the staging host, verified with certificate checking on (`37-staging-deployment-evidence.md` §1a). *Earlier status (16 Nov 2026):* no certificate evidence for the staging host was available to this build environment, and the hosts could not be reached (network policy). The last recorded check (8 Nov) found **no** valid certificate for the staging host: the server presented `*.web-hosting.com`. G3 is therefore **open**. Do not accept an invalid certificate, do not buy one, and do not remove the protection globally to obtain one. Escalate to Namecheap support if AutoSSL domain validation fails.
 
 ## 1. Pre-deployment host preflight (no switch-over yet)
 

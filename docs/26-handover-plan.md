@@ -33,7 +33,7 @@ Each session uses the guides `20-administrator-guide.md`, `21-treasurer-guide.md
 | `composer audit`, `npm audit`, update patch versions, run full tests, rebuild release | monthly | Technical maintainer |
 | Review officer accounts and roles | quarterly and at each change of executive | System Administrator |
 | Review audit history for unusual activity | monthly | Executive / System Administrator |
-| Renew/verify SSL (AutoSSL is automatic) | monthly glance | Technical maintainer |
+| Verify SSL; staging certificate (Namecheap SSL 36817201) does **not** auto-renew — renew/reissue in cPanel → Namecheap SSL before 4 Jun 2027 | monthly glance; reminder May 2027 | Technical maintainer |
 
 ## Change of administration (new executive)
 

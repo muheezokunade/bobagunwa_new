@@ -2,8 +2,9 @@
 
 **Authorisation:** Mr Ibrahim approved deploying the complete application to the protected staging site `v2-staging.bobagunwa.com` (recorded 16 Nov 2026, D-017). This does **not** cover the main website, WordPress, DNS, existing certificates, email, production records or cutover.
 
-**Status on 16 Nov 2026:**
-- **Not yet deployed on Namecheap**, because of the two external blockers below.
+**Status on 18 Nov 2026:**
+- **B1 (SSL) resolved 18 Nov 2026**: the staging host now has a valid certificate (§1a).
+- **Not yet deployed on Namecheap**: B2 (server access) remains.
 - **Staging deployment tooling:** built and verified end to end in a simulated cPanel account (§3).
 - **Next step:** continue in a Claude Code session on the maintainer's own computer, which can use the logged-in Namecheap tab or SSH. Use the prompt kept with this document (§7).
 
@@ -11,10 +12,27 @@
 
 | # | Blocker | Evidence | Who resolves |
 |---|---|---|---|
-| B1 | **No valid certificate for the staging host.** The server presents Namecheap's shared certificate `CN=*.web-hosting.com` (SAN `*.web-hosting.com`, `web-hosting.com`; issuer SSL.com TLS Issuing RSA CA R1; valid 3 Nov 2026 – 20 May 2027). `curl` reports "no alternative certificate subject name matches target host name 'v2-staging.bobagunwa.com'". Same finding as 8 Nov. | `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com`, run 16 Nov 2026 from the build environment | Maintainer: cPanel → SSL/TLS Status → AutoSSL for the staging host only, keeping the `/.well-known/acme-challenge/` allowance; if validation still fails, ask Namecheap support for the free certificate. Never buy one, never disable the protection globally, never accept an invalid certificate. |
+| B1 | **Resolved 18 Nov 2026 — see §1a.** *Original finding:* **no valid certificate for the staging host.** The server presents Namecheap's shared certificate `CN=*.web-hosting.com` (SAN `*.web-hosting.com`, `web-hosting.com`; issuer SSL.com TLS Issuing RSA CA R1; valid 3 Nov 2026 – 20 May 2027). `curl` reports "no alternative certificate subject name matches target host name 'v2-staging.bobagunwa.com'". Same finding as 8 Nov. | `openssl s_client -connect v2-staging.bobagunwa.com:443 -servername v2-staging.bobagunwa.com`, run 16 Nov 2026 from the build environment | Maintainer: cPanel → SSL/TLS Status → AutoSSL for the staging host only, keeping the `/.well-known/acme-challenge/` allowance; if validation still fails, ask Namecheap support for the free certificate. Never buy one, never disable the protection globally, never accept an invalid certificate. |
 | B2 | **No server access from the cloud build environment.** Its proxy carries HTTPS on port 443 only. SSH (port 21098) and cPanel (port 2083) are not possible, and no computer was linked to the session. The maintainer's Namecheap login is in a browser on their own computer, which a cloud session cannot see. | network policy response (CONNECT 403 before the host was allowed; non-443 ports unsupported) | Run the deployment from a Claude Code session on the maintainer's computer (Desktop app with Claude in Chrome, or SSH). |
 
-Until B1 is resolved, nobody signs in to the staging application in a browser. Server-side preflight, deployment behind the protection and the internal smoke check may proceed.
+Browser sign-in on staging is now allowed (B1 resolved), but only once the application is deployed and only from an address the protection admits.
+
+### 1a. B1 resolution — certificate installed (18 Nov 2026)
+
+The account has no AutoSSL, so the account holder asked Namecheap support, who issued Namecheap SSL certificate ID 36817201 ("Standard SSL", `CN=v2-staging.bobagunwa.com`, issuer SSL.com TLS Issuing RSA CA R1, valid 18 Nov 2026 – 4 Jun 2027). It was installed through cPanel → "Exclusive for Namecheap customers" → **Namecheap SSL** → certificate 36817201 → Install, by a Claude Code session on the maintainer's computer using the logged-in browser.
+
+| Check | Result |
+|---|---|
+| Certificate's domain before install | `v2-staging.bobagunwa.com` only; the install screen offered no other domain |
+| Validation, DNS records, payment | none requested; nothing bought, enabled or disabled |
+| Status in the plugin | "Active", expires 4 Jun 2027 |
+| HTTPS redirect for the staging host | turned on automatically by the plugin's existing "HTTPS by default" setting; not changed by us |
+| Main site certificate (`bobagunwa.com`, ID 34208607, expires 23 Jan 2027) | still Active, untouched (observed in the plugin; this build environment cannot reach the main site) |
+| Independent TLS check from the build environment, verification **on** (`evidence/staging-ssl-2026-11-18/tls-check.txt`) | `subject CN=v2-staging.bobagunwa.com`; SAN matches the host; issuer SSL.com TLS Issuing RSA CA R1; 18 Nov 2026 18:41 – 4 Jun 2027 18:51 UTC; **"SSL certificate verify ok"** |
+| Response | HTTP/2 403 from LiteSpeed, body "Compatibility endpoint is closed." — the existing protection is still in place |
+| `/.well-known/acme-challenge/` | 403 (not needed: this certificate was not issued through AutoSSL) |
+
+**Renewal:** this is not an automatically renewing AutoSSL certificate. Reissue or renew it from the same Namecheap SSL plugin before **4 Jun 2027**, and confirm before then whether the free certificate continues after its first year. Do not buy a certificate without a recorded decision.
 
 ## 2. Release integrity
 
@@ -105,7 +123,7 @@ The key pair was generated for the test only and is not the custodian key.
 | Member outstanding | ₦30,000.00 (statement, portal, balances CSV and raw ledger agree) |
 | Ledger exceptions / integrity check | none / passed |
 
-## 6. Client acceptance checklist — for Mr Ibrahim (after B1 and B2 are resolved)
+## 6. Client acceptance checklist — for Mr Ibrahim (after deployment; B1 resolved 18 Nov, B2 still open)
 
 Use only made-up names and amounts. Tick each item, or note what went wrong.
 

@@ -7,7 +7,7 @@ Please reply against each numbered item. Where a recommendation is given, "Agree
 ## A. Needed before protected staging (testing with made-up data)
 
 1. **Permission to install the new platform on the protected test address** `v2-staging.bobagunwa.com` (made-up data only; the current website and WordPress are not touched). *Recommendation: agree.*
-2. **SSL certificate for the test address** — authorise the developer to ask Namecheap support to issue the free certificate for `v2-staging.bobagunwa.com`. No purchase involved. *Recommendation: agree.*
+2. **SSL certificate for the test address** — authorise the developer to ask Namecheap support to issue the free certificate for `v2-staging.bobagunwa.com`. No purchase involved. *Recommendation: agree.* — **Done 18 Nov 2026**: the account holder obtained free certificate 36817201 from Namecheap support; installed and verified.
 3. **First administrator** — name the person who will hold the first administrator account (they set their own password from a one-time link).
 3a. **Hosting access** — who may log in to the Namecheap account (cPanel and SSH) to install the test site? Access is needed only for the protected test address.
 

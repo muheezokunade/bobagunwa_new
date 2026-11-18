@@ -1,0 +1,12 @@
+# TLS check of https://v2-staging.bobagunwa.com/ from the build environment, 2026-11-18 18:56 UTC
+# command: curl -sv -o /dev/null https://v2-staging.bobagunwa.com/  (certificate verification ON)
+subject: CN=v2-staging.bobagunwa.com
+start date: Nov 18 18:41:22 2026 GMT
+expire date: Jun  4 18:51:07 2027 GMT
+subjectAltName: host "v2-staging.bobagunwa.com" matched cert's "v2-staging.bobagunwa.com"
+issuer: C=US; O=SSL Corporation; CN=SSL.com TLS Issuing RSA CA R1
+SSL certificate verify ok.
+HTTP/2 403 
+server: LiteSpeed
+# GET /.well-known/acme-challenge/probe -> 403
+# body of /: Compatibility endpoint is closed.

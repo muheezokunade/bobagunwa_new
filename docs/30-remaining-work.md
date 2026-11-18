@@ -7,8 +7,9 @@ Review of the project against `03-requirements-traceability.md` and the original
 | P | Item | Ref |
 |---|---|---|
 | ~~P0~~ | ~~Written approval to deploy the full application to protected staging~~ — **received 16 Nov 2026** | D-017 |
-| P0 | Valid SSL for `v2-staging.bobagunwa.com` (still `*.web-hosting.com` on 16 Nov) and running the deployment from the maintainer's computer | `37` §1 |
-| P0 | Authorise a request to Namecheap support for the free SSL certificate on `v2-staging.bobagunwa.com` | — |
+| ~~P0~~ | ~~Valid SSL for `v2-staging.bobagunwa.com`~~ — **installed and verified 18 Nov 2026** | `37` §1a |
+| P0 | Running the deployment from the maintainer's computer (server access) | `37` §1 |
+| ~~P0~~ | ~~Authorise a request to Namecheap support for the free SSL certificate~~ — done; certificate 36817201 issued and installed | — |
 | P0 | Name the first administrator | D-021 |
 | P0 | Grant hosting access (cPanel + SSH) to the named deployer for staging only | — |
 | P1 | Membership-number format; named approvers; officer role assignments | D-004, D-005, D-022 |
@@ -30,7 +31,7 @@ Review of the project against `03-requirements-traceability.md` and the original
 | P | Item |
 |---|---|
 | P0 | Follow `36-staging-installation-plan.md`: gates G1–G5, then `php artisan boba:preflight` on the host: PHP 8.3 for **web and CLI**, extensions, MariaDB version, `CREATE TRIGGER` privilege, writable private paths |
-| P0 | Obtain a **valid** certificate (AutoSSL with the `.well-known` allowance through the 403 protection); never test login over an invalid certificate |
+| ~~P0~~ | ~~Obtain a **valid** certificate~~ — done 18 Nov 2026 (Namecheap SSL plugin; renew before 4 Jun 2027) |
 | P0 | Deploy with `09-deployment-runbook.md`; keep the staging 403/IP protection; synthetic data only |
 | P0 | Verify ModSecurity does not block form posts (application, enquiry, content editor, imports) |
 | P0 | Install cron `schedule:run`; confirm the daily ledger check and backup run |

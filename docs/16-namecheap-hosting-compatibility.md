@@ -19,7 +19,7 @@ The application has instead been verified against the same software versions loc
 | SSH | port 21098 | Needed for migrations, cron set-up, restore drills | `ssh -p 21098` |
 | Cron | available with restrictions | One entry every 15 min (or the shortest allowed) runs `schedule:run`; tasks are daily/hourly | cPanel Cron Jobs |
 | Staging host | `v2-staging.bobagunwa.com`, docroot `/home/bobakkgn/bobagunwa-v2-webcheck/public`, protected with HTTP 403 rules | Laravel's `public/` maps directly onto this docroot | cPanel Domains |
-| SSL | Free certificate **not issued**: re-checked **16 Nov 2026**, the server still presents `CN=*.web-hosting.com` (SSL.com TLS Issuing RSA CA R1, valid 3 Nov 2026 – 20 May 2027) | **Blocks** secure cookies and therefore safe staging login | cPanel SSL/TLS Status; Namecheap support |
+| SSL | **Valid since 18 Nov 2026**: Namecheap SSL certificate ID 36817201 ("Standard SSL", `CN=v2-staging.bobagunwa.com`, issuer SSL.com TLS Issuing RSA CA R1, valid 18 Nov 2026 – 4 Jun 2027), installed via cPanel → Namecheap SSL plugin; verified from the build environment with certificate checking on. The account has **no AutoSSL**: renew/reissue manually before 4 Jun 2027 | Secure cookies and staging login now possible | cPanel → Namecheap SSL plugin; `37-staging-deployment-evidence.md` §1a |
 | Account 2FA | Enabled | — | — |
 
 ## Requirements matrix (verified locally)
@@ -45,7 +45,7 @@ Verified in a simulated cPanel account (44 PASS, 0 FAIL); not yet on Namecheap.
 
 ## Known hosting risks
 
-1. **SSL for the staging hostname** — must be resolved (AutoSSL needs the `.well-known/acme-challenge` path reachable through the 403 protection; a narrow allow rule was previously tested). Do not accept an invalid certificate; do not purchase SSL; do not remove the protection globally. If AutoSSL still fails, escalate to Namecheap support with the evidence (domain, docroot, DCV error from cPanel → SSL/TLS Status).
+1. **SSL for the staging hostname** — **resolved 18 Nov 2026** (Namecheap SSL certificate 36817201; no AutoSSL on this account, so watch the 4 Jun 2027 expiry). Historical note: AutoSSL needs the `.well-known/acme-challenge` path reachable through the 403 protection; a narrow allow rule was previously tested). Do not accept an invalid certificate; do not purchase SSL; do not remove the protection globally. If AutoSSL still fails, escalate to Namecheap support with the evidence (domain, docroot, DCV error from cPanel → SSL/TLS Status).
 2. **Account default PHP 8.1** — set PHP 8.3 per domain in MultiPHP Manager and call PHP 8.3 explicitly for CLI/cron (e.g. `/opt/cpanel/ea-php83/root/usr/bin/php` — confirm the path with `ls /opt/cpanel/`).
 3. **ModSecurity** — may block some form posts containing words like `SELECT` or `<script>` in free text. Test the application and enquiry forms on staging; request a targeted rule exception from support if needed.
 4. **Cron interval restrictions** — scheduled tasks tolerate a 15–30 minute cron.

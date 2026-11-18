@@ -7,7 +7,7 @@
 | Stage | Status |
 |---|---|
 | Complete and locally verified | **Yes** — every required capability is implemented and covered by executed tests on PHP 8.3 + MariaDB 11.4 (151 tests / 3,288 assertions, seven workflows, all 56 admin mutation routes × 7 roles over HTTP, 225-view browser audit) |
-| Ready for protected staging deployment | **Yes** — approval D-017 received 16 Nov 2026; release `19c6a66` verified; deploy/rollback scripts, preflight, smoke check and the HTTPS acceptance script verified end to end in a simulated cPanel account (`37-staging-deployment-evidence.md`). **Blocked on Namecheap** by (B1) no valid certificate for the staging host — re-checked 16 Nov: still the shared `*.web-hosting.com` certificate — and (B2) server access, which must come from the maintainer's own computer |
+| Ready for protected staging deployment | **Yes** — approval D-017 received 16 Nov 2026; release `19c6a66` verified; deploy/rollback scripts, preflight, smoke check and the HTTPS acceptance script verified end to end in a simulated cPanel account (`37-staging-deployment-evidence.md`). (B1) valid certificate for the staging host **installed and verified 18 Nov 2026**. **Still blocked on Namecheap** by (B2) server access, which must come from the maintainer's own computer |
 | Verified on protected staging | **No** — nothing has been deployed to Namecheap yet; simulated-deployment evidence only (19/19 acceptance steps, restore verified) |
 | Ready for production acceptance | **No** — requires staging acceptance, the approvals in `29-approval-packet.md`, backup custody and production cutover approval |
 | Live | **No.** Nothing was deployed; the existing website, WordPress, DNS, SSL and email were not touched |
@@ -80,7 +80,7 @@ States: **Implemented** · **Locally tested** · **Staging verified** · **Await
 
 1. ~~Written approval D-017~~ — **received 16 Nov 2026** (staging only).
 2. Server access: run the deployment from a Claude Code session on the maintainer's computer, using the logged-in Namecheap tab or SSH. The cloud build environment cannot open SSH or cPanel ports.
-3. A valid certificate for `v2-staging.bobagunwa.com`. **Re-checked 16 Nov 2026: still not issued** — the server presents `*.web-hosting.com` (SSL.com, valid until 20 May 2027).
+3. ~~A valid certificate for `v2-staging.bobagunwa.com`~~ — **installed and verified 18 Nov 2026** (Namecheap SSL 36817201, valid until 4 Jun 2027; `37-staging-deployment-evidence.md` §1a).
 4. The first administrator named (D-021).
 5. Host preflight passing on the server.
 
@@ -88,8 +88,8 @@ Client decisions still open: D-004 … D-016, D-018 … D-022, D-024 … D-026 (
 
 ## Blockers, in order
 
-1. ~~**D-017**~~ approved 16 Nov 2026; now: **valid SSL** for the staging host and **server access** from the maintainer's computer (`37-staging-deployment-evidence.md` §1).
-2. **Valid SSL** for `v2-staging.bobagunwa.com` (AutoSSL/DCV through the 403 protection, or Namecheap support).
+1. ~~**D-017**~~ approved 16 Nov 2026; ~~valid SSL~~ installed 18 Nov 2026; now: **server access** from the maintainer's computer (`37-staging-deployment-evidence.md` §1).
+2. ~~**Valid SSL** for `v2-staging.bobagunwa.com`~~ — resolved 18 Nov 2026 via Namecheap support and the Namecheap SSL plugin.
 3. Server verification: `php artisan boba:preflight` on the host (PHP 8.3 for web and CLI, trigger privilege, writable paths).
 4. Officer acceptance on staging with synthetic data.
 5. Production decisions (D-004 … D-022), backup custodians, legal review, then **D-018** cutover approval with a verified backup and rehearsed rollback.
