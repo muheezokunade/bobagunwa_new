@@ -5,7 +5,7 @@
 #   deploy/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
 #
 # Configuration (no secrets on the command line; nothing secret is printed):
-#   BOBA_PHP            PHP 8.3 CLI binary (required), e.g. /opt/cpanel/ea-php83/root/usr/bin/php
+#   BOBA_PHP            PHP 8.3 CLI binary (required), e.g. /opt/alt/php83/usr/bin/php (Namecheap/CloudLinux; check with ls /opt/alt/)
 #   BOBA_STAGING_ROOT   live staging application directory; cPanel docroot = $BOBA_STAGING_ROOT/public
 #                       (default ~/bobagunwa-v2-webcheck)
 #   BOBA_CONFIG_DIR     private directory holding staging.env and staging-protection.htaccess

@@ -46,7 +46,7 @@ Verified in a simulated cPanel account (44 PASS, 0 FAIL); not yet on Namecheap.
 ## Known hosting risks
 
 1. **SSL for the staging hostname** — **resolved 18 Nov 2026** (Namecheap SSL certificate 36817201; no AutoSSL on this account, so watch the 4 Jun 2027 expiry). Historical note: AutoSSL needs the `.well-known/acme-challenge` path reachable through the 403 protection; a narrow allow rule was previously tested). Do not accept an invalid certificate; do not purchase SSL; do not remove the protection globally. If AutoSSL still fails, escalate to Namecheap support with the evidence (domain, docroot, DCV error from cPanel → SSL/TLS Status).
-2. **Account default PHP 8.1** — set PHP 8.3 per domain in MultiPHP Manager and call PHP 8.3 explicitly for CLI/cron (e.g. `/opt/cpanel/ea-php83/root/usr/bin/php` — confirm the path with `ls /opt/cpanel/`).
+2. **Account default PHP 8.1** — set PHP 8.3 per domain in MultiPHP Manager and call PHP 8.3 explicitly for CLI/cron (on this server: **`/opt/alt/php83/usr/bin/php`**, confirmed 18 Nov 2026; `/opt/cpanel/ea-php83/` does not exist).
 3. **ModSecurity** — may block some form posts containing words like `SELECT` or `<script>` in free text. Test the application and enquiry forms on staging; request a targeted rule exception from support if needed.
 4. **Cron interval restrictions** — scheduled tasks tolerate a 15–30 minute cron.
 5. **Binary logging** — if enabled, trigger creation may need `log_bin_trust_function_creators` (support request). Preflight detects this.

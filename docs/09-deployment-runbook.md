@@ -45,9 +45,10 @@ Requires a clean Git tree. The package contains `MANIFEST.sha256` (every file) a
 ```bash
 mkdir -p ~/releases       # upload bobagunwa-<rev>.zip and .zip.sha256 here
 cd ~ && unzip -o -j ~/releases/bobagunwa-<rev>.zip deploy/staging-deploy.sh deploy/staging-rollback.sh -d ~ && chmod 700 ~/staging-*.sh
-ls /opt/cpanel/            # find the PHP 8.3 CLI, e.g. /opt/cpanel/ea-php83/root/usr/bin/php
-BOBA_DRY_RUN=1 BOBA_PHP=/opt/cpanel/ea-php83/root/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
-BOBA_PHP=/opt/cpanel/ea-php83/root/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
+ls /opt/alt/               # the PHP 8.3 CLI on Namecheap (CloudLinux) is /opt/alt/php83/usr/bin/php
+                          # (/opt/cpanel/ea-php83/ does not exist there; confirmed on the server 18 Nov 2026)
+BOBA_DRY_RUN=1 BOBA_PHP=/opt/alt/php83/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
+BOBA_PHP=/opt/alt/php83/usr/bin/php ~/staging-deploy.sh ~/releases/bobagunwa-<rev>.zip
 ```
 
 The script (`deploy/staging-deploy.sh`) does, in order, and stops before the switch on any failure:
@@ -72,7 +73,7 @@ Record the STAMP the script prints.
 ## 3. Cron (cPanel → Cron Jobs, staging only)
 
 ```
-*/15 * * * * cd /home/<user>/bobagunwa-v2-webcheck && /opt/cpanel/ea-php83/root/usr/bin/php artisan schedule:run >> /dev/null 2>&1
+*/15 * * * * cd /home/<user>/bobagunwa-v2-webcheck && /opt/alt/php83/usr/bin/php artisan schedule:run >> /dev/null 2>&1
 ```
 If preflight reports `proc_open` disabled, replace it with direct entries: `boba:ledger:verify` daily, `boba:backup:create --keep=14` daily, and the hourly overdue and prune tasks.
 

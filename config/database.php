@@ -86,6 +86,9 @@ return [
             'timezone' => '+00:00',
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 Mysql::ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+                // Namecheap's MariaDB may default to MyISAM: make every session
+                // default to InnoDB as well (`boba:preflight` checks it).
+                (PHP_VERSION_ID >= 80400 ? Mysql::ATTR_INIT_COMMAND : PDO::MYSQL_ATTR_INIT_COMMAND) => 'SET SESSION default_storage_engine=InnoDB',
             ], fn ($value) => $value !== null) : [],
         ],
 

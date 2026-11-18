@@ -15,6 +15,14 @@ class DeploymentChecksTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_every_database_session_defaults_to_innodb_even_if_the_host_defaults_to_myisam(): void
+    {
+        // Namecheap's MariaDB may default to MyISAM (no transactions, foreign keys or row locks).
+        $options = config('database.connections.mariadb.options');
+        $this->assertContains('SET SESSION default_storage_engine=InnoDB', $options);
+        $this->assertSame('innodb', strtolower(\Illuminate\Support\Facades\DB::selectOne('SELECT @@session.default_storage_engine AS e')->e));
+    }
+
     public function test_smoke_check_passes_on_a_working_installation(): void
     {
         $this->artisan('boba:smoke')->assertExitCode(0);
