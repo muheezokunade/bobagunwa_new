@@ -245,6 +245,8 @@ Run by the Claude Code session on the maintainer's computer in cPanel; reported 
 
 **Also fixed in `main` (found while investigating Issue 2):** the deploy script did not carry uploaded files over to the new release folder. Public images (`public/media`) and private uploads such as payment evidence (`storage/app`) would have been left behind in the `.previous-*` folder at every deployment. The script now copies both from the live site, then restores the files the release ships there (notably `public/media/.htaccess`, which stops uploads executing) from the verified zip and checks them against the manifest. Rehearsed on the simulated account 19 Nov: a test image and a test private file carried over, a tampered `media/.htaccess` replaced by the release copy, resulting modes app 711 / `public` 755 / files 644, `.env` 600, `storage` closed to other users; smoke 13/13.
 
+**Release with these fixes:** `bobagunwa-ae875554b96d.zip`, SHA-256 `763d9fd52aca0685b3a4cf0c10dc8a8a239a1e394e875a0290c476c9ac096dcc`, commit `ae875554b96da77fb580edf45ad15db348b78159` (verified; differs from `8db1405` only in `UploadService`, `Preflight`, the two deploy scripts and docs). Sent as four ≤ 5 MB parts with `parts.sha256`.
+
 The simulation did not catch Issues 1 and 2 because its PHP server runs as the same user that owns the files; Namecheap's LiteSpeed does not.
 
 **Not yet verified on Namecheap:** browser login, web PHP 8.3, acceptance (§4 workflows), restore drill, rollback rehearsal.
