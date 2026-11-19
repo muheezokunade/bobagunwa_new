@@ -25,5 +25,6 @@ else
   echo "First install had no previous site: moving the release aside leaves the staging docroot empty." >&2
   mv "$ROOT" "$ROOT.failed-$NOW"; mkdir -p "$ROOT/public"
   cp "${BOBA_CONFIG_DIR:-$HOME/bobagunwa-config}/staging-protection.htaccess" "$ROOT/public/.htaccess"
+  chmod 711 "$ROOT"; chmod 755 "$ROOT/public"; chmod 644 "$ROOT/public/.htaccess"
   echo "Staging now serves only the protection rules; failed release at $ROOT.failed-$NOW" | tee -a "$RUN/deploy.log"
 fi

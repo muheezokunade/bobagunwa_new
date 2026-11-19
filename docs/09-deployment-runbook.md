@@ -73,6 +73,7 @@ The script (`deploy/staging-deploy.sh`) does, in order, and stops before the swi
 5. **`migrate --force`** and **`boba:ledger:verify`** (35 triggers, zero exceptions).
 6. **Protection**: the protection rules are placed at the top of `public/.htaccess`.
 7. **Switch** by renaming within the home filesystem. The previous directory is kept as `~/bobagunwa-v2-webcheck.previous-<STAMP>`.
+   Before the switch the script also **carries uploads over** (`public/media`, `storage/app`) from the live site, restores the release's own files there from the zip, and sets **web permissions** (app folder 711, `public/` 755/644) because LiteSpeed reads files as `nobody`.
 8. **Caches are built in the final location** (they store absolute paths; building them before the rename makes every page fail). Then **`boba:smoke`** sends internal requests to 13 pages and checks status codes and security headers. **If it fails, the previous site is restored automatically.**
 
 Record the STAMP the script prints.

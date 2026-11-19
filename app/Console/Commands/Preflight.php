@@ -97,7 +97,7 @@ class Preflight extends Command
         }
 
         foreach ([storage_path('framework/sessions'), storage_path('framework/views'), storage_path('logs'), storage_path('app/private'), base_path('bootstrap/cache'), public_path('media'), config('boba.backup.path')] as $dir) {
-            @mkdir($dir, 0750, true);
+            @mkdir($dir, $dir === public_path('media') ? 0755 : 0750, true);
             $this->check('Writable: '.$dir, is_dir($dir) && is_writable($dir), is_writable($dir) ? 'ok' : 'not writable');
         }
         $this->check('Private storage outside webroot', ! str_starts_with(realpath(storage_path()) ?: storage_path(), realpath(public_path()) ?: public_path()), storage_path());

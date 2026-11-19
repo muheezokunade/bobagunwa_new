@@ -95,6 +95,15 @@ if [ -z "$(envval APP_KEY)" ]; then
   log "Generated a new staging APP_KEY (stored only in $CONFIG/staging.env)"
 fi
 BACKUPS=$(envval BOBA_BACKUP_PATH); [ -n "$BACKUPS" ] && mkdir -p "$BACKUPS" && chmod 700 "$BACKUPS"
+# Uploaded files live inside the application folder: carry them over from the
+# live site (public images in public/media, private uploads in storage/app).
+# Files the release itself ships there (e.g. public/media/.htaccess, which stops
+# uploads from executing) are then restored from the verified zip.
+if [ -d "$ROOT/public/media" ]; then cp -a "$ROOT/public/media/." "$REL/public/media/"; fi
+if [ -d "$ROOT/storage/app" ]; then cp -a "$ROOT/storage/app/." "$REL/storage/app/"; fi
+unzip -o -q "$ZIP" 'public/media/*' 'storage/app/*' -d "$REL" 2>/dev/null || true
+(cd "$REL" && grep -E '  \./(public/media|storage/app)/' MANIFEST.sha256 | sha256sum -c --quiet -) || die "shipped files in public/media or storage/app do not match MANIFEST.sha256"
+[ -d "$ROOT" ] && log "Uploads carried over: $(find "$REL/public/media" -type f ! -name .htaccess ! -name .gitignore | wc -l) public image(s), $(find "$REL/storage/app" -type f ! -name .gitignore | wc -l) file(s) under storage/app"
 chmod -R u+rwX,g+rX,o-rwx "$REL/storage" "$REL/bootstrap/cache"
 
 # ---- 4. Host preflight (abort on FAIL) -------------------------------------
@@ -119,6 +128,14 @@ log "Migrated; integrity triggers and ledger verified (caches are built after th
   echo "# --- end staging protection ---"; echo
   cat "$REL/public/.htaccess"; } > "$REL/public/.htaccess.new" && mv "$REL/public/.htaccess.new" "$REL/public/.htaccess"
 log "Protection rules placed at the top of public/.htaccess"
+# The web server (LiteSpeed) reads static files and .htaccess as another user
+# (`nobody`); with umask 027 everything would be unreadable and every page a
+# 404 (seen on Namecheap 16 and 18 Nov 2026). 711 lets it pass through the app
+# folder without listing or reading .env, storage or the code; public/ only
+# holds the front controller, compiled assets and public images.
+chmod 711 "$REL"
+find "$REL/public" -type d -exec chmod 755 {} + -o -type f -exec chmod 644 {} +
+log "Web permissions: app folder 711, public/ directories 755 and files 644"
 
 if [ "${BOBA_DRY_RUN:-0}" = 1 ]; then
   log "DRY RUN: release prepared at $REL; live directory not switched"; exit 0

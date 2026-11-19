@@ -20,6 +20,7 @@ The application has instead been verified against the same software versions loc
 | Cron | available with restrictions | One entry every 15 min (or the shortest allowed) runs `schedule:run`; tasks are daily/hourly | cPanel Cron Jobs |
 | Staging host | `v2-staging.bobagunwa.com`, docroot `/home/bobakkgn/bobagunwa-v2-webcheck/public`, protected with HTTP 403 rules | Laravel's `public/` maps directly onto this docroot | cPanel Domains |
 | SSL | **Valid since 18 Nov 2026**: Namecheap SSL certificate ID 36817201 ("Standard SSL", `CN=v2-staging.bobagunwa.com`, issuer SSL.com TLS Issuing RSA CA R1, valid 18 Nov 2026 – 4 Jun 2027), installed via cPanel → Namecheap SSL plugin; verified from the build environment with certificate checking on. The account has **no AutoSSL**: renew/reissue manually before 4 Jun 2027 | Secure cookies and staging login now possible | cPanel → Namecheap SSL plugin; `37-staging-deployment-evidence.md` §1a |
+| Web server user | LiteSpeed reads static files and `.htaccess` as `nobody` (PHP itself runs as the account user) | The app folder must be **711**, `public/` directories **755** and files **644**, or every page is a 404 (seen 16 and 18 Nov 2026); `.env`, `storage` and code stay closed. `staging-deploy.sh` sets this | `stat`; `37` §6a |
 | Account 2FA | Enabled | — | — |
 
 ## Requirements matrix (verified locally)

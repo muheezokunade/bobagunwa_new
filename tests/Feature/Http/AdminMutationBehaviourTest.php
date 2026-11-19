@@ -261,7 +261,11 @@ class AdminMutationBehaviourTest extends TestCase
         $this->actingAs($sec)->post(route('admin.content.galleries.items', $gallery->id), ['image' => UploadedFile::fake()->image('photo.jpg', 40, 30), 'alt_text' => 'Synthetic photo', 'rights_confirmed' => '1'])->assertSessionHasNoErrors();
         $this->assertSame(1, $gallery->items()->count());
         $this->audited('gallery.item_added', $gallery->id);
-        @unlink(public_path('media/'.$gallery->items()->first()->media->path));
+        // Served directly by the web server (another OS user on shared hosting): must be world-readable.
+        $stored = public_path('media/'.$gallery->items()->first()->media->path);
+        $this->assertSame('0644', substr(sprintf('%o', fileperms($stored)), -4));
+        $this->assertSame('0755', substr(sprintf('%o', fileperms(dirname($stored))), -4));
+        @unlink($stored);
     }
 
     public function test_backup_creation_requires_a_configured_key_and_succeeds_with_one(): void

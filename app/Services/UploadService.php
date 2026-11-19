@@ -37,6 +37,11 @@ class UploadService
         $target = public_path("media/{$dir}");
         File::ensureDirectoryExists($target, 0755);
         file_put_contents("{$target}/{$name}", $binary);
+        // Public images are served directly by the web server, which on shared
+        // hosting (LiteSpeed) reads files as another user: world-readable, not 0640.
+        @chmod(dirname($target), 0755);
+        @chmod($target, 0755);
+        @chmod("{$target}/{$name}", 0644);
 
         $media = Media::create([
             'path' => "{$dir}/{$name}", 'original_name' => mb_substr($file->getClientOriginalName(), 0, 190), 'mime' => $mime,
