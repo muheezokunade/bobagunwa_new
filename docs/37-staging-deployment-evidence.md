@@ -249,7 +249,23 @@ Run by the Claude Code session on the maintainer's computer in cPanel; reported 
 
 The simulation did not catch Issues 1 and 2 because its PHP server runs as the same user that owns the files; Namecheap's LiteSpeed does not.
 
-**Not yet verified on Namecheap:** browser login, web PHP 8.3, acceptance (§4 workflows), restore drill, rollback rehearsal.
+## 6b. Namecheap results — permissions fixed, upgrade to `ae87555` (19 Nov 2026)
+
+Run by the Claude Code session on the maintainer's computer; reported here. 401 responses confirmed independently from the build environment.
+
+| Step | Result |
+|---|---|
+| Hand fix on the `8db1405` deploy (staging folder only) | app folder 711, `public/` 755/644 → `/`, `/robots.txt`, `/login` all `HTTP/2 401` with `realm="Bobagunwa staging"` (Issue 2 resolved; diagnosis confirmed) |
+| Browser sign-in | the account holder signed in as `boba-staging` (~06:01 UTC); access log: 200 for `/`, CSS and JS bundles, crest images and web fonts — the website runs PHP 8.3 (Laravel 13 cannot start on 8.1). Issue 1 resolved |
+| Release transfer | four parts OK; joined 19,886,072 bytes; `sha256sum -c` OK |
+| Dry run | stamp `20261119T061043Z`, exit 0; logged "Web permissions" |
+| Deploy | stamp `20261119T061129Z`, exit 0; PHP CLI 8.3.36; snapshot 16 MB (`.env` excluded); manifest verified, revision `ae875554b96da77fb580edf45ad15db348b78159`; "Uploads carried over: 0 public image(s), 0 file(s) under storage/app" (none exist yet); "Nothing to migrate"; 35 triggers, no invariant exceptions; protection placed; "Web permissions: app folder 711, public/ directories 755 and files 644"; previous kept at `~/bobagunwa-v2-webcheck.previous-20261119T061129Z`; rollback `staging-rollback.sh 20261119T061129Z` |
+| Preflight | 44 PASS, 0 FAIL, 1 WARN (backup public key not set) |
+| Smoke | **13/13 PASS** |
+| Permissions after deploy (set by the script, no hand fix) | app folder 711, `public` 755, `public/index.php` and `.htaccess` 644; `staging.env` 600 |
+| Without login | `/`, `/robots.txt`, `/login` → `HTTP/2 401`, `realm="Bobagunwa staging"` |
+
+**Staging is ready for acceptance.** Not yet verified on Namecheap: the acceptance workflows (§4), a backup key and the restore drill, the rollback rehearsal, and the officers' checklist (§6).
 
 ## 7. Continuing on Namecheap
 
