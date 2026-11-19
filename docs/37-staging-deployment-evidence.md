@@ -306,7 +306,29 @@ Run by the Claude Code session on the maintainer's computer in cPanel Terminal; 
 
 `…_v2restore` now holds the restored copy; empty it before the next drill (the restore command needs an empty target).
 
-**Still to observe on Namecheap:** the overnight scheduled jobs (daily ledger check, nightly backup) and the officers' checklist (§6). Everything else in §3–§5 is now verified on the real host.
+## 6e. Checklist rehearsal on behalf of the maintainer (19 Nov 2026, 08:50–09:20 UTC) — **13/13 pass; not officer acceptance**
+
+The officers were not available, so the Claude Code session on the maintainer's computer worked through the §6 checklist itself in the maintainer's Chrome, signing in as each synthetic officer (made-up data only). **This is a rehearsal by the developer's tooling, not the association's acceptance:** §6 still needs to be done by Mr Ibrahim and the officers at their own screens, with Mr Ibrahim recording the results.
+
+| # | Item | Result |
+|---|---|---|
+| 1 | Padlock, no certificate warning | pass, *partly checked*: HTTPS with no certificate warning; the address bar itself was not visible to the tool |
+| 2 | Not visible without the login | pass: `/`, `/robots.txt`, `/login` → 401 with the staging prompt |
+| 3 | Public pages on phone and computer | pass, *partly checked*: all 15 public pages 200 with correct headings; seven main pages inspected at ~540 and ~780 px without horizontal scrolling; 1440 px only in the automated run (§6c) |
+| 4 | Application, tracking shows "Received" | pass: `BOB-APP-2026-JTRWNQ` |
+| 5 | Officer approves; one-time link works once | pass: Received → Under review → Approved; member `BOB-000004`; link refused on reuse |
+| 6 | Member sees number and statement | pass: portal shows `BOB-000004`, Active; member gets 403 on admin and finance pages |
+| 7 | ₦20,000 awaiting verification until a different person verifies | pass, *partly checked*: `PAY-2026-V7AJD5X` pending and not counted; recorder had no verify button and got 403 on a direct attempt; verifier verified it. Checked on the officer side, not in the member portal |
+| 8 | Statement 50,000 / 20,000 / 30,000, prints neatly | pass, *partly checked*: figures correct; print layout checked by applying the print styles on screen, not on paper |
+| 9 | System Administrator cannot open finance | pass: 403 on all 8 finance pages tried; no finance menu items |
+| 10 | Integrity check passes | pass: "Integrity check passed" (35 triggers, no findings). History shows the **scheduled daily check ran at 02:30 WAT on 17, 18 and 19 Nov** — the cron job works |
+| 11 | Backup created; restore drill passed | pass: `bobagunwa-20261119-081907-739868.bobabk` (0.20 MB); this morning's drill recorded "Restore verification — Succeeded" |
+| 12 | Event drafted, published, shown on Events | pass: hidden while a draft; on `/events` when signed out after publishing |
+| 13 | Decisions listed in `29-approval-packet.md` (items 4–24) | pass: all 21 present |
+
+Notes: the first approval attempt in item 5 was not saved because the page's confirmation dialog was dismissed by the browser tool; repeated with the dialog answered (not an application defect). The synthetic officers' passwords were set by the tool and are not recorded anywhere; officers who later test staging get fresh single-use links from `boba:staging:prepare`. Spent links file deleted on the server.
+
+**Still to observe on Namecheap:** the nightly scheduled backup (02:00 UTC). **Still to do:** the officers' own run of §6, recorded by Mr Ibrahim. Everything else in §3–§5 is verified on the real host.
 
 ## 7. Continuing on Namecheap
 
