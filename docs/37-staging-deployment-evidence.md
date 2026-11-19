@@ -290,7 +290,23 @@ Run with `tests/browser/staging-acceptance.cjs` from the maintainer's Mac (macOS
 | Contact enquiry | submitted with SQL- and HTML-like words — **not blocked by ModSecurity**; listed for the secretariat |
 | Responsive | 375 / 768 / 1440 px, 30 page views, no horizontal overflow |
 
-The financial figures match §5. Not yet verified on Namecheap: the server-side restore drill (W7), the rollback rehearsal, the scheduled jobs actually running overnight, and the officers' checklist (§6).
+The financial figures match §5.
+
+## 6d. Namecheap restore drill and rollback rehearsal (19 Nov 2026)
+
+Run by the Claude Code session on the maintainer's computer in cPanel Terminal; reported here.
+
+| Check | Result |
+|---|---|
+| **Restore drill (W7, server side)** | `bobagunwa-20261119-063237-e51926.bobabk` (162,864 bytes, mode 600, made by the acceptance run) restored into the empty `…_v2restore` with the staging-only test key: exit 0, **"Restore verified."** — 3 members, 35 triggers, 88 foreign keys checked, 0 orphaned rows, 48 audit events, 118 statements; obligations 5,000,000 kobo, allocated verified payments 2,000,000, outstanding 3,000,000 (₦50,000 / ₦20,000 / ₦30,000, matching W6); 0 adjustments, 0 unallocated credit, 0 pending |
+| **Rollback** | `staging-rollback.sh 20261119T061129Z` → `8db1405` restored; smoke 13/13; `/` 401; permissions kept (711/755) |
+| **Forward again** | `staging-deploy.sh` with `ae87555`, stamp `20261119T064111Z`, exit 0; uploads carried over (none yet); preflight no failure, **0 advisories** (backup key now set); web permissions set; smoke 13/13; `/` 401; `boba:ledger:verify`: 35 triggers, no exceptions; data survived (3 members, 7 users) |
+| Test private key | `staging-TEST-backup.keypair` deleted and confirmed gone; public key kept so the nightly backup job can be observed (backups made with it can no longer be decrypted, acceptable for synthetic staging; the custodians' key replaces it before production) |
+| Officer accounts for §6 | `boba:staging:prepare`: 6 fresh single-use links written (mode 600, never printed), downloaded privately; server copy deleted after the download is confirmed |
+
+`…_v2restore` now holds the restored copy; empty it before the next drill (the restore command needs an empty target).
+
+**Still to observe on Namecheap:** the overnight scheduled jobs (daily ledger check, nightly backup) and the officers' checklist (§6). Everything else in §3–§5 is now verified on the real host.
 
 ## 7. Continuing on Namecheap
 
