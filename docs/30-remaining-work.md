@@ -9,7 +9,8 @@ Review of the project against `03-requirements-traceability.md` and the original
 | ~~P0~~ | ~~Written approval to deploy the full application to protected staging~~ — **received 16 Nov 2026** | D-017 |
 | ~~P0~~ | ~~Valid SSL for `v2-staging.bobagunwa.com`~~ — **installed and verified 18 Nov 2026** | `37` §1a |
 | ~~P0~~ | ~~Upgrade staging from `9e805f3` to a release from `main`~~ — **done 19 Nov 2026**: `ae87555` deployed, login protection working | `37` §6b |
-| P0 | Staging acceptance on Namecheap: staging-only test backup key, synthetic officers (`boba:staging:prepare`), `staging-acceptance.cjs` from the maintainer's computer, restore drill into `…_v2restore`, rollback rehearsal; then officer checklist (§6) | `37` §6b, §7 |
+| ~~P0~~ | ~~Automated staging acceptance on Namecheap~~ — **19/19 PASS, 19 Nov 2026** | `37` §6c |
+| P0 | Restore drill into `…_v2restore` with the staging test key, then delete the private key; rollback rehearsal; confirm the overnight ledger check and backup ran; officers' checklist (§6) | `37` §6c, §7 |
 | ~~P0~~ | ~~Authorise a request to Namecheap support for the free SSL certificate~~ — done; certificate 36817201 issued and installed | — |
 | P0 | Name the first administrator | D-021 |
 | P0 | Grant hosting access (cPanel + SSH) to the named deployer for staging only | — |

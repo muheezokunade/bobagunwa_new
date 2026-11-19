@@ -13,6 +13,9 @@
  * Optional environment:
  *   STAGING_HTTP_USER / STAGING_HTTP_PASS   if the staging protection is cPanel Directory Privacy
  *   STAGING_ALLOW_HTTP=1                    only for the local simulation (http://127.0.0.1)
+ *   STAGING_BROWSER_CHANNEL=chrome          use the installed Google Chrome (or msedge) instead of
+ *                                           Playwright's Chromium, e.g. where `npx playwright install
+ *                                           chromium` is unsupported (macOS 13 with Playwright 1.63)
  *
  * Certificate errors are NEVER ignored: an invalid certificate stops the run.
  * Officer passwords are random, held in memory for this run only, never printed.
@@ -44,7 +47,9 @@ async function attempt(step, fn) { try { const d = await fn(); record(step, true
 function must(cond, msg) { if (!cond) throw new Error(msg); }
 
 (async () => {
-  const browser = await chromium.launch();
+  const channel = process.env.STAGING_BROWSER_CHANNEL || undefined;
+  if (channel && !/^(chrome|chrome-beta|msedge|msedge-beta)$/.test(channel)) { console.error('STAGING_BROWSER_CHANNEL must be chrome, chrome-beta, msedge or msedge-beta'); process.exit(2); }
+  const browser = await chromium.launch(channel ? { channel } : {});
   const ctxOptions = { ignoreHTTPSErrors: false };
   if (process.env.STAGING_HTTP_USER) ctxOptions.httpCredentials = { username: process.env.STAGING_HTTP_USER, password: process.env.STAGING_HTTP_PASS || '' };
   const contexts = [];

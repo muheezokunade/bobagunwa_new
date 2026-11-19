@@ -98,9 +98,10 @@ If preflight reports `proc_open` disabled, replace it with direct entries: `boba
 
 On the computer that runs it (a clone of the repository, not the server):
 ```bash
-npm ci && npx playwright install chromium
+npm ci && npx playwright install chromium   # or skip and set STAGING_BROWSER_CHANNEL=chrome to use installed Chrome
 node tests/browser/staging-acceptance.cjs https://v2-staging.bobagunwa.com acceptance-links.json staging-acceptance.json
-# STAGING_HTTP_USER / STAGING_HTTP_PASS if the protection is cPanel Directory Privacy
+# STAGING_HTTP_USER / STAGING_HTTP_PASS if the protection is cPanel Directory Privacy (type the password, never store it)
+# STAGING_BROWSER_CHANNEL=chrome where Playwright cannot install Chromium (e.g. macOS 13)
 ```
 Run it from an allowed address. It refuses invalid HTTPS and reproduces workflows W1–W7 (the web part of W7), role restrictions, the integrity check, an event, an enquiry (ModSecurity check) and responsive rendering.
 

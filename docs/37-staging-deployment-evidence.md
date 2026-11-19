@@ -265,7 +265,32 @@ Run by the Claude Code session on the maintainer's computer; reported here. 401 
 | Permissions after deploy (set by the script, no hand fix) | app folder 711, `public` 755, `public/index.php` and `.htaccess` 644; `staging.env` 600 |
 | Without login | `/`, `/robots.txt`, `/login` → `HTTP/2 401`, `realm="Bobagunwa staging"` |
 
-**Staging is ready for acceptance.** Not yet verified on Namecheap: the acceptance workflows (§4), a backup key and the restore drill, the rollback rehearsal, and the officers' checklist (§6).
+**Staging is ready for acceptance.**
+
+## 6c. Namecheap acceptance run (19 Nov 2026 ~06:30 UTC) — **19/19 PASS**
+
+Preparation on the server: a **staging-only test backup key pair** generated on the server, private half in `~/bobagunwa-config/staging-TEST-backup.keypair` (mode 600, never printed), public key in `staging.env` and the live `.env`, config re-cached; six synthetic officers from `boba:staging:prepare` (links file downloaded privately, deleted from the server). The test key is not the custodian key (D-014) and is replaced before production.
+
+Run with `tests/browser/staging-acceptance.cjs` from the maintainer's Mac (macOS 13, Node 22) against `https://v2-staging.bobagunwa.com` with the `boba-staging` login typed by the account holder. Playwright 1.63 cannot install Chromium on macOS 13, so the unchanged script ran in installed Google Chrome 157 (`channel: 'chrome'`); the script now accepts `STAGING_BROWSER_CHANNEL=chrome` for this. Full results: `staging-acceptance.json` on the maintainer's computer (no links or passwords in it).
+
+| Step | Result on Namecheap |
+|---|---|
+| HTTPS, assets, headers, cookies | HTTP 200; 22 compiled assets served; CSP, X-Frame-Options, nosniff and **HSTS** present; session cookie **Secure**, HttpOnly, SameSite=Lax |
+| Synthetic officers | all 6 activated through single-use links |
+| Role restrictions | System Administrator → finance 403; Treasurer → member import 403; Secretariat → payments 403; anonymous → sign-in |
+| **W1** import | 2 members imported without login accounts; re-upload flagged 2 duplicates and was cancelled |
+| **W2** application | `BOB-APP-2026-N78JYC` tracked and approved; one-time link shown once |
+| **W3** activation | portal shows `BOB-000003`; admin 403; link refused on reuse |
+| **W4** assessment | ₦50,000 posted to 1 member; cannot be posted twice |
+| **W5** payment | ₦20,000 pending, verified by a different officer; over-allocation refused; allocated, reversed, re-allocated |
+| **W6** statement and reports | ₦50,000 / ₦20,000 / ₦30,000; print button; balances CSV reconciles |
+| Integrity check | run from the alerts page; recorded as passed |
+| **W7** backup (web part) | encrypted backup created and registered with the staging-only test key |
+| Event | drafted, published, visible on `/events` |
+| Contact enquiry | submitted with SQL- and HTML-like words — **not blocked by ModSecurity**; listed for the secretariat |
+| Responsive | 375 / 768 / 1440 px, 30 page views, no horizontal overflow |
+
+The financial figures match §5. Not yet verified on Namecheap: the server-side restore drill (W7), the rollback rehearsal, the scheduled jobs actually running overnight, and the officers' checklist (§6).
 
 ## 7. Continuing on Namecheap
 
