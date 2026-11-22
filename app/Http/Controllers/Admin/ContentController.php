@@ -44,7 +44,7 @@ class ContentController extends Controller
             ]],
             'leaders' => ['label' => 'Leadership', 'singular' => 'leadership entry', 'model' => Leader::class, 'scope' => [], 'title' => 'name', 'fields' => [
                 ['name', 'Name (as approved for publication)', 'text', true], ['office', 'Office or title', 'text', true],
-                ['group', 'Group', 'select', true, ['executive' => 'Executive', 'council' => 'Council', 'chiefs' => 'Chiefs', 'other' => 'Other']],
+                ['group', 'Group', 'select', true, ['council' => 'Giwa-in-Council', 'chiefs' => 'Bobagunwa Chiefs', 'executive' => 'Bobagunwa Executives', 'other' => 'Other']],
                 ['term_label', 'Term (e.g. 2025–2027)', 'text', false], ['bio', 'Short biography', 'textarea', false], ['photo_media_id', 'Approved photograph', 'media', false], ['sort_order', 'Display order', 'number', false],
             ]],
             'galleries' => ['label' => 'Galleries', 'singular' => 'gallery', 'model' => Gallery::class, 'scope' => [], 'title' => 'title', 'fields' => [

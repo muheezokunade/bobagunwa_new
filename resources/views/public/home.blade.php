@@ -17,6 +17,16 @@
     </div>
 </section>
 
+@if ($welcome)
+<section class="section" aria-labelledby="welcome-title">
+    <div class="wrap narrow-text">
+        <p class="kicker">Giwa’s welcome address</p>
+        <h2 id="welcome-title">{{ $welcome->title }}</h2>
+        <div class="prose welcome-address">{{ \App\Support\Content::markdown($welcome->body) }}</div>
+    </div>
+</section>
+@endif
+
 <section class="section" aria-labelledby="rooted-title">
     <div class="wrap split wide-left">
         <div>
@@ -92,7 +102,7 @@
 @if ($leaders->isNotEmpty())
 <section class="section mist" aria-labelledby="leaders-title">
     <div class="wrap">
-        <p class="kicker">Leadership</p>
+        <p class="kicker">Giwa-in-Council</p>
         <h2 id="leaders-title">Service before self.</h2>
         <div class="people">
             @foreach ($leaders as $leader)

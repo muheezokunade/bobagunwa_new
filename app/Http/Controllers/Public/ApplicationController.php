@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Http\Controllers\Controller;
 use App\Models\MembershipApplication;
 use App\Services\ApplicationService;
+use App\Support\DateParts;
 use App\Support\FormGuard;
 use App\Support\Settings;
 use Illuminate\Http\RedirectResponse;
@@ -23,6 +24,7 @@ class ApplicationController extends Controller
     public function store(Request $request): RedirectResponse
     {
         FormGuard::check($request, 'membership_application');
+        DateParts::merge($request, 'date_of_birth');
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:80'],
             'last_name' => ['required', 'string', 'max:80'],

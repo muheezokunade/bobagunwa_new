@@ -15,6 +15,7 @@ final class Content
 {
     /** Pages officers can manage, with their purpose. */
     public const PAGES = [
+        'welcome' => 'Giwa’s welcome address (home page)',
         'about' => 'About the association',
         'history' => 'History and heritage',
         'membership' => 'Membership responsibilities and guidance',

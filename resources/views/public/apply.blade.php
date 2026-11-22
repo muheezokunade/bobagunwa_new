@@ -20,7 +20,7 @@
                     <x-field name="first_name" label="First name" required autocomplete="given-name" />
                     <x-field name="last_name" label="Surname" required autocomplete="family-name" />
                     <x-field name="other_names" label="Other names" class="full" autocomplete="additional-name" />
-                    <x-field name="date_of_birth" label="Date of birth" type="date" required hint="Membership is for those born 1 January 1980 – 31 December 1982. Other dates are considered individually." autocomplete="bday" class="full" />
+                    <x-date-parts name="date_of_birth" label="Date of birth" required hint="Membership is for those born 1 January 1980 – 31 December 1982. Other dates are considered individually by an officer." autocomplete="bday" class="full" />
                     <x-field name="ijebu_town" label="Ijebu town of origin" required hint="For example Ijebu Ode, Ijebu Igbo or Ago Iwoye." />
                     <x-field name="occupation" label="Occupation" required autocomplete="organization-title" />
                 </div>

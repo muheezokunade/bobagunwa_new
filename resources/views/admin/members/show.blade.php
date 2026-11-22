@@ -124,7 +124,7 @@
         <x-field name="preferred_name" label="Preferred name" :value="$member->preferred_name" />
         <x-field name="email" label="Email" type="email" :value="$member->email" />
         <x-field name="phone" label="Phone" type="tel" :value="$member->phone" />
-        <x-field name="date_of_birth" label="Date of birth" type="date" :value="$member->date_of_birth?->format('Y-m-d')" />
+        <x-date-parts name="date_of_birth" label="Date of birth" :value="$member->date_of_birth" />
         <x-field name="ijebu_town" label="Ijebu town" :value="$member->ijebu_town" />
         <x-field name="city" label="City of residence" :value="$member->city" />
         <x-field name="occupation" label="Occupation" :value="$member->occupation" />

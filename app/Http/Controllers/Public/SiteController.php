@@ -22,8 +22,9 @@ class SiteController extends Controller
         return view('public.home', [
             'news' => Post::where('type', 'news')->where('audience', 'public')->where('status', 'published')->latest('published_at')->limit(3)->get(),
             'events' => $this->publicEvents()->where('starts_at', '>=', now())->orderBy('starts_at')->limit(3)->get(),
-            'leaders' => Leader::with('photo')->where('status', 'published')->where('group', 'executive')->orderBy('sort_order')->limit(4)->get(),
+            'leaders' => Leader::with('photo')->where('status', 'published')->where('group', 'council')->orderBy('sort_order')->limit(4)->get(),
             'about' => Content::published('about'),
+            'welcome' => Content::published('welcome'),
         ]);
     }
 
@@ -39,7 +40,7 @@ class SiteController extends Controller
 
     public function leadership(): View
     {
-        $leaders = Leader::with('photo')->where('status', 'published')->orderByRaw("FIELD(`group`, 'executive', 'council', 'chiefs', 'other')")->orderBy('sort_order')->orderBy('name')->get()->groupBy('group');
+        $leaders = Leader::with('photo')->where('status', 'published')->orderByRaw("FIELD(`group`, 'council', 'chiefs', 'executive', 'other')")->orderBy('sort_order')->orderBy('name')->get()->groupBy('group');
 
         return view('public.leadership', ['groups' => $leaders]);
     }

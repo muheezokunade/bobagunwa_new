@@ -10,7 +10,7 @@
         <x-field name="membership_number" label="Existing membership number (if any)" hint="Leave blank to issue the next number. Numbers are permanent." />
         <x-field name="email" label="Email address" type="email" hint="Needed later to issue an activation link." />
         <x-field name="phone" label="Phone number" type="tel" />
-        <x-field name="date_of_birth" label="Date of birth" type="date" />
+        <x-date-parts name="date_of_birth" label="Date of birth" />
         <x-field name="joined_on" label="Date joined" type="date" />
         <x-field name="ijebu_town" label="Ijebu town of origin" />
         <x-field name="city" label="City of residence" />

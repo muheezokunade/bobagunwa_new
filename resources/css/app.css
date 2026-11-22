@@ -191,6 +191,26 @@ p { margin: 0 0 1em; }
 .people figcaption { padding-top: 14px; }
 .people figcaption strong { display: block; font: 400 22px/1.25 var(--serif); }
 .people figcaption span { color: var(--wine); font-weight: 600; font-size: 15px; }
+.narrow-text { max-width: 760px; }
+.welcome-address p:first-child { font-family: var(--serif); font-size: 20px; line-height: 1.6; }
+.date-parts { border: 0; padding: 0; margin: 0; min-width: 0; }
+.date-parts legend { font-weight: 600; padding: 0; margin-bottom: 4px; }
+.date-parts-row { display: flex; flex-wrap: wrap; gap: 12px; }
+.date-parts-row label { display: block; font-size: 14px; color: var(--muted); font-weight: 400; }
+.date-parts-row input { width: 7ch; }
+.person-link { display: block; color: inherit; text-decoration: none; }
+.person-link:hover strong, .person-link:focus-visible strong { text-decoration: underline; }
+.person-more { display: block; margin-top: 4px; color: var(--wine); font-weight: 600; }
+.person-dialog { max-width: min(720px, calc(100vw - 32px)); width: 100%; border: 1px solid var(--line); background: var(--paper); color: var(--ink); padding: 28px; }
+.person-dialog::backdrop { background: rgba(40, 31, 32, .55); }
+.person-dialog:target:not([open]) { display: block; position: static; margin: 24px auto; }
+.person-dialog-body { display: grid; gap: 24px; align-items: start; }
+.person-dialog-body.has-photo { grid-template-columns: minmax(0, 200px) 1fr; }
+.person-dialog-body img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--mist); }
+.person-dialog h3 { font: 400 28px/1.2 var(--serif); margin: 4px 0 8px; }
+.person-bio { white-space: pre-line; }
+.person-dialog-close { margin-top: 20px; text-align: right; }
+@media (max-width: 560px) { .person-dialog-body.has-photo { grid-template-columns: 1fr; } .person-dialog-body img { max-width: 220px; } }
 .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .gallery-grid figure { margin: 0; }
 .gallery-grid img { aspect-ratio: 1; object-fit: cover; width: 100%; }

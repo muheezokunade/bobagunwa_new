@@ -24,7 +24,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | Shows only published, public content; renders without JavaScript. |
-| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`PublicSiteTest::test_no_fabricated_content_is_shown_on_an_empty_site`<br>`TesterFeedbackFixesTest::test_robots_and_sitemap_use_absolute_urls_and_include_the_homepage` |
+| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`PublicSiteTest::test_no_fabricated_content_is_shown_on_an_empty_site`<br>`TesterFeedbackFixesTest::test_robots_and_sitemap_use_absolute_urls_and_include_the_homepage`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent` |
 | Status | Implemented · HTTP-tested |
 
 ## `about`
@@ -41,7 +41,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | Shows the published revision or the approved placeholder; never an unpublished draft. |
-| Tests | `RemainingRoutesTest::test_public_information_pages_render_and_hide_drafts`<br>`PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata` |
+| Tests | `RemainingRoutesTest::test_public_information_pages_render_and_hide_drafts`<br>`PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent` |
 | Status | Implemented · HTTP-tested |
 
 ## `history`
@@ -58,7 +58,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | No invented historical facts; unpublished revisions hidden. |
-| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`ContentAndUploadSecurityTest::test_drafts_stay_private_until_a_publisher_publishes_them` |
+| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent`<br>`ContentAndUploadSecurityTest::test_drafts_stay_private_until_a_publisher_publishes_them` |
 | Status | Implemented · HTTP-tested |
 
 ## `leadership`
@@ -75,7 +75,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | Only approved, published leaders are listed. |
-| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`PublicSiteTest::test_no_fabricated_content_is_shown_on_an_empty_site` |
+| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`PublicSiteTest::test_no_fabricated_content_is_shown_on_an_empty_site`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent`<br>`DemoFeedbackTest::test_content_loader_without_publish_creates_drafts_only`<br>`DemoFeedbackTest::test_leader_profile_dialog_shows_the_biography` |
 | Status | Implemented · HTTP-tested |
 
 ## `membership`
@@ -330,7 +330,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | Explains the eligibility range; works without JavaScript. |
-| Tests | `RemainingRoutesTest::test_public_information_pages_render_and_hide_drafts`<br>`PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata` |
+| Tests | `RemainingRoutesTest::test_public_information_pages_render_and_hide_drafts`<br>`PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`DemoFeedbackTest::test_date_of_birth_is_entered_as_day_month_name_and_year` |
 | Status | Implemented · HTTP-tested |
 
 ## `membership.apply.store`
@@ -347,7 +347,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Validation errors; duplicate open application by email/phone refused; outside the birth-date range → accepted but flagged for human review. |
 | Security controls | rate limit `applications`; CSRF token + Origin check (419 otherwise); strict CSP and security headers |
 | Acceptance criterion | Never auto-rejects on date of birth; one open application per email/phone. |
-| Tests | `TesterFeedbackFixesTest::test_application_errors_use_the_form_labels`<br>`ApplicationWorkflowTest::test_validation_duplicates_and_anti_automation`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
+| Tests | `TesterFeedbackFixesTest::test_application_errors_use_the_form_labels`<br>`DemoFeedbackTest::test_date_of_birth_is_entered_as_day_month_name_and_year`<br>`ApplicationWorkflowTest::test_validation_duplicates_and_anti_automation`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
 | Status | Implemented · HTTP-tested |
 
 ## `membership.receipt`
@@ -364,7 +364,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Without a fresh submission → redirect to the application form. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | Token shown once; page is no-store. |
-| Tests | `MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
+| Tests | `DemoFeedbackTest::test_date_of_birth_is_entered_as_day_month_name_and_year`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
 | Status | Implemented · HTTP-tested |
 
 ## `membership.status`
@@ -1344,7 +1344,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Handler | `MemberController@store` |
 | Purpose | Add one member manually. |
 | Roles / permission | `members.manage` → Membership Officer |
-| Validation | `full_name`: required, string, min:3, max:190<br>`preferred_name`: nullable, string, max:120<br>`email`: nullable, email:rfc, max:190<br>`phone`: nullable, string, max:40, regex:/^[0-9+()\-\s]{7,40}$/<br>`date_of_birth`: nullable, date_format:Y-m-d, before:today<br>`joined_on`: nullable, date_format:Y-m-d, before_or_equal:today<br>`membership_number`: nullable, string, max:32<br>`ijebu_town`: nullable, string, max:120<br>`city`: nullable, string, max:120<br>`occupation`: nullable, string, max:120<br>`address`: nullable, string, max:255<br>`admin_notes`: nullable, string, max:3000<br>`reason`: required, string, min:5, max:255<br>`confirm_distinct_person`: nullable, boolean<br>`distinguishing_note`: nullable, string, max:500<br>`idempotency_key`: required exactly-once key (a replay returns the first result) |
+| Validation | `full_name`: required, string, min:3, max:190<br>`preferred_name`: nullable, string, max:120<br>`email`: nullable, email:rfc, max:190<br>`phone`: nullable, string, max:40, regex:/^[0-9+()\-\s]{7,40}$/<br>`date_of_birth`: nullable, date_format:Y-m-d, before:today, after:1900-01-01<br>`joined_on`: nullable, date_format:Y-m-d, before_or_equal:today<br>`membership_number`: nullable, string, max:32<br>`ijebu_town`: nullable, string, max:120<br>`city`: nullable, string, max:120<br>`occupation`: nullable, string, max:120<br>`address`: nullable, string, max:255<br>`admin_notes`: nullable, string, max:3000<br>`reason`: required, string, min:5, max:255<br>`confirm_distinct_person`: nullable, boolean<br>`distinguishing_note`: nullable, string, max:500<br>`idempotency_key`: required exactly-once key (a replay returns the first result) |
 | Data | members, membership_numbers, audit_events |
 | Success | Member created with the next number; no account yet. |
 | Failure states | Duplicate email/phone → refused; same name without confirmation and a distinguishing note → refused. |
@@ -1378,7 +1378,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Handler | `MemberController@update` |
 | Purpose | Correct member details with a reason. |
 | Roles / permission | `members.manage` → Membership Officer |
-| Validation | `version`: required, integer<br>`reason`: required, string, min:5, max:255<br>`full_name`: required, string, min:3, max:190<br>`preferred_name`: nullable, string, max:120<br>`email`: nullable, email:rfc, max:190<br>`phone`: nullable, string, max:40, regex:/^[0-9+()\-\s]{7,40}$/<br>`date_of_birth`: nullable, date_format:Y-m-d, before:today<br>`ijebu_town`: nullable, string, max:120<br>`city`: nullable, string, max:120<br>`occupation`: nullable, string, max:120<br>`address`: nullable, string, max:255<br>`joined_on`: nullable, date_format:Y-m-d<br>`admin_notes`: nullable, string, max:3000 |
+| Validation | `version`: required, integer<br>`reason`: required, string, min:5, max:255<br>`full_name`: required, string, min:3, max:190<br>`preferred_name`: nullable, string, max:120<br>`email`: nullable, email:rfc, max:190<br>`phone`: nullable, string, max:40, regex:/^[0-9+()\-\s]{7,40}$/<br>`date_of_birth`: nullable, date_format:Y-m-d, before:today, after:1900-01-01<br>`ijebu_town`: nullable, string, max:120<br>`city`: nullable, string, max:120<br>`occupation`: nullable, string, max:120<br>`address`: nullable, string, max:255<br>`joined_on`: nullable, date_format:Y-m-d<br>`admin_notes`: nullable, string, max:3000 |
 | Data | members, audit_events |
 | Success | Changes saved; version incremented. |
 | Failure states | Stale version, duplicate email/phone or validation error → refused. |

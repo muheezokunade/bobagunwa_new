@@ -41,6 +41,7 @@
 | 35 | [Route catalogue (purpose, roles, validation, states, tests)](35-route-catalogue.md) — *generated* | maintainers, reviewers |
 | 36 | [Protected staging installation plan](36-staging-installation-plan.md) | technical maintainer, executive |
 | 37 | [Staging deployment evidence, blockers and client acceptance checklist](37-staging-deployment-evidence.md) | everyone |
+| 38 | [Official website content: what was loaded and what needs confirmation](38-official-content.md) | everyone |
 | — | [Evidence](evidence/) | reviewers |
 | — | [Historical V1 documentation](historical/v1/README.md) — *reference only, not evidence* | maintainers |
 

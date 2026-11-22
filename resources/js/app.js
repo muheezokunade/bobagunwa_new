@@ -82,3 +82,21 @@ document.querySelectorAll('[data-print]').forEach((button) => {
 // users hear it and keyboard users start from it.
 const errorSummary = document.querySelector('.alert.error[tabindex="-1"]');
 if (errorSummary) errorSummary.focus();
+
+// Leadership profiles: open the card's <dialog> as a modal; Escape, Close or a
+// click on the backdrop closes it and focus returns to the card.
+document.querySelectorAll('[data-dialog-open]').forEach((opener) => {
+    const dialog = document.getElementById(opener.dataset.dialogOpen);
+    if (!dialog || typeof dialog.showModal !== 'function') return;
+    opener.addEventListener('click', (event) => {
+        event.preventDefault();
+        dialog.showModal();
+    });
+    dialog.addEventListener('click', (event) => {
+        if (event.target === dialog || event.target.closest('[data-dialog-close]')) {
+            event.preventDefault();
+            dialog.close();
+        }
+    });
+    dialog.addEventListener('close', () => opener.focus());
+});
