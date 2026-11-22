@@ -21,7 +21,7 @@ class TwoFactorService
 {
     /** Permissions that make an officer "privileged" for two-factor purposes. */
     /** Administrator rights: two-factor applies to these (decided at the 22 Nov 2026 demo, D-024). */
-    public const ADMINISTRATIVE = ['access.manage', 'settings.manage', 'backups.manage'];
+    public const ADMINISTRATIVE = ['access.manage', 'access.recover_administrators', 'settings.manage', 'backups.manage'];
 
     /** Finance write rights: included only if the association extends the requirement. */
     public const FINANCE_WRITE = [
@@ -165,7 +165,8 @@ class TwoFactorService
     /** Lost device: another administrator removes enrolment; the officer must enrol again. */
     public function adminReset(User $target, User $actor, string $reason): void
     {
-        if (! $actor->hasPermission('access.manage')) {
+        $recoveringAdministrator = $actor->hasPermission('access.recover_administrators') && $target->hasPermission('access.manage');
+        if (! $actor->hasPermission('access.manage') && ! $recoveringAdministrator) {
             throw new DomainRuleException('You do not have permission to reset two-factor sign-in.');
         }
         if ($actor->id === $target->id) {

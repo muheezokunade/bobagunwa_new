@@ -21,7 +21,7 @@ class StagingPrepare extends Command
 {
     public const DOMAIN = 'staging-synthetic.invalid';
 
-    public const ROLES = ['system_admin', 'membership_initiator', 'membership_officer', 'secretariat', 'treasurer', 'payment_verifier', 'executive'];
+    public const ROLES = ['system_admin', 'membership_initiator', 'membership_officer', 'secretariat', 'treasurer', 'payment_verifier', 'executive', 'giwa'];
 
     protected $signature = 'boba:staging:prepare {--links-file= : Private JSON file to write the one-time links to (mode 600)} {--confirm-synthetic : Confirm this environment holds synthetic data only}';
 

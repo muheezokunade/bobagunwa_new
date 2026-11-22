@@ -39,6 +39,7 @@ final class PermissionCatalog
             'events.manage' => ['group' => 'Content', 'description' => 'Manage events and view attendance responses'],
             'enquiries.manage' => ['group' => 'Content', 'description' => 'Review and resolve contact enquiries'],
 
+            'access.recover_administrators' => ['group' => 'Administration', 'description' => 'Restore a System Administrator’s lost access (one-time password link, two-factor reset) — never one’s own; cannot change roles or settings'],
             'access.manage' => ['group' => 'Administration', 'description' => 'Manage officer accounts, role assignments and account recovery'],
             'audit.read' => ['group' => 'Administration', 'description' => 'Read audit and security history'],
             'integrity.alerts' => ['group' => 'Administration', 'description' => 'See, acknowledge and resolve integrity alerts (check names and counts only; no financial records)'],
@@ -95,9 +96,15 @@ final class PermissionCatalog
             ],
             'executive' => [
                 'name' => 'Executive (read-only oversight)',
-                'description' => 'Read-only register, finance and audit oversight.',
+                'description' => 'Read-only register, finance and audit oversight (for example the General Secretary).',
                 'is_staff' => true,
                 'permissions' => ['members.read', 'finance.read', 'finance.reports.export', 'audit.read', 'integrity.alerts'],
+            ],
+            'giwa' => [
+                'name' => 'Giwa (oversight and administrator recovery)',
+                'description' => 'The Giwa: read-only view of the register, finance and audit, and can restore a System Administrator’s access if it is lost. Cannot change roles, settings or any record, approve members or verify payments.',
+                'is_staff' => true,
+                'permissions' => ['members.read', 'finance.read', 'finance.reports.export', 'audit.read', 'integrity.alerts', 'access.recover_administrators'],
             ],
         ];
     }

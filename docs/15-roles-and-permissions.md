@@ -2,7 +2,7 @@
 
 Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the database by the reference-data migration. Roles are **templates**; every route checks a named permission (`permission:` middleware) and every financial or membership decision re-checks it inside the service. Hidden menu items are never relied upon. **Final assignments require association approval (decisions D-005, D-007, D-008).**
 
-## Permissions (26)
+## Permissions (27)
 
 | Group | Permission | Allows |
 |---|---|---|
@@ -28,6 +28,7 @@ Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the data
 | | `events.manage` | Manage events and RSVPs |
 | | `enquiries.manage` | Handle enquiries |
 | Administration | `access.manage` | Officer accounts, roles, account recovery |
+| | `access.recover_administrators` | The Giwa: restore a System Administrator’s lost access (one-time password link, two-factor reset); never his own; nothing else |
 | | `audit.read` | Audit and security history |
 | | `settings.manage` | Organisation settings and launch approvals |
 | | `backups.manage` | Create and download encrypted backups |
@@ -35,36 +36,38 @@ Source of truth: `app/Support/PermissionCatalog.php`, synchronised into the data
 
 ## Role templates
 
-| Permission | Member | System Administrator | Membership Initiator | Membership Officer | Secretariat | Treasurer | Payment Verifier | Executive |
-|---|---|---|---|---|---|---|---|---|
-| applications.review | | | ✓ | ✓ | | | | |
-| applications.decide | | | | ✓ | | | | |
-| members.read | | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
-| members.manage | | | | ✓ | | | | |
-| members.import | | | | | ✓ | | | |
-| members.export | | | | | ✓ | | | |
-| accounts.issue | | | | ✓ | | | | |
-| finance.read | | | | | | ✓ | ✓ | ✓ |
-| finance.categories.manage | | | | | | ✓ | | |
-| finance.assessments.manage | | | | | | ✓ | | |
-| finance.payments.record | | | | | | ✓ | | |
-| finance.payments.verify | | | | | | | ✓ | |
-| finance.allocate | | | | | | ✓ | | |
-| finance.adjust | | | | | | ✓ | | |
-| finance.reverse | | | | | | | ✓ | |
-| finance.import | | | | | | ✓ | | |
-| finance.reports.export | | | | | | ✓ | | ✓ |
-| content.manage / publish | | | | | ✓ | | | |
-| events.manage, enquiries.manage | | | | | ✓ | | | |
-| access.manage, settings.manage, backups.manage | | ✓ | | | | | | |
-| integrity.alerts | | ✓ | | | | ✓ | ✓ | ✓ |
-| audit.read | | ✓ | | | | | | ✓ |
+| Permission | Member | System Administrator | Membership Initiator | Membership Officer | Secretariat | Treasurer | Payment Verifier | Executive | Giwa |
+|---|---|---|---|---|---|---|---|---|---|
+| applications.review | | | ✓ | ✓ | | | | | |
+| applications.decide | | | | ✓ | | | | | |
+| members.read | | | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ | ✓ |
+| members.manage | | | | ✓ | | | | | |
+| members.import | | | | | ✓ | | | | |
+| members.export | | | | | ✓ | | | | |
+| accounts.issue | | | | ✓ | | | | | |
+| finance.read | | | | | | ✓ | ✓ | ✓ | ✓ |
+| finance.categories.manage | | | | | | ✓ | | | |
+| finance.assessments.manage | | | | | | ✓ | | | |
+| finance.payments.record | | | | | | ✓ | | | |
+| finance.payments.verify | | | | | | | ✓ | | |
+| finance.allocate | | | | | | ✓ | | | |
+| finance.adjust | | | | | | ✓ | | | |
+| finance.reverse | | | | | | | ✓ | | |
+| finance.import | | | | | | ✓ | | | |
+| finance.reports.export | | | | | | ✓ | | ✓ | ✓ |
+| content.manage / publish | | | | | ✓ | | | | |
+| events.manage, enquiries.manage | | | | | ✓ | | | | |
+| access.manage, settings.manage, backups.manage | | ✓ | | | | | | | |
+| access.recover_administrators | | | | | | | | | ✓ |
+| integrity.alerts | | ✓ | | | | ✓ | ✓ | ✓ | ✓ |
+| audit.read | | ✓ | | | | | | ✓ | ✓ |
 
 Members have no permissions; their portal access is scoped to the member record linked to their own account (resolved from the session, never from a URL parameter).
 
 ## Critical separations (tested)
 
 * **System Administrator has no treasury or approval powers** — cannot record, verify, allocate, reverse or post (`AuthorisationMatrixTest::test_system_administrator_has_no_treasury_or_approval_powers`, `LedgerServiceTest::test_permissions_are_enforced_inside_finance_services`).
+* **The Giwa** (22 Nov 2026): read-only oversight like the Executive, plus restoring a System Administrator’s lost access. He cannot change roles or settings, approve members or verify payments. The association keeps one top-level administrator; the recovery page warns if there is more than one.
 * **Two-step membership approval** (22 Nov 2026): the Membership Initiator (the General Secretary) reviews and recommends; the Membership Officer (chair of the screening committee) gives the final decision, and never on his own recommendation. Asking the applicant for more information clears the recommendation. Setting `membership.two_step_approval` (default on).
 * **Membership Officer sees no financial details** (finance summary hidden and finance routes forbidden).
 * **Recording vs verifying vs reversing** are different permissions held by different default roles; the two-officer rule additionally stops one person who holds both from verifying their own entry.

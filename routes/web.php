@@ -234,6 +234,11 @@ Route::middleware(['auth', 'staff', 'two-factor'])->prefix('admin')->name('admin
         Route::post('/enquiries/{enquiry}', 'update')->name('enquiries.update');
     });
 
+    Route::middleware('permission:access.recover_administrators')->controller(Admin\AdministratorRecoveryController::class)->group(function () {
+        Route::get('/administrator-recovery', 'index')->name('administrator-recovery.index');
+        Route::post('/administrator-recovery/{user}/link', 'link')->name('administrator-recovery.link');
+        Route::post('/administrator-recovery/{user}/two-factor-reset', 'twoFactorReset')->name('administrator-recovery.two-factor');
+    });
     Route::middleware('permission:access.manage')->controller(Admin\AccessController::class)->group(function () {
         Route::get('/access', 'index')->name('access.index');
         Route::post('/access', 'store')->name('access.store');

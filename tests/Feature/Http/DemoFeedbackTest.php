@@ -17,6 +17,7 @@ use App\Services\UploadService;
 use App\Support\Format;
 use App\Support\Money;
 use App\Support\Settings;
+use App\Support\Totp;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Crypt;
@@ -311,5 +312,35 @@ class DemoFeedbackTest extends TestCase
         $this->assertStringContainsString('Synthetic dues', $list);
         // The membership officer has no finance access.
         $this->actingAs($this->officer('membership_officer'))->get(route('admin.finance.reports.index', ['category' => $categoryId]))->assertForbidden();
+    }
+
+    public function test_giwa_can_restore_the_system_administrators_access_and_nothing_more(): void
+    {
+        $giwa = $this->officer('giwa');
+        $admin = $this->officer('system_admin');
+        $admin->forceFill(['two_factor_confirmed_at' => now(), 'two_factor_secret' => Totp::newSecret()])->save();
+        $treasurer = $this->officer('treasurer');
+        $form = ['reason' => 'Administrator locked out, confirmed by phone', 'confirm_identity' => '1'];
+
+        $this->actingAs($giwa)->get(route('admin.administrator-recovery.index'))->assertOk()->assertSee($admin->name)->assertDontSee($treasurer->email);
+        $this->actingAs($giwa)->post(route('admin.administrator-recovery.link', $admin), $form)->assertSessionHas('one_time_link');
+        $this->assertDatabaseHas('audit_events', ['action' => 'access.administrator_recovery']);
+        $this->actingAs($giwa)->post(route('admin.administrator-recovery.two-factor', $admin), $form)->assertSessionHasNoErrors();
+        $this->assertNull($admin->fresh()->two_factor_confirmed_at);
+
+        // Not for other officers, not for himself, and identity must be confirmed.
+        $this->actingAs($giwa)->post(route('admin.administrator-recovery.link', $treasurer), $form)->assertSessionHasErrors('domain');
+        $this->actingAs($giwa)->post(route('admin.administrator-recovery.link', $giwa), $form)->assertSessionHasErrors('domain');
+        $this->actingAs($giwa)->post(route('admin.administrator-recovery.link', $admin), ['reason' => 'No check'])->assertSessionHasErrors('confirm_identity');
+
+        // Oversight only: he can read finance and the register, but cannot manage access, settings or approve or verify.
+        $this->actingAs($giwa)->get(route('admin.finance.index'))->assertOk();
+        $this->actingAs($giwa)->get(route('admin.members.index'))->assertOk();
+        foreach (['admin.access.index', 'admin.settings.index', 'admin.applications.index'] as $route) {
+            $this->actingAs($giwa)->get(route($route))->assertForbidden();
+        }
+        $this->actingAs($giwa)->post(route('admin.access.roles', $treasurer), ['roles' => ['system_admin'], 'reason' => 'Escalation attempt'])->assertForbidden();
+        // Officers without the recovery right cannot use the page.
+        $this->actingAs($this->officer('executive'))->get(route('admin.administrator-recovery.index'))->assertForbidden();
     }
 }
