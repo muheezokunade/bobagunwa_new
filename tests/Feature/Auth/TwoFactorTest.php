@@ -98,9 +98,11 @@ class TwoFactorTest extends TestCase
 
     public function test_enforcement_cannot_be_enabled_while_privileged_officers_are_unenrolled_and_then_applies(): void
     {
+        // The wider scope (finance officers included), which the association may switch on later.
+        Settings::set('security.two_factor_include_finance', true, null);
         $admin = $this->officer('system_admin');
         $treasurer = $this->officer('treasurer');
-        $field = ['security__require_two_factor' => '1', 'membership__number_width' => '6'];
+        $field = ['security__require_two_factor' => '1', 'security__two_factor_include_finance' => '1', 'membership__number_width' => '6'];
         $this->actingAs($admin)->post(route('admin.settings.update'), $field)->assertSessionHasErrors('security__require_two_factor');
         $this->assertFalse(Settings::bool('security.require_two_factor'));
 
@@ -141,5 +143,19 @@ class TwoFactorTest extends TestCase
         $this->actingAs($officer)->post(route('admin.account.two-factor.disable'), ['password' => 'wrong', 'code' => Totp::code($secret, Totp::currentStep() + 1)])->assertSessionHasErrors('domain');
         $this->actingAs($officer)->post(route('admin.account.two-factor.disable'), ['password' => 'synthetic-password-123', 'code' => Totp::code($secret, Totp::currentStep() + 1)])->assertSessionHasNoErrors();
         $this->assertNull($officer->fresh()->two_factor_confirmed_at);
+    }
+
+    public function test_by_default_two_factor_covers_administrators_only(): void
+    {
+        $admin = $this->officer('system_admin');
+        $treasurer = $this->officer('treasurer');
+        // Only the administrator needs to enrol before enforcement can be switched on.
+        $admin->forceFill(['two_factor_confirmed_at' => now(), 'two_factor_secret' => Totp::newSecret()])->save();
+        $this->actingAs($admin)->post(route('admin.settings.update'), ['security__require_two_factor' => '1', 'membership__number_width' => '6'])->assertSessionHasNoErrors();
+        $this->assertTrue(Settings::bool('security.require_two_factor'));
+        // Finance officers and members are not forced; a new administrator is.
+        $this->actingAs($treasurer)->get(route('admin.finance.index'))->assertOk();
+        $this->actingAs($this->officer('system_admin'))->get(route('admin.dashboard'))->assertRedirect(route('admin.account'));
+        $this->actingAs($this->member([], true)->user)->get(route('portal.dashboard'))->assertOk();
     }
 }

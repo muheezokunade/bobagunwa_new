@@ -20,17 +20,29 @@ use Illuminate\Support\Str;
 class TwoFactorService
 {
     /** Permissions that make an officer "privileged" for two-factor purposes. */
-    public const PRIVILEGED = [
-        'access.manage', 'settings.manage', 'backups.manage',
+    /** Administrator rights: two-factor applies to these (decided at the 22 Nov 2026 demo, D-024). */
+    public const ADMINISTRATIVE = ['access.manage', 'settings.manage', 'backups.manage'];
+
+    /** Finance write rights: included only if the association extends the requirement. */
+    public const FINANCE_WRITE = [
         'finance.assessments.manage', 'finance.payments.record', 'finance.payments.verify',
         'finance.allocate', 'finance.adjust', 'finance.reverse', 'finance.import',
     ];
+
+    /** @deprecated kept for reference: the full set when finance officers are included */
+    public const PRIVILEGED = [...self::ADMINISTRATIVE, ...self::FINANCE_WRITE];
+
+    /** @return list<string> */
+    public static function scope(): array
+    {
+        return Settings::bool('security.two_factor_include_finance') ? self::PRIVILEGED : self::ADMINISTRATIVE;
+    }
 
     public const RECOVERY_CODES = 8;
 
     public static function isPrivileged(User $user): bool
     {
-        return $user->hasAnyPermission(...self::PRIVILEGED);
+        return $user->hasAnyPermission(...self::scope());
     }
 
     public static function enforced(): bool
@@ -42,7 +54,7 @@ class TwoFactorService
     public static function privilegedOfficersWithoutTwoFactor(): Collection
     {
         return User::with('member')->where('status', 'active')->whereNull('two_factor_confirmed_at')
-            ->whereHas('roles.permissions', fn ($q) => $q->whereIn('key', self::PRIVILEGED))
+            ->whereHas('roles.permissions', fn ($q) => $q->whereIn('key', self::scope()))
             ->get()->filter(fn (User $u) => $u->isActive())->values();
     }
 

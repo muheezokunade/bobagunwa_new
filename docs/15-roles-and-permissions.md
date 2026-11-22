@@ -79,4 +79,4 @@ Members have no permissions; their portal access is scoped to the member record 
 
 ## Two-factor enforcement
 
-Privileged permissions for the optional two-factor requirement (`TwoFactorService::PRIVILEGED`): `access.manage`, `settings.manage`, `backups.manage` and every `finance.*` write permission. See [32-two-factor-authentication.md](32-two-factor-authentication.md).
+Two-factor sign-in applies to **administrator accounts** (`TwoFactorService::ADMINISTRATIVE`: `access.manage`, `settings.manage`, `backups.manage`), as agreed at the 22 Nov 2026 demo (D-024); members are never asked for it. The setting `security.two_factor_include_finance` extends it to every `finance.*` write permission. Enforcement itself stays off until the administrators have enrolled (the switch refuses otherwise). See [32-two-factor-authentication.md](32-two-factor-authentication.md).

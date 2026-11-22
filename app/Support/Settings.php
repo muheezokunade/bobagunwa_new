@@ -41,7 +41,8 @@ final class Settings
             'accounts.self_service_reset' => ['type' => 'bool', 'group' => 'Accounts', 'label' => 'Email password-reset links automatically to verified member email addresses', 'help' => 'Off by default: recovery requests go to the officer queue.', 'default' => false],
 
             'alerts.email_enabled' => ['type' => 'bool', 'group' => 'Alerts', 'label' => 'Also email integrity alerts to officers with the alerts permission', 'help' => 'Only takes effect after the mail channel has been verified below. Emails contain no financial details.', 'default' => false],
-            'security.require_two_factor' => ['type' => 'bool', 'group' => 'Security', 'label' => 'Require two-factor sign-in for privileged officers', 'help' => 'Off until the association approves it and every privileged officer has enrolled and stored recovery codes (see docs/32-two-factor-authentication.md).', 'default' => false],
+            'security.two_factor_include_finance' => ['type' => 'bool', 'group' => 'Security', 'label' => 'Also require two-factor sign-in for finance officers', 'help' => 'Off: the requirement covers administrator accounts only (officer access, settings and backups), as agreed at the 22 Nov 2026 demo. On: also treasurers and payment verifiers.', 'default' => false],
+            'security.require_two_factor' => ['type' => 'bool', 'group' => 'Security', 'label' => 'Require two-factor sign-in for administrators', 'help' => 'Off until the association approves it and every privileged officer has enrolled and stored recovery codes (see docs/32-two-factor-authentication.md).', 'default' => false],
             'alerts.email_verified' => ['type' => 'internal', 'group' => 'Alerts', 'label' => 'Alert email channel verification', 'default' => null],
 
             'approval.membership_number_format' => ['type' => 'approval', 'group' => 'Launch approvals', 'label' => 'Membership-number format approved by the association', 'default' => null],
