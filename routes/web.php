@@ -209,12 +209,12 @@ Route::middleware(['auth', 'staff', 'two-factor'])->prefix('admin')->name('admin
         Route::post('/pages/{page}/unpublish', 'unpublishPage')->name('pages.unpublish');
         Route::get('/media', 'media')->name('media');
         Route::post('/media', 'uploadMedia')->name('media.upload');
-        Route::get('/{type}', 'list')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->name('list');
-        Route::get('/{type}/create', 'create')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->name('create');
-        Route::post('/{type}', 'store')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->name('store');
-        Route::get('/{type}/{id}', 'edit')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->whereNumber('id')->name('edit');
-        Route::post('/{type}/{id}', 'update')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->whereNumber('id')->name('update');
-        Route::post('/{type}/{id}/status', 'status')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'galleries', 'documents'])->whereNumber('id')->name('status');
+        Route::get('/{type}', 'list')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->name('list');
+        Route::get('/{type}/create', 'create')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->name('create');
+        Route::post('/{type}', 'store')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->name('store');
+        Route::get('/{type}/{id}', 'edit')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->whereNumber('id')->name('edit');
+        Route::post('/{type}/{id}', 'update')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->whereNumber('id')->name('update');
+        Route::post('/{type}/{id}/status', 'status')->whereIn('type', ['news', 'announcements', 'activities', 'leaders', 'heritage', 'galleries', 'documents'])->whereNumber('id')->name('status');
         Route::post('/galleries/{id}/items', 'addGalleryItem')->whereNumber('id')->name('galleries.items');
     });
 

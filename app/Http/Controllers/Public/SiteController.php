@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Models\HistoricalFigure;
 use App\Http\Controllers\Controller;
 use App\Models\Activity;
 use App\Models\Event;
@@ -35,7 +36,10 @@ class SiteController extends Controller
 
     public function history(): View
     {
-        return view('public.history', ['page' => Content::published('history')]);
+        return view('public.history', [
+            'page' => Content::published('history'),
+            'figures' => HistoricalFigure::with('photo')->where('status', 'published')->orderBy('sort_order')->orderBy('id')->get(),
+        ]);
     }
 
     public function leadership(): View

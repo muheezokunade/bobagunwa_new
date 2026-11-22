@@ -343,4 +343,19 @@ class DemoFeedbackTest extends TestCase
         // Officers without the recovery right cannot use the page.
         $this->actingAs($this->officer('executive'))->get(route('admin.administrator-recovery.index'))->assertForbidden();
     }
+
+    public function test_history_shows_past_awujales_with_pop_up_histories_managed_as_content(): void
+    {
+        $sec = $this->officer('secretariat');
+        $this->actingAs($sec)->get(route('admin.content.create', 'heritage'))->assertOk()->assertSee('Full history (shown in the pop-up)');
+        $this->actingAs($sec)->post(route('admin.content.store', 'heritage'), ['name' => 'Synthetic Awujale', 'title' => 'Awujale of Ijebuland', 'years_label' => 'reigned 1900–1920', 'summary' => 'A synthetic summary.', 'body' => 'A synthetic **full** history.', 'sort_order' => '10'])->assertSessionHasNoErrors();
+        $figure = \App\Models\HistoricalFigure::sole();
+        $this->assertSame('draft', $figure->status);
+        $this->get(route('history'))->assertOk()->assertDontSee('Synthetic Awujale');
+
+        $this->actingAs($sec)->post(route('admin.content.status', ['heritage', $figure->id]), ['status' => 'published'])->assertSessionHasNoErrors();
+        $this->get(route('history'))->assertOk()->assertSee('The Awujales of Ijebuland')->assertSee('Synthetic Awujale')->assertSee('reigned 1900–1920')
+            ->assertSee('<dialog id="figure-'.$figure->id.'"', false)->assertSee('<strong>full</strong>', false);
+        $this->actingAs($this->officer('treasurer'))->get(route('admin.content.create', 'heritage'))->assertForbidden();
+    }
 }

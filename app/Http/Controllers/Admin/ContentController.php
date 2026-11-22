@@ -8,6 +8,7 @@ use App\Models\Activity;
 use App\Models\Document;
 use App\Models\Gallery;
 use App\Models\GalleryItem;
+use App\Models\HistoricalFigure;
 use App\Models\Leader;
 use App\Models\Media;
 use App\Models\Page;
@@ -46,6 +47,10 @@ class ContentController extends Controller
                 ['name', 'Name (as approved for publication)', 'text', true], ['office', 'Office or title', 'text', true],
                 ['group', 'Group', 'select', true, ['council' => 'Giwa-in-Council', 'chiefs' => 'Bobagunwa Chiefs', 'executive' => 'Bobagunwa Executives', 'other' => 'Other']],
                 ['term_label', 'Term (e.g. 2025–2027)', 'text', false], ['bio', 'Short biography', 'textarea', false], ['photo_media_id', 'Approved photograph', 'media', false], ['sort_order', 'Display order', 'number', false],
+            ]],
+            'heritage' => ['label' => 'History and heritage figures', 'singular' => 'historical figure', 'model' => HistoricalFigure::class, 'scope' => [], 'title' => 'name', 'fields' => [
+                ['name', 'Name', 'text', true], ['title', 'Title (for example “Awujale of Ijebuland”)', 'text', false], ['years_label', 'Years (for example “reigned 1960–2025”)', 'text', false],
+                ['summary', 'Short summary (shown under the picture)', 'textarea', true], ['body', 'Full history (shown in the pop-up)', 'markdown', false], ['photo_media_id', 'Picture', 'media', false], ['sort_order', 'Display order (oldest first)', 'number', false],
             ]],
             'galleries' => ['label' => 'Galleries', 'singular' => 'gallery', 'model' => Gallery::class, 'scope' => [], 'title' => 'title', 'fields' => [
                 ['title', 'Title', 'text', true], ['description', 'Description', 'textarea', false],

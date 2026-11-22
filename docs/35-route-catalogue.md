@@ -58,7 +58,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown or unpublished record → 404. |
 | Security controls | strict CSP and security headers |
 | Acceptance criterion | No invented historical facts; unpublished revisions hidden. |
-| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent`<br>`ContentAndUploadSecurityTest::test_drafts_stay_private_until_a_publisher_publishes_them` |
+| Tests | `PublicSiteTest::test_every_public_page_renders_with_security_headers_and_metadata`<br>`DemoFeedbackTest::test_official_content_loads_as_revisions_publishes_approved_pages_and_is_idempotent`<br>`DemoFeedbackTest::test_history_shows_past_awujales_with_pop_up_histories_managed_as_content`<br>`ContentAndUploadSecurityTest::test_drafts_stay_private_until_a_publisher_publishes_them` |
 | Status | Implemented · HTTP-tested |
 
 ## `leadership`
@@ -2226,10 +2226,10 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 |---|---|
 | Method · path | GET `/admin/content/{type}` |
 | Handler | `ContentController@list` |
-| Purpose | List news, notices, activities, leaders, galleries or documents. |
+| Purpose | List news, notices, activities, leaders, historical figures, galleries or documents. |
 | Roles / permission | `content.manage` or `content.publish` → Secretariat Officer |
 | Validation | Read-only; route parameters resolved by model binding. |
-| Data | posts, activities, leaders, galleries, documents |
+| Data | posts, activities, leaders, historical_figures, galleries, documents |
 | Success | 200 with the page; nothing is written. |
 | Failure states | Unknown type → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
@@ -2251,7 +2251,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown type → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Type-specific fields. |
-| Tests | `AdminViewsRenderTest::test_all_admin_pages_render` |
+| Tests | `AdminViewsRenderTest::test_all_admin_pages_render`<br>`DemoFeedbackTest::test_history_shows_past_awujales_with_pop_up_histories_managed_as_content` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.content.store`
@@ -2268,7 +2268,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Validation errors; unknown type → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); CSRF token + Origin check (419 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | New content is never published automatically. |
-| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`ContentAndUploadSecurityTest::test_news_publication_and_member_only_notices` |
+| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`DemoFeedbackTest::test_history_shows_past_awujales_with_pop_up_histories_managed_as_content`<br>`ContentAndUploadSecurityTest::test_news_publication_and_member_only_notices` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.content.edit`
@@ -2319,7 +2319,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Invalid transition or approval gate closed → refused. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); CSRF token + Origin check (419 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Publication audited. |
-| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`ContentAndUploadSecurityTest::test_news_publication_and_member_only_notices` |
+| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`DemoFeedbackTest::test_history_shows_past_awujales_with_pop_up_histories_managed_as_content`<br>`ContentAndUploadSecurityTest::test_news_publication_and_member_only_notices` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.content.galleries.items`
