@@ -122,7 +122,7 @@ Append-only review timeline: private notes and applicant-visible messages kept s
 |---|---|---|---|
 | `id` | `bigint(20) unsigned` | NO |  |
 | `membership_application_id` | `bigint(20) unsigned` | NO |  |
-| `type` | `enum('submitted','status_changed','note','applicant_response')` | NO |  |
+| `type` | `enum('submitted','status_changed','note','applicant_response','recommended')` | NO |  |
 | `from_status` | `varchar(30)` | YES | `NULL` |
 | `to_status` | `varchar(30)` | YES | `NULL` |
 | `actor_user_id` | `bigint(20) unsigned` | YES | `NULL` |
@@ -649,6 +649,9 @@ Public applications with screening result, private status-token hash and review 
 | `declaration_accepted_at` | `timestamp` | NO |  |
 | `privacy_accepted_at` | `timestamp` | NO |  |
 | `status` | `enum('submitted','under_review','changes_requested','approved','rejected')` | NO | `'submitted'` |
+| `recommendation` | `enum('approve','reject')` | YES | `NULL` |
+| `recommended_by` | `bigint(20) unsigned` | YES | `NULL` |
+| `recommended_at` | `timestamp` | YES | `NULL` |
 | `decided_by` | `bigint(20) unsigned` | YES | `NULL` |
 | `decided_at` | `timestamp` | YES | `NULL` |
 | `member_id` | `bigint(20) unsigned` | YES | `NULL` |
@@ -659,9 +662,9 @@ Public applications with screening result, private status-token hash and review 
 | `active_email_key` | `varchar(190)` | YES | generated: `if(`status` in ('submitted','under_review','changes_requested'),`email_normalized`,NULL)` |
 | `active_phone_key` | `varchar(20)` | YES | generated: `if(`status` in ('submitted','under_review','changes_requested'),`phone_normalized`,NULL)` |
 
-**Indexes:** UNIQUE `applications_active_email_unique`(active_email_key); UNIQUE `applications_active_phone_unique`(active_phone_key); `membership_applications_decided_by_foreign`(decided_by); `membership_applications_eligibility_status_index`(eligibility_status); `membership_applications_email_normalized_index`(email_normalized); UNIQUE `membership_applications_member_id_unique`(member_id); `membership_applications_phone_normalized_index`(phone_normalized); UNIQUE `membership_applications_reference_unique`(reference); `membership_applications_status_created_at_index`(status,created_at); UNIQUE `membership_applications_status_token_hash_unique`(status_token_hash); UNIQUE `PRIMARY`(id)
+**Indexes:** UNIQUE `applications_active_email_unique`(active_email_key); UNIQUE `applications_active_phone_unique`(active_phone_key); `membership_applications_decided_by_foreign`(decided_by); `membership_applications_eligibility_status_index`(eligibility_status); `membership_applications_email_normalized_index`(email_normalized); UNIQUE `membership_applications_member_id_unique`(member_id); `membership_applications_phone_normalized_index`(phone_normalized); `membership_applications_recommended_by_foreign`(recommended_by); UNIQUE `membership_applications_reference_unique`(reference); `membership_applications_status_created_at_index`(status,created_at); UNIQUE `membership_applications_status_token_hash_unique`(status_token_hash); UNIQUE `PRIMARY`(id)
 
-**Foreign keys (all RESTRICT):** (decided_by) → `users`(id); (member_id) → `members`(id)
+**Foreign keys (all RESTRICT):** (decided_by) → `users`(id); (member_id) → `members`(id); (recommended_by) → `users`(id)
 
 ## `membership_numbers`
 

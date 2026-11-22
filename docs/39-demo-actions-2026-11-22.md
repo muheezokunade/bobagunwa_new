@@ -17,11 +17,12 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | Partial payments: a part-payment leaves the remainder outstanding on the statement | already built; display to be made clearer with the receipt upload |
 | **Application form = the association's Member Profile form**, with country of residence and the eight supporting documents (private, reviewer-only, audited downloads; kept by the nightly clean-up; copied profile fields to the member on approval); association's privacy notice wording | this commit — see the note below on PHP upload limits |
 
+| **Two-step membership approval**: new Membership Initiator role (the General Secretary) reviews and recommends; the Membership Officer (screening-committee chair) approves or rejects, never on his own recommendation; asking for more information clears the recommendation; committee reviews in the app only | this commit |
+
 ## In progress / to build
 
 | # | Item | Notes |
 |---|---|---|
-| 2 | **Two-step membership approval** | General Secretary initiates (reviews, may ask for information, recommends); the membership lead who chairs the screening committee approves. Committee reviews in the app only — no emailed copies of applicants' data. |
 | 3 | **Members upload payment receipts** | Pick the levy, amount pre-filled (part-payment allowed), upload receipt, payer name if another account paid; payment verifier confirms against the bank alert. |
 | 4 | **Report of who has paid a particular levy** (paid / part-paid / unpaid), CSV export; levy categories CSV | Requested in the demo. |
 | 5 | **MFA for administrators only** (not members) | Built and switched off; scope to admin accounts and enable after enrolment (D-024). |

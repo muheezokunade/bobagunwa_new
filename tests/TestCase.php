@@ -6,9 +6,11 @@ use App\Models\Assessment;
 use App\Models\FeeCategory;
 use App\Models\Member;
 use App\Models\MemberObligation;
+use App\Models\MembershipApplication;
 use App\Models\Payment;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\ApplicationService;
 use App\Services\Finance\AssessmentService;
 use App\Services\Finance\PaymentService;
 use App\Services\MembershipNumberService;
@@ -47,6 +49,15 @@ abstract class TestCase extends BaseTestCase
             'passport_photo' => UploadedFile::fake()->image('passport.jpg', 60, 80),
             'full_photo' => UploadedFile::fake()->image('full.png', 60, 120),
         ]];
+    }
+
+    /** Two-step approval, step one: a reviewer (the General Secretary's role) records a recommendation. */
+    protected function recommend(MembershipApplication $application, string $outcome = 'approve'): User
+    {
+        $initiator = $this->officer('membership_initiator');
+        app(ApplicationService::class)->recommend($application, $initiator, $outcome, 'Synthetic recommendation');
+
+        return $initiator;
     }
 
     protected function officer(string|array $roles, array $attributes = []): User

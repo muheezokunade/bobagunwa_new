@@ -2,7 +2,8 @@
 @section('content')
 @php
     $F = \App\Support\Format::class;
-    $allowed = \App\Models\MembershipApplication::TRANSITIONS[$application->status] ?? [];
+    $allowed = $application->stepsFor(auth()->user());
+    $open = \App\Models\MembershipApplication::TRANSITIONS[$application->status] ?? [];
     $decisionOptions = collect($allowed)->mapWithKeys(fn ($s) => [$s => \App\Models\MembershipApplication::statusLabel($s)])->all();
     $flags = is_array($application->eligibility_flags) ? $application->eligibility_flags : [];
 @endphp
@@ -100,6 +101,17 @@
     </section>
 
     <div>
+        @if ($application->recommendation && in_array($application->status, ['under_review'], true))
+            <section class="panel">
+                <h2>Recommendation</h2>
+                <p><strong>{{ $application->recommendation === 'approve' ? 'Recommended for approval' : 'Recommended for rejection' }}</strong> by {{ $application->recommender?->name ?? 'an officer' }}, {{ $F::dateTime($application->recommended_at) }}.</p>
+                @if (! auth()->user()->hasPermission('applications.decide'))
+                    <p class="muted small">Waiting for the final approver (the chair of the screening committee).</p>
+                @elseif ((int) $application->recommended_by === auth()->id())
+                    <p class="muted small">You made this recommendation, so a different officer must give the final decision.</p>
+                @endif
+            </section>
+        @endif
         @if ($allowed)
             <form class="panel" method="post" action="{{ route('admin.applications.decide', $application) }}" data-confirm="Record this decision on application {{ $application->reference }}? Approval and rejection are final.">
                 @csrf
@@ -107,9 +119,14 @@
                 <x-select name="decision" label="Next step" :options="$decisionOptions" required placeholder="Choose…" />
                 <x-textarea name="private_note" label="Review note (officers only)" required rows="4" hint="Explain the reason for this step. The applicant does not see this note." />
                 <x-textarea name="applicant_message" label="Message to the applicant" rows="4" hint="Required when requesting more information or when not approving. The applicant sees this when they check their status, and a message is prepared for delivery." />
-                <p class="small muted">Approving creates the member record with a permanent membership number and issues a one-time activation link.</p>
+                <p class="small muted">@if (\App\Support\Settings::bool('membership.two_step_approval'))Two-step approval: a reviewer (normally the General Secretary) recommends; a different officer with final-decision rights approves or rejects. @endif Approving creates the member record with a permanent membership number and issues a one-time activation link.</p>
                 <button class="btn" type="submit">Record decision</button>
             </form>
+        @elseif ($open)
+            <section class="panel">
+                <h2>Decision</h2>
+                <p class="muted">There is nothing for you to record at this stage.</p>
+            </section>
         @else
             <section class="panel">
                 <h2>Decision</h2>

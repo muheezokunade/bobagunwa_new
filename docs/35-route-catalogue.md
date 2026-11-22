@@ -935,7 +935,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin` |
 | Handler | `DashboardController@index` |
 | Purpose | Officer dashboard with role-appropriate queues. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | counts from members, applications, payments, enquiries, system_alerts |
 | Success | 200 with the page; nothing is written. |
@@ -952,7 +952,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/account` |
 | Handler | `AccountController@show` |
 | Purpose | Own officer account: password and two-factor enrolment. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | users |
 | Success | 200 with the page; nothing is written. |
@@ -969,7 +969,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/account/password` |
 | Handler | `AccountController@password` |
 | Purpose | Change own officer password. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | `current_password`: required, string<br>`password`: required, string, confirmed, max:128 |
 | Data | users, sessions, security_events |
 | Success | Password changed; other sessions ended. |
@@ -986,7 +986,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/account/two-factor/start` |
 | Handler | `AccountController@twoFactorStart` |
 | Purpose | Begin authenticator enrolment. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | No body fields; acts on the bound record. |
 | Data | session (pending secret) |
 | Success | Secret and otpauth link shown. |
@@ -1003,7 +1003,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/account/two-factor/confirm` |
 | Handler | `AccountController@twoFactorConfirm` |
 | Purpose | Confirm enrolment with a code. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | `code`: required, string, max:20 |
 | Data | users, audit_events |
 | Success | Encrypted secret saved; 8 recovery codes shown once. |
@@ -1020,7 +1020,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/account/two-factor/recovery-codes` |
 | Handler | `AccountController@twoFactorRecovery` |
 | Purpose | Regenerate recovery codes. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | `code`: required, string, max:20 |
 | Data | users, audit_events |
 | Success | New codes shown once; old codes invalid. |
@@ -1037,7 +1037,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/account/two-factor/disable` |
 | Handler | `AccountController@twoFactorDisable` |
 | Purpose | Turn off own two-factor. |
-| Roles / permission | Any active officer → System Administrator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | Any active officer → System Administrator, Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | `password`: required, string<br>`code`: required, string, max:20 |
 | Data | users, audit_events |
 | Success | Two-factor removed. |
@@ -1173,7 +1173,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/applications` |
 | Handler | `ApplicationController@index` |
 | Purpose | Application review queue. |
-| Roles / permission | `applications.review` → Membership Officer |
+| Roles / permission | `applications.review` → Membership Initiator, Membership Officer |
 | Validation | `status`: nullable, string, max:30<br>`eligibility`: nullable, in:eligible,flagged<br>`q`: nullable, string, max:100 |
 | Data | membership_applications |
 | Success | 200 with the page; nothing is written. |
@@ -1190,14 +1190,14 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/applications/{application}` |
 | Handler | `ApplicationController@show` |
 | Purpose | Single application with timeline. |
-| Roles / permission | `applications.review` → Membership Officer |
+| Roles / permission | `applications.review` → Membership Initiator, Membership Officer |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | membership_applications, application_events |
 | Success | 200 with the page; nothing is written. |
 | Failure states | Anonymous → redirect to sign-in; without permission → 403; unknown record → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Private notes and applicant messages are separated. |
-| Tests | `AdminViewsRenderTest::test_all_admin_pages_render`<br>`DemoFeedbackTest::test_application_follows_the_member_profile_form_and_stores_documents_privately`<br>`ApplicationWorkflowTest::test_officer_review_approval_creates_exactly_one_member_and_rejects_repeat` |
+| Tests | `AdminViewsRenderTest::test_all_admin_pages_render`<br>`DemoFeedbackTest::test_application_follows_the_member_profile_form_and_stores_documents_privately`<br>`DemoFeedbackTest::test_two_step_approval_general_secretary_recommends_and_a_different_officer_decides`<br>`ApplicationWorkflowTest::test_officer_review_approval_creates_exactly_one_member_and_rejects_repeat` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.applications.decide`
@@ -1207,14 +1207,14 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/applications/{application}/decision` |
 | Handler | `ApplicationController@decide` |
 | Purpose | Approve, decline, request information or add a note. |
-| Roles / permission | `applications.review` → Membership Officer |
-| Validation | `decision`: required, in:under_review,changes_requested,approved,rejected<br>`private_note`: required, string, max:3000<br>`applicant_message`: nullable, string, max:3000 |
+| Roles / permission | `applications.review` → Membership Initiator, Membership Officer |
+| Validation | `decision`: required, in:under_review,changes_requested,recommend_approve,recommend_reject,approved,rejected<br>`private_note`: required, string, max:3000<br>`applicant_message`: nullable, string, max:3000 |
 | Data | membership_applications, application_events, members, membership_numbers, audit_events |
 | Success | Decision recorded; approval creates the member and issues a number. |
 | Failure states | Already decided, stale state or duplicate member → refused. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); CSRF token + Origin check (419 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Approval is exactly-once; numbers are never reused. |
-| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`DemoFeedbackTest::test_application_follows_the_member_profile_form_and_stores_documents_privately`<br>`ApplicationWorkflowTest::test_officer_review_approval_creates_exactly_one_member_and_rejects_repeat`<br>`ApplicationWorkflowTest::test_rejection_requires_applicant_message_and_is_final`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
+| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`DemoFeedbackTest::test_application_follows_the_member_profile_form_and_stores_documents_privately`<br>`DemoFeedbackTest::test_two_step_approval_general_secretary_recommends_and_a_different_officer_decides`<br>`DemoFeedbackTest::test_single_step_approval_when_two_step_is_switched_off`<br>`ApplicationWorkflowTest::test_officer_review_approval_creates_exactly_one_member_and_rejects_repeat`<br>`ApplicationWorkflowTest::test_rejection_requires_applicant_message_and_is_final`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.applications.attachments.show`
@@ -1224,7 +1224,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/applications/{application}/documents/{attachment}` |
 | Handler | `ApplicationController@attachment` |
 | Purpose | Download a supporting document from an application (certificates, referee letters, photographs). |
-| Roles / permission | `applications.review` → Membership Officer |
+| Roles / permission | `applications.review` → Membership Initiator, Membership Officer |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | reads application_attachments, private_files; writes audit_events |
 | Success | 200 with the page; nothing is written. |
@@ -1241,7 +1241,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/messages` |
 | Handler | `MessageController@index` |
 | Purpose | Outbound message queue. |
-| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Officer |
+| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Initiator, Membership Officer |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | outbound_messages |
 | Success | 200 with the page; nothing is written. |
@@ -1258,7 +1258,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/messages/{message}` |
 | Handler | `MessageController@show` |
 | Purpose | Single prepared message. |
-| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Officer |
+| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Initiator, Membership Officer |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | outbound_messages |
 | Success | 200 with the page; nothing is written. |
@@ -1275,7 +1275,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/messages/{message}/delivered` |
 | Handler | `MessageController@delivered` |
 | Purpose | Attest manual delivery of a message. |
-| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Officer |
+| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Initiator, Membership Officer |
 | Validation | `note`: required, string, min:5, max:255<br>`confirm`: accepted |
 | Data | outbound_messages, audit_events |
 | Success | Marked delivered with officer and note. |
@@ -1292,7 +1292,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | POST `/admin/messages/{message}/cancel` |
 | Handler | `MessageController@cancel` |
 | Purpose | Cancel a pending message. |
-| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Officer |
+| Roles / permission | `applications.review` or `accounts.issue` or `access.manage` → System Administrator, Membership Initiator, Membership Officer |
 | Validation | `note`: required, string, min:5, max:255 |
 | Data | outbound_messages, audit_events |
 | Success | Cancelled with note. |
@@ -1309,7 +1309,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/members` |
 | Handler | `MemberController@index` |
 | Purpose | Membership register search. |
-| Roles / permission | `members.read` → Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | `members.read` → Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | `q`: nullable, string, max:100<br>`status`: nullable, in:active,suspended,inactive<br>`origin`: nullable, in:application,import,manual<br>`account`: nullable, in:none,pending,active<br>`incomplete`: nullable, boolean |
 | Data | members |
 | Success | 200 with the page; nothing is written. |
@@ -1377,7 +1377,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Method · path | GET `/admin/members/{member}` |
 | Handler | `MemberController@show` |
 | Purpose | Member record with history. |
-| Roles / permission | `members.read` → Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
+| Roles / permission | `members.read` → Membership Initiator, Membership Officer, Secretariat Officer, Treasurer, Payment Verifier, Executive (read-only oversight) |
 | Validation | Read-only; route parameters resolved by model binding. |
 | Data | members, users, audit_events |
 | Success | 200 with the page; nothing is written. |
@@ -2500,13 +2500,13 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Handler | `AccessController@store` |
 | Purpose | Create an officer account. |
 | Roles / permission | `access.manage` → System Administrator |
-| Validation | `name`: required, string, max:190<br>`email`: required, email:rfc, max:190<br>`roles`: required, array, min:1<br>`roles.*`: string, exists:roles,key<br>`membership_number`: nullable, string, max:32<br>`reason`: required, string, min:5, max:255 |
+| Validation | `name`: required, string, max:190<br>`email`: required, email:rfc, max:190<br>`roles`: required, array, min:1<br>`roles.*`: string, exists:roles,key<br>`reason`: required, string, min:5, max:255 |
 | Data | users, role_user, account_tokens, audit_events |
 | Success | Pending account created; one-time activation link shown once. |
 | Failure states | Validation errors; duplicate email refused. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); CSRF token + Origin check (419 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Account cannot sign in until activated. |
-| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`AdminViewsRenderTest::test_all_admin_pages_render`<br>`AdminMutationBehaviourTest::test_officer_creation_and_member_correction` |
+| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`AdminViewsRenderTest::test_all_admin_pages_render`<br>`DemoFeedbackTest::test_officer_logins_are_separate_from_member_logins`<br>`AdminMutationBehaviourTest::test_officer_creation_and_member_correction` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.access.show`
@@ -2540,7 +2540,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Removing the last system administrator or own access-management → refused. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); CSRF token + Origin check (419 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Lockout prevention; change audited. |
-| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`AuthorisationMatrixTest::test_role_escalation_and_last_administrator_protection` |
+| Tests | `AdminMutationMatrixTest::test_every_admin_mutation_enforces_roles_server_side, AdminMutationMatrixTest::test_every_admin_mutation_rejects_missing_csrf_token`<br>`DemoFeedbackTest::test_officer_logins_are_separate_from_member_logins`<br>`AuthorisationMatrixTest::test_role_escalation_and_last_administrator_protection` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.access.status`

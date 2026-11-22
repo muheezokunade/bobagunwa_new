@@ -49,7 +49,7 @@ class ApplicationController extends Controller
             ->limit(5)->get();
 
         return view('admin.applications.show', [
-            'application' => $application->load('events.actor', 'member', 'decider', 'attachments.file'),
+            'application' => $application->load('events.actor', 'member', 'decider', 'attachments.file', 'recommender'),
             'matches' => $possibleMatches,
             'messages' => OutboundMessage::where('related_type', 'MembershipApplication')->where('related_id', $application->id)->latest()->get(),
             'otherApplications' => MembershipApplication::where('id', '!=', $application->id)->where(fn ($q) => $q->where('email_normalized', $application->email_normalized)->orWhere('phone_normalized', $application->phone_normalized))->get(),
@@ -59,10 +59,15 @@ class ApplicationController extends Controller
     public function decide(Request $request, MembershipApplication $application, ApplicationService $service): RedirectResponse
     {
         $data = $request->validate([
-            'decision' => ['required', 'in:under_review,changes_requested,approved,rejected'],
+            'decision' => ['required', 'in:under_review,changes_requested,recommend_approve,recommend_reject,approved,rejected'],
             'private_note' => ['required', 'string', 'max:3000'],
             'applicant_message' => ['nullable', 'string', 'max:3000'],
         ]);
+        if (str_starts_with($data['decision'], 'recommend_')) {
+            $service->recommend($application, $request->user(), substr($data['decision'], 10), $data['private_note']);
+
+            return redirect()->route('admin.applications.show', $application)->with('status', 'Recommendation recorded. The final approver can now decide.');
+        }
         if ($data['decision'] === 'approved') {
             [$member, $link] = $service->approve($application, $request->user(), $data['private_note'], $data['applicant_message'] ?? null);
 

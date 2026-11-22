@@ -30,6 +30,7 @@ final class Settings
             'contact.address' => ['type' => 'string', 'group' => 'Contact', 'label' => 'Secretariat address', 'default' => null],
 
             'membership.applications_open' => ['type' => 'bool', 'group' => 'Membership', 'label' => 'Accept public membership applications', 'default' => true],
+            'membership.two_step_approval' => ['type' => 'bool', 'group' => 'Membership', 'label' => 'Two-step approval of applications', 'help' => 'On: the General Secretary (or another reviewer) recommends, and a different officer with final-decision rights approves or rejects. Off: an officer with final-decision rights decides alone.', 'default' => true],
             'membership.require_documents' => ['type' => 'bool', 'group' => 'Membership', 'label' => 'Require the supporting documents with each application', 'help' => 'Birth certificate, local government certificate, school certificates, referee letters and photographs (the association’s list). Off: documents are optional.', 'default' => true],
             'membership.number_prefix' => ['type' => 'string', 'group' => 'Membership', 'label' => 'Membership number prefix', 'help' => 'Applies to numbers issued after a change. Issued numbers never change.', 'default' => 'BOB-'],
             'membership.number_width' => ['type' => 'int', 'group' => 'Membership', 'label' => 'Membership number digits', 'default' => 6],

@@ -156,6 +156,7 @@ class ConcurrencyTest extends TestCase
         [$application] = app(ApplicationService::class)->submit(['first_name' => 'Race', 'last_name' => 'Applicant', 'email' => 'race-'.uniqid().'@example.test', 'phone' => '0809'.random_int(1000000, 9999999), 'date_of_birth' => '1981-01-01', 'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic', 'reason' => 'Synthetic concurrency test application.']);
         $officer = $this->officer('membership_officer');
         app(ApplicationService::class)->transition($application, 'under_review', $officer, 'Start', null);
+        $this->recommend($application);
         $before = Member::count();
         $approve = fn () => app(ApplicationService::class)->approve(MembershipApplication::find($application->id), User::find($officer->id), 'Approve', null);
         $results = $this->race([$approve, $approve, $approve]);

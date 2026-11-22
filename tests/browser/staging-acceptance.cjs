@@ -173,7 +173,7 @@ function must(cond, msg) { if (!cond) throw new Error(msg); }
   // ---- W2. Application, tracking, approval ------------------------------------
   const applicant = { first: 'Synthetic', last: `Applicant ${RUN}`, email: `applicant-${RUN.toLowerCase()}@${DOMAIN}`, phone: phone() };
   await attempt('W2 Membership application, tracking and approval', async () => {
-    must(need('membership_officer', 'system_admin'), 'officers missing');
+    must(need('membership_initiator', 'membership_officer', 'system_admin'), 'officers missing');
     const a = await newPage();
     await go(a, '/membership/apply');
     await a.waitForTimeout(4500); // public forms reject submissions made within seconds of loading
@@ -199,12 +199,19 @@ function must(cond, msg) { if (!cond) throw new Error(msg); }
     const appPath = new URL(href, BASE).pathname;
     must((await go(officers.system_admin, appPath)) === 403, 'System Administrator could open the application');
     await go(mo, appPath);
-    await submit(mo, appPath + '/decision', { decision: 'under_review', private_note: 'Synthetic staging review' });
+    // Two-step approval: the General Secretary (Membership Initiator) reviews and recommends; the chair decides.
+    const gs = officers.membership_initiator;
+    await go(gs, appPath);
+    await submit(gs, appPath + '/decision', { decision: 'under_review', private_note: 'Synthetic staging review' });
+    await submit(gs, appPath + '/decision', { decision: 'recommend_approve', private_note: 'Documents and referees checked (synthetic)' });
+    must(/Recommend/i.test(await text(gs)) && !(await gs.locator('select[name="decision"] option[value="approved"]').count()), 'the General Secretary was offered the final approval');
+    await go(mo, appPath);
+    must(/Recommended for approval/i.test(await text(mo)), 'the chair does not see the recommendation');
     await submit(mo, appPath + '/decision', { decision: 'approved', private_note: 'Meets the confirmed criteria (synthetic)' });
     const url = (await mo.locator('#otl-url').innerText()).trim();
     must(url.includes('/account/activate/'), 'no activation link shown after approval: ' + (await errors(mo)));
     facts.application = ref; facts.activation_url = url;
-    return `application ${ref} tracked and approved; one-time activation link shown once`;
+    return `application ${ref} tracked, recommended by the General Secretary role, approved by the chair; one-time activation link shown once`;
   });
 
   // ---- W3. Member activation --------------------------------------------------

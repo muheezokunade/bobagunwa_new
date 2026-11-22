@@ -15,7 +15,8 @@ final class PermissionCatalog
     public static function permissions(): array
     {
         return [
-            'applications.review' => ['group' => 'Membership', 'description' => 'Review, request information on, approve or reject membership applications'],
+            'applications.review' => ['group' => 'Membership', 'description' => 'Review membership applications, request information and record a recommendation'],
+            'applications.decide' => ['group' => 'Membership', 'description' => 'Give the final decision (approve or reject) on a membership application recommended by another officer'],
             'members.read' => ['group' => 'Membership', 'description' => 'View the membership register'],
             'members.manage' => ['group' => 'Membership', 'description' => 'Correct permitted member fields; suspend and reactivate members'],
             'members.import' => ['group' => 'Membership', 'description' => 'Preview and commit existing-member imports'],
@@ -62,11 +63,17 @@ final class PermissionCatalog
                 'is_staff' => true,
                 'permissions' => ['access.manage', 'audit.read', 'settings.manage', 'backups.manage', 'integrity.alerts'],
             ],
+            'membership_initiator' => [
+                'name' => 'Membership Initiator',
+                'description' => 'The General Secretary: reviews membership applications, asks applicants for information and recommends approval or rejection. Cannot give the final decision. No financial access.',
+                'is_staff' => true,
+                'permissions' => ['applications.review', 'members.read'],
+            ],
             'membership_officer' => [
                 'name' => 'Membership Officer',
-                'description' => 'Reviews applications and maintains the register. No financial access.',
+                'description' => 'Chair of the screening committee: gives the final decision on applications recommended by the General Secretary, and maintains the register. No financial access.',
                 'is_staff' => true,
-                'permissions' => ['applications.review', 'members.read', 'members.manage', 'accounts.issue'],
+                'permissions' => ['applications.review', 'applications.decide', 'members.read', 'members.manage', 'accounts.issue'],
             ],
             'secretariat' => [
                 'name' => 'Secretariat Officer',

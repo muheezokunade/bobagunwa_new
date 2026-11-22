@@ -174,11 +174,18 @@ class ApplicationService
         return DB::transaction(function () use ($application, $to, $officer, $privateNote, $applicantMessage) {
             $locked = MembershipApplication::lockForUpdate()->findOrFail($application->id);
             $this->assertTransition($locked, $to);
+            if ($to === 'rejected') {
+                $this->assertFinalDecision($locked, $officer, 'reject');
+            }
             ApplicationEvent::create([
                 'membership_application_id' => $locked->id, 'type' => 'status_changed', 'from_status' => $locked->status, 'to_status' => $to,
                 'actor_user_id' => $officer->id, 'private_note' => trim($privateNote), 'applicant_message' => $applicantMessage ? trim($applicantMessage) : null,
             ]);
             $updates = ['status' => $to, 'version' => $locked->version + 1];
+            if ($to === 'changes_requested') {
+                // New information means a fresh review: any earlier recommendation no longer stands.
+                $updates += ['recommendation' => null, 'recommended_by' => null, 'recommended_at' => null];
+            }
             if ($to === 'rejected') {
                 $updates += ['decided_by' => $officer->id, 'decided_at' => now()];
             }
@@ -222,6 +229,7 @@ class ApplicationService
                 throw new DomainRuleException('This application has already been approved.');
             }
             $this->assertTransition($locked, 'approved');
+            $this->assertFinalDecision($locked, $officer, 'approve');
             if (Member::where('email_normalized', $locked->email_normalized)->orWhere('phone_normalized', $locked->phone_normalized)->exists()) {
                 throw new DomainRuleException('A member with the same email address or phone number already exists. Resolve the possible duplicate before approving.');
             }
@@ -275,8 +283,57 @@ class ApplicationService
     private function authorise(User $officer): void
     {
         if (! $officer->hasPermission('applications.review')) {
-            throw new DomainRuleException('You do not have permission to decide membership applications.');
+            throw new DomainRuleException('You do not have permission to review membership applications.');
         }
+    }
+
+    /**
+     * Final decisions need applications.decide and, with two-step approval on,
+     * a matching recommendation from a different officer.
+     */
+    private function assertFinalDecision(MembershipApplication $locked, User $officer, string $outcome): void
+    {
+        if (! $officer->hasPermission('applications.decide')) {
+            throw new DomainRuleException('Only an officer with final-decision rights can approve or reject an application. Record a recommendation instead.');
+        }
+        if (! Settings::bool('membership.two_step_approval')) {
+            return;
+        }
+        if ($locked->recommendation !== $outcome) {
+            throw new DomainRuleException($outcome === 'approve'
+                ? 'This application has not been recommended for approval yet. The General Secretary (or another reviewer) records the recommendation first.'
+                : 'This application has not been recommended for rejection yet. The General Secretary (or another reviewer) records the recommendation first.');
+        }
+        if ((int) $locked->recommended_by === $officer->id) {
+            throw new DomainRuleException('The final decision must be made by a different officer from the one who recommended it.');
+        }
+    }
+
+    /** Step one: record a recommendation (approve or reject) for the final approver. */
+    public function recommend(MembershipApplication $application, User $officer, string $outcome, string $privateNote): MembershipApplication
+    {
+        $this->authorise($officer);
+        if (! in_array($outcome, ['approve', 'reject'], true)) {
+            throw new DomainRuleException('Choose a recommendation.');
+        }
+        if (trim($privateNote) === '') {
+            throw new DomainRuleException('Record a review note explaining the recommendation.');
+        }
+
+        return DB::transaction(function () use ($application, $officer, $outcome, $privateNote) {
+            $locked = MembershipApplication::lockForUpdate()->findOrFail($application->id);
+            if ($locked->status !== 'under_review') {
+                throw new DomainRuleException('Only an application under review can be recommended.');
+            }
+            ApplicationEvent::create([
+                'membership_application_id' => $locked->id, 'type' => 'recommended', 'actor_user_id' => $officer->id,
+                'private_note' => 'Recommended '.($outcome === 'approve' ? 'approval' : 'rejection').': '.trim($privateNote),
+            ]);
+            $locked->update(['recommendation' => $outcome, 'recommended_by' => $officer->id, 'recommended_at' => now(), 'version' => $locked->version + 1]);
+            Audit::record('application.recommended', "Application {$locked->reference} recommended for ".($outcome === 'approve' ? 'approval' : 'rejection'), $locked, ['note' => $privateNote]);
+
+            return $locked;
+        });
     }
 
     private function assertTransition(MembershipApplication $application, string $to): void

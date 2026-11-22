@@ -92,6 +92,11 @@ class MandatoryWorkflowsTest extends TestCase
         $this->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'x'])->assertRedirect(route('login'));
         $this->actingAs($systemAdmin)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'x'])->assertForbidden();
         $this->actingAs($membershipOfficer)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Documents reviewed'])->assertSessionHasNoErrors();
+        // Two-step approval: the final approver cannot approve before the General Secretary recommends.
+        $this->actingAs($membershipOfficer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Too early'])->assertSessionHasErrors('domain');
+        $generalSecretary = $this->officer('membership_initiator');
+        $this->actingAs($generalSecretary)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Not mine to decide'])->assertSessionHasErrors('domain');
+        $this->actingAs($generalSecretary)->post(route('admin.applications.decide', $application), ['decision' => 'recommend_approve', 'private_note' => 'Documents and referees checked'])->assertSessionHasNoErrors();
         $approval = $this->actingAs($membershipOfficer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Meets the confirmed criteria']);
         $approval->assertSessionHas('one_time_link');
         $activationUrl = session('one_time_link')['url'];

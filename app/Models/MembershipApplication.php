@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Settings;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,7 +18,7 @@ class MembershipApplication extends Model
     /** Allowed transitions; approval and rejection are final. */
     public const TRANSITIONS = [
         'submitted' => ['under_review'],
-        'under_review' => ['changes_requested', 'approved', 'rejected'],
+        'under_review' => ['changes_requested', 'recommend_approve', 'recommend_reject', 'approved', 'rejected'],
         'changes_requested' => ['under_review'],
         'approved' => [],
         'rejected' => [],
@@ -30,11 +31,45 @@ class MembershipApplication extends Model
         'declaration_accepted_at' => 'datetime',
         'privacy_accepted_at' => 'datetime',
         'decided_at' => 'datetime',
+        'recommended_at' => 'datetime',
     ];
 
     public function attachments(): HasMany
     {
         return $this->hasMany(ApplicationAttachment::class)->orderBy('id');
+    }
+
+    /**
+     * The next steps this officer may take, given two-step approval:
+     * reviewers recommend; a different officer with final-decision rights approves or rejects.
+     *
+     * @return list<string>
+     */
+    public function stepsFor(User $officer): array
+    {
+        $steps = self::TRANSITIONS[$this->status] ?? [];
+        $twoStep = Settings::bool('membership.two_step_approval');
+        $canDecide = $officer->hasPermission('applications.decide');
+
+        return array_values(array_filter($steps, function ($step) use ($twoStep, $canDecide, $officer) {
+            if (in_array($step, ['approved', 'rejected'], true)) {
+                if (! $canDecide) {
+                    return false;
+                }
+
+                return ! $twoStep || ($this->recommendation === ($step === 'approved' ? 'approve' : 'reject') && (int) $this->recommended_by !== $officer->id);
+            }
+            if (in_array($step, ['recommend_approve', 'recommend_reject'], true)) {
+                return $twoStep;
+            }
+
+            return true;
+        }));
+    }
+
+    public function recommender(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recommended_by');
     }
 
     public function events(): HasMany
@@ -70,6 +105,8 @@ class MembershipApplication extends Model
             'changes_requested' => 'More information requested',
             'approved' => 'Approved',
             'rejected' => 'Not approved',
+            'recommend_approve' => 'Recommend approval (for the final approver)',
+            'recommend_reject' => 'Recommend rejection (for the final approver)',
         ][$status] ?? ucfirst(str_replace('_', ' ', $status));
     }
 }

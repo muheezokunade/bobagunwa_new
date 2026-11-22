@@ -118,6 +118,7 @@ class ApplicationWorkflowTest extends TestCase
         $this->assertStringContainsString('the applicant has replied', $request->fresh()->attestation_note);
         $this->post(route('membership.status.lookup'), ['reference' => $receipt['reference'], 'code' => $receipt['token']])->assertDontSee('Need town');
 
+        $this->recommend($application);
         $response = $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Meets criteria', 'applicant_message' => 'Welcome.']);
         $response->assertSessionHas('one_time_link');
         $member = Member::where('membership_application_id', $application->id)->sole();
@@ -142,6 +143,8 @@ class ApplicationWorkflowTest extends TestCase
         $officer = $this->officer('membership_officer');
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Review']);
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'rejected', 'private_note' => 'Not eligible'])->assertSessionHasErrors('domain');
+        $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'rejected', 'private_note' => 'Not eligible', 'applicant_message' => 'We are unable to approve.'])->assertSessionHasErrors('domain'); // not yet recommended
+        $this->recommend($application, 'reject');
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'rejected', 'private_note' => 'Not eligible', 'applicant_message' => 'We are unable to approve.'])->assertSessionHasNoErrors();
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Reopen'])->assertSessionHasErrors('domain');
         $this->assertSame(0, Member::count());

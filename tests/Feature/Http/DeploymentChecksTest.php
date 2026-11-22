@@ -45,8 +45,8 @@ class DeploymentChecksTest extends TestCase
             $this->assertSame([$role], $user->roles->pluck('key')->all());
         }
         $this->artisan('boba:staging:prepare', ['--confirm-synthetic' => true, '--links-file' => $file])->assertExitCode(0);
-        $this->assertSame(6, User::where('email', 'like', '%@staging-synthetic.invalid')->count(), 'Re-running does not duplicate accounts');
-        $this->assertSame(6, AccountToken::whereNull('revoked_at')->whereNull('consumed_at')->count(), 'Re-issuing revokes the earlier unused links');
+        $this->assertSame(count(StagingPrepare::ROLES), User::where('email', 'like', '%@staging-synthetic.invalid')->count(), 'Re-running does not duplicate accounts');
+        $this->assertSame(count(StagingPrepare::ROLES), AccountToken::whereNull('revoked_at')->whereNull('consumed_at')->count(), 'Re-issuing revokes the earlier unused links');
         @unlink($file);
 
         $this->app['env'] = 'production';

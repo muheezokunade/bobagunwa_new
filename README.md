@@ -25,7 +25,7 @@ Demo accounts (local only, refused in staging/production): `admin@`, `membership
 ## Tests
 
 ```bash
-php artisan test        # 162 tests on MariaDB 11.4 (database bobagunwa_test)
+php artisan test        # 169 tests on MariaDB 11.4 (database bobagunwa_test)
 ```
 
 Includes direct-SQL ledger invariants, forked-process concurrency, the seven mandatory end-to-end workflows, encrypted backup/restore with tamper and wrong-key rejection, an authorisation matrix, an HTTP matrix of every admin mutation route × role (+ CSRF), integrity alerting, two-factor and volume tests. `php artisan boba:docs:reference` regenerates the schema, route inventory, endpoint coverage matrix and route catalogue. Browser audit: `node tests/browser/responsive-a11y.cjs http://127.0.0.1:8000`.

@@ -9,6 +9,7 @@ use App\Models\Page;
 use App\Models\PageRevision;
 use App\Models\PrivateFile;
 use App\Models\User;
+use App\Services\ApplicationService;
 use App\Services\UploadService;
 use App\Support\Format;
 use App\Support\Settings;
@@ -125,9 +126,9 @@ class DemoFeedbackTest extends TestCase
         $this->assertSame(8, PrivateFile::count());
 
         // Approval carries the profile details to the member record.
-        foreach (['under_review', 'approved'] as $step) {
-            $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => $step, 'private_note' => 'Synthetic review'])->assertSessionHasNoErrors();
-        }
+        $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Synthetic review'])->assertSessionHasNoErrors();
+        $this->recommend($application->fresh());
+        $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Synthetic review'])->assertSessionHasNoErrors();
         $member = Member::where('membership_application_id', $application->id)->sole();
         $this->assertSame(['United States', 'married', 'Synthetic profile summary.', '1 Synthetic Street'], [$member->country, $member->marital_status, $member->profile_summary, $member->address]);
     }
@@ -185,5 +186,50 @@ class DemoFeedbackTest extends TestCase
         $this->assertNull($officer->member_id);
         $this->assertSame(['treasurer'], $officer->roles()->pluck('key')->all());
         $this->assertSame(['member'], $member->user->fresh()->roles()->pluck('key')->all());
+    }
+
+    public function test_two_step_approval_general_secretary_recommends_and_a_different_officer_decides(): void
+    {
+        [$application] = app(ApplicationService::class)->submit(['first_name' => 'Two', 'last_name' => 'Step', 'email' => 'two.step@example.test', 'phone' => '08035557777', 'date_of_birth' => '1981-01-01', 'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic']);
+        $gs = $this->officer('membership_initiator');
+        $chair = $this->officer('membership_officer');
+
+        $this->actingAs($gs)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Starting review'])->assertSessionHasNoErrors();
+        $page = $this->actingAs($gs)->get(route('admin.applications.show', $application))->assertOk();
+        $page->assertSee('Recommend approval')->assertDontSee('<option value="approved"', false);
+        $this->actingAs($gs)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'x'])->assertSessionHasErrors('domain');
+
+        $this->actingAs($gs)->post(route('admin.applications.decide', $application), ['decision' => 'recommend_approve', 'private_note' => 'Documents and referees checked'])->assertSessionHasNoErrors();
+        $this->assertSame(['approve', $gs->id], [$application->fresh()->recommendation, (int) $application->fresh()->recommended_by]);
+        $this->assertDatabaseHas('application_events', ['membership_application_id' => $application->id, 'type' => 'recommended']);
+
+        // The chair sees the recommendation and can approve; rejection is not offered against an approval recommendation.
+        $this->actingAs($chair)->get(route('admin.applications.show', $application))->assertSee('Recommended for approval')
+            ->assertSee('<option value="approved"', false)->assertDontSee('<option value="rejected"', false);
+
+        // An officer holding both rights cannot approve his own recommendation.
+        $both = $this->officer(['membership_officer']);
+        $this->actingAs($both)->post(route('admin.applications.decide', $application), ['decision' => 'changes_requested', 'private_note' => 'Need referee phone', 'applicant_message' => 'Please add your referees’ phone numbers.'])->assertSessionHasNoErrors();
+        $this->assertNull($application->fresh()->recommendation, 'asking for more information clears the recommendation');
+        $application->refresh()->update(['status' => 'under_review']);
+        $this->actingAs($both)->post(route('admin.applications.decide', $application), ['decision' => 'recommend_approve', 'private_note' => 'Rechecked'])->assertSessionHasNoErrors();
+        $this->actingAs($both)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Self'])
+            ->assertSessionHasErrors(['domain' => 'The final decision must be made by a different officer from the one who recommended it.']);
+        $this->actingAs($chair)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Approved by the screening committee chair'])->assertSessionHasNoErrors();
+        $this->assertSame('approved', $application->fresh()->status);
+    }
+
+    public function test_single_step_approval_when_two_step_is_switched_off(): void
+    {
+        Settings::set('membership.two_step_approval', false, null);
+        [$application] = app(ApplicationService::class)->submit(['first_name' => 'One', 'last_name' => 'Step', 'email' => 'one.step@example.test', 'phone' => '08035558888', 'date_of_birth' => '1981-01-01', 'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic']);
+        $chair = $this->officer('membership_officer');
+        $this->actingAs($chair)->post(route('admin.applications.decide', $application), ['decision' => 'under_review', 'private_note' => 'Review'])->assertSessionHasNoErrors();
+        $this->actingAs($chair)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Approved'])->assertSessionHasNoErrors();
+        // Final-decision rights are still required.
+        [$other] = app(ApplicationService::class)->submit(['first_name' => 'Other', 'last_name' => 'Step', 'email' => 'other.step@example.test', 'phone' => '08035559999', 'date_of_birth' => '1981-01-01', 'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic']);
+        $gs = $this->officer('membership_initiator');
+        $this->actingAs($gs)->post(route('admin.applications.decide', $other), ['decision' => 'under_review', 'private_note' => 'Review'])->assertSessionHasNoErrors();
+        $this->actingAs($gs)->post(route('admin.applications.decide', $other), ['decision' => 'approved', 'private_note' => 'x'])->assertSessionHasErrors('domain');
     }
 }
