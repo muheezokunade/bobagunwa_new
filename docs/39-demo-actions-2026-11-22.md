@@ -18,12 +18,12 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | **Application form = the association's Member Profile form**, with country of residence and the eight supporting documents (private, reviewer-only, audited downloads; kept by the nightly clean-up; copied profile fields to the member on approval); association's privacy notice wording | this commit — see the note below on PHP upload limits |
 
 | **Two-step membership approval**: new Membership Initiator role (the General Secretary) reviews and recommends; the Membership Officer (screening-committee chair) approves or rejects, never on his own recommendation; asking for more information clears the recommendation; committee reviews in the app only | this commit |
+| **Members report payments with a receipt**: portal "Report a payment" (choose the due or levy, amount pre-filled and part-payment allowed, date, method, bank reference, payer name if another account paid, receipt upload); pending until a payment verifier (always a different person) confirms it; officer page shows "Reported by the member" and the intended levy; part-payments leave the rest outstanding | this commit |
 
 ## In progress / to build
 
 | # | Item | Notes |
 |---|---|---|
-| 3 | **Members upload payment receipts** | Pick the levy, amount pre-filled (part-payment allowed), upload receipt, payer name if another account paid; payment verifier confirms against the bank alert. |
 | 4 | **Report of who has paid a particular levy** (paid / part-paid / unpaid), CSV export; levy categories CSV | Requested in the demo. |
 | 5 | **MFA for administrators only** (not members) | Built and switched off; scope to admin accounts and enable after enrolment (D-024). |
 | 6 | **Admin access recovery** | System Administrator (Abiodun's committee) resets other admins' access with one-time links; the Giwa's account can reset even the System Administrator; one top-level administrator. Executive read-only access = Giwa and General Secretary. |

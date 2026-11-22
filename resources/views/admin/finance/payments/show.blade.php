@@ -15,7 +15,8 @@
             @if ($payment->payer_name)<dt>Paid by</dt><dd>{{ $payment->payer_name }}</dd>@endif
             @if ($payment->narrative)<dt>Note</dt><dd>{{ $payment->narrative }}</dd>@endif
             <dt>Origin</dt><dd>{{ \App\Support\Format::label($payment->origin) }}</dd>
-            <dt>Recorded by</dt><dd>{{ $payment->recorder->name }} · {{ \App\Support\Format::dateTime($payment->created_at) }}</dd>
+            <dt>Recorded by</dt><dd>{{ $payment->recorder->name }} · {{ \App\Support\Format::dateTime($payment->created_at) }}@if ($payment->submitted_by_member) <span class="tag">Reported by the member</span>@endif</dd>
+            @if ($payment->intendedObligation)<dt>Member says it is for</dt><dd>{{ $payment->intendedObligation->assessment->title }} <span class="muted small">({{ $payment->intendedObligation->assessment->reference }})</span></dd>@endif
             @if ($payment->verifier)<dt>Verified by</dt><dd>{{ $payment->verifier->name }} · {{ \App\Support\Format::dateTime($payment->verified_at) }}@if ($payment->verification_note)<br><span class="small muted">{{ $payment->verification_note }}</span>@endif</dd>@endif
             @if ($payment->rejecter)<dt>Rejected by</dt><dd>{{ $payment->rejecter->name }} · {{ \App\Support\Format::dateTime($payment->rejected_at) }}<br>{{ $payment->rejection_reason }}</dd>@endif
             @if ($payment->evidence)<dt>Evidence</dt><dd><a href="{{ route('admin.finance.payments.evidence', $payment) }}">Download {{ $payment->evidence->original_name }}</a></dd>@endif

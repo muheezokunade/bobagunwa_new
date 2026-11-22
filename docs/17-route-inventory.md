@@ -134,7 +134,7 @@ Access is enforced server-side by middleware on every route and again inside the
 | POST | `/login/two-factor` | `login.two-factor.verify` | `TwoFactorChallengeController@verify` | Signed-out visitors · rate limit `two-factor` · CSRF + origin check |
 | POST | `/logout` | `logout` | `LoginController@logout` | Any signed-in account · CSRF + origin check |
 
-## Member portal (16 routes)
+## Member portal (18 routes)
 
 | Method | Path | Name | Handler | Access |
 |---|---|---|---|---|
@@ -145,6 +145,8 @@ Access is enforced server-side by middleware on every route and again inside the
 | GET | `/portal/events/{event}` | `portal.events.show` | `PortalController@event` | Signed-in member (own records only) |
 | POST | `/portal/events/{event}/rsvp` | `portal.events.rsvp` | `PortalController@rsvp` | Signed-in member (own records only) · CSRF + origin check |
 | GET | `/portal/finances` | `portal.finances` | `PortalController@finances` | Signed-in member (own records only) |
+| GET | `/portal/finances/report-payment` | `portal.payments.create` | `PortalController@paymentForm` | Signed-in member (own records only) |
+| POST | `/portal/finances/report-payment` | `portal.payments.store` | `PortalController@submitPayment` | Signed-in member (own records only) · rate limit `20,60` · CSRF + origin check |
 | GET | `/portal/finances/statement` | `portal.statement` | `PortalController@statement` | Signed-in member (own records only) |
 | GET | `/portal/finances/statement.csv` | `portal.statement.csv` | `PortalController@statementCsv` | Signed-in member (own records only) |
 | GET | `/portal/notices` | `portal.notices` | `PortalController@notices` | Signed-in member (own records only) |

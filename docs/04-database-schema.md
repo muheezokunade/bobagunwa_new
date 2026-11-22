@@ -842,6 +842,8 @@ Money received: pending → verified/rejected; verified → reversed only via a 
 | `payer_name` | `varchar(190)` | YES | `NULL` |
 | `narrative` | `varchar(255)` | YES | `NULL` |
 | `origin` | `enum('native','historical')` | NO | `'native'` |
+| `submitted_by_member` | `tinyint(1)` | NO | `0` |
+| `intended_obligation_id` | `bigint(20) unsigned` | YES | `NULL` |
 | `status` | `enum('pending','verified','rejected','reversed')` | NO | `'pending'` |
 | `requires_distinct_verifier` | `tinyint(1)` | NO | `1` |
 | `evidence_file_id` | `bigint(20) unsigned` | YES | `NULL` |
@@ -858,9 +860,9 @@ Money received: pending → verified/rejected; verified → reversed only via a 
 | `updated_at` | `timestamp` | YES | `NULL` |
 | `live_external_reference` | `varchar(120)` | YES | generated: `if(`status` <> 'rejected',`external_reference`,NULL)` |
 
-**Indexes:** `payments_evidence_file_id_foreign`(evidence_file_id); `payments_external_reference_index`(external_reference); UNIQUE `payments_external_reference_unique`(live_external_reference); UNIQUE `payments_idempotency_key_unique`(idempotency_key); UNIQUE `payments_id_member_id_unique`(id,member_id); `payments_import_batch_id_foreign`(import_batch_id); `payments_member_id_amount_kobo_received_on_index`(member_id,amount_kobo,received_on); `payments_member_id_received_on_index`(member_id,received_on); `payments_recorded_by_foreign`(recorded_by); UNIQUE `payments_reference_unique`(reference); `payments_rejected_by_foreign`(rejected_by); `payments_status_received_on_index`(status,received_on); `payments_verified_by_foreign`(verified_by); UNIQUE `PRIMARY`(id)
+**Indexes:** `payments_evidence_file_id_foreign`(evidence_file_id); `payments_external_reference_index`(external_reference); UNIQUE `payments_external_reference_unique`(live_external_reference); UNIQUE `payments_idempotency_key_unique`(idempotency_key); UNIQUE `payments_id_member_id_unique`(id,member_id); `payments_import_batch_id_foreign`(import_batch_id); `payments_intended_obligation_id_foreign`(intended_obligation_id); `payments_member_id_amount_kobo_received_on_index`(member_id,amount_kobo,received_on); `payments_member_id_received_on_index`(member_id,received_on); `payments_recorded_by_foreign`(recorded_by); UNIQUE `payments_reference_unique`(reference); `payments_rejected_by_foreign`(rejected_by); `payments_status_received_on_index`(status,received_on); `payments_verified_by_foreign`(verified_by); UNIQUE `PRIMARY`(id)
 
-**Foreign keys (all RESTRICT):** (evidence_file_id) → `private_files`(id); (import_batch_id) → `import_batches`(id); (member_id) → `members`(id); (recorded_by) → `users`(id); (rejected_by) → `users`(id); (verified_by) → `users`(id)
+**Foreign keys (all RESTRICT):** (evidence_file_id) → `private_files`(id); (import_batch_id) → `import_batches`(id); (intended_obligation_id) → `member_obligations`(id); (member_id) → `members`(id); (recorded_by) → `users`(id); (rejected_by) → `users`(id); (verified_by) → `users`(id)
 
 **Check constraints:** `payments_amount_positive`: ``amount_kobo` > 0`; `payments_currency_ngn`: ``currency` = 'NGN'`
 

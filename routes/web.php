@@ -76,6 +76,8 @@ Route::middleware(['auth', 'member'])->prefix('portal')->name('portal.')->contro
     Route::get('/profile', 'profile')->name('profile');
     Route::post('/profile', 'updateProfile')->name('profile.update');
     Route::get('/finances', 'finances')->name('finances');
+    Route::get('/finances/report-payment', 'paymentForm')->name('payments.create');
+    Route::post('/finances/report-payment', 'submitPayment')->middleware('throttle:20,60')->name('payments.store');
     Route::get('/finances/statement', 'statement')->name('statement');
     Route::get('/finances/statement.csv', 'statementCsv')->name('statement.csv');
     Route::get('/notices', 'notices')->name('notices');

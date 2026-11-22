@@ -70,6 +70,65 @@ class PaymentService
         }, Payment::class));
     }
 
+    /**
+     * A member reports his own payment with the receipt. It is recorded as
+     * pending with the member as recorder, so a payment verifier (always a
+     * different person) must confirm it before it counts. No finance
+     * permission is needed: the member can only report for himself.
+     *
+     * @return array{0: Payment, 1: bool} [payment, replayed]
+     */
+    public function submitByMember(User $user, array $data, int $evidenceFileId, ?string $idempotencyKey): array
+    {
+        $member = $user->member;
+        if (! $member || $member->status !== 'active' || ! $user->isActive()) {
+            throw new DomainRuleException('Only an active member can report a payment.');
+        }
+        $amount = Money::parse($data['amount']);
+        if ($amount <= 0) {
+            throw new DomainRuleException('Enter the amount you paid.');
+        }
+        if ($data['received_on'] > now()->toDateString()) {
+            throw new DomainRuleException('The payment date cannot be in the future.');
+        }
+        $obligation = null;
+        if (! empty($data['obligation_id'])) {
+            $obligation = MemberObligation::with('assessment')->where('id', $data['obligation_id'])->where('member_id', $member->id)->first();
+            if (! $obligation) {
+                throw new DomainRuleException('Choose one of your own dues or levies.');
+            }
+        }
+        $external = isset($data['external_reference']) && trim((string) $data['external_reference']) !== '' ? strtoupper(trim($data['external_reference'])) : null;
+
+        return Ledger::guard(fn () => Idempotency::run('payment.member_submit', $idempotencyKey, [$member->id, $amount, $data['received_on'], $external], function () use ($data, $member, $amount, $external, $user, $evidenceFileId, $obligation) {
+            if ($external && Payment::where('external_reference', $external)->where('status', '!=', 'rejected')->exists()) {
+                throw new DomainRuleException("A payment with bank reference {$external} has already been reported. If you think this is a mistake, contact the treasurer.");
+            }
+            $payment = Payment::create([
+                'reference' => Ledger::reference('PAY'),
+                'member_id' => $member->id,
+                'amount_kobo' => $amount,
+                'currency' => 'NGN',
+                'method' => $data['method'],
+                'received_on' => $data['received_on'],
+                'external_reference' => $external,
+                'payer_name' => trim((string) ($data['payer_name'] ?? '')) ?: $member->full_name,
+                'narrative' => mb_substr('Reported by the member'.($obligation ? ' for '.$obligation->assessment->title : ''), 0, 255),
+                'origin' => 'native',
+                'submitted_by_member' => true,
+                'intended_obligation_id' => $obligation?->id,
+                'status' => 'pending',
+                'requires_distinct_verifier' => true,
+                'evidence_file_id' => $evidenceFileId,
+                'idempotency_key' => Idempotency::newKey(),
+                'recorded_by' => $user->id,
+            ]);
+            Audit::record('payment.submitted_by_member', "Payment {$payment->reference} of ".Money::format($amount)." reported by member {$member->membership_number}", $payment, ['amount_kobo' => $amount]);
+
+            return $payment;
+        }, Payment::class));
+    }
+
     public function verify(Payment $payment, User $officer, ?string $note): Payment
     {
         Ledger::authorise($officer, 'finance.payments.verify', 'verify payments');

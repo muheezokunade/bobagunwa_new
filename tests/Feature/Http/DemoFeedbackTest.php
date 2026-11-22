@@ -7,9 +7,11 @@ use App\Models\Member;
 use App\Models\MembershipApplication;
 use App\Models\Page;
 use App\Models\PageRevision;
+use App\Models\Payment;
 use App\Models\PrivateFile;
 use App\Models\User;
 use App\Services\ApplicationService;
+use App\Services\Finance\LedgerQuery;
 use App\Services\UploadService;
 use App\Support\Format;
 use App\Support\Settings;
@@ -231,5 +233,56 @@ class DemoFeedbackTest extends TestCase
         $gs = $this->officer('membership_initiator');
         $this->actingAs($gs)->post(route('admin.applications.decide', $other), ['decision' => 'under_review', 'private_note' => 'Review'])->assertSessionHasNoErrors();
         $this->actingAs($gs)->post(route('admin.applications.decide', $other), ['decision' => 'approved', 'private_note' => 'x'])->assertSessionHasErrors('domain');
+    }
+
+    public function test_member_reports_a_part_payment_with_a_receipt_and_a_verifier_confirms_it(): void
+    {
+        $member = $this->member([], true);
+        $assessment = $this->assess([$member], '1000');
+        $obligation = $this->obligationOf($member, $assessment);
+        $user = $member->user;
+
+        $this->actingAs($user)->get(route('portal.finances'))->assertOk()->assertSee('Report a payment')->assertSee('Report payment');
+        $this->actingAs($user)->get(route('portal.payments.create', ['obligation' => $obligation->id]))->assertOk()
+            ->assertSee('What is this payment for?')->assertSee('value="1000.00"', false)->assertSee('Name on the paying account');
+
+        $form = ['obligation_id' => $obligation->id, 'amount' => '500', 'method' => 'bank_transfer', 'received_on' => now()->subDay()->toDateString(),
+            'external_reference' => 'TRF-SYN-500', 'payer_name' => 'Synthetic Brother', 'confirm' => '1', 'idempotency_key' => $this->key(),
+            'receipt' => UploadedFile::fake()->image('receipt.jpg', 200, 300)];
+        // The receipt is required; a future date is refused.
+        $this->actingAs($user)->post(route('portal.payments.store'), array_diff_key($form, ['receipt' => 1]))->assertSessionHasErrors('receipt');
+        $this->actingAs($user)->post(route('portal.payments.store'), ['received_on' => now()->addDay()->toDateString()] + $form)->assertSessionHasErrors('received_on');
+
+        $this->actingAs($user)->post(route('portal.payments.store'), $form)->assertRedirect(route('portal.finances'));
+        $payment = Payment::sole();
+        $this->assertSame(['pending', 50000, true, $user->id, $obligation->id, 'Synthetic Brother'], [$payment->status, $payment->amount_kobo, $payment->submitted_by_member, $payment->recorded_by, $payment->intended_obligation_id, $payment->payer_name]);
+        $this->assertNotNull($payment->evidence_file_id);
+        $this->assertSame(0, app(LedgerQuery::class)->memberSummary($member->id)['allocated'], 'a pending payment does not count');
+
+        // The officer sees who reported it and what for; the payment verifier confirms; the treasurer applies it.
+        $verifier = $this->officer('payment_verifier');
+        $this->actingAs($verifier)->get(route('admin.finance.payments.show', $payment))->assertOk()->assertSee('Reported by the member')->assertSee('Member says it is for');
+        $this->actingAs($verifier)->post(route('admin.finance.payments.verify', $payment), ['confirm' => '1', 'note' => 'Matched the bank alert'])->assertSessionHasNoErrors();
+        $this->actingAs($this->officer('treasurer'))->post(route('admin.finance.payments.allocate', $payment), ['amounts' => [$obligation->id => '500'], 'idempotency_key' => $this->key()])->assertSessionHasNoErrors();
+
+        // Part-payment: ₦500 of ₦1,000 leaves ₦500 outstanding.
+        $open = app(LedgerQuery::class)->openObligations($member->id)->firstWhere('id', $obligation->id);
+        $this->assertSame([50000, 50000], [(int) $open->allocated, (int) $open->outstanding]);
+        $this->actingAs($user)->get(route('portal.finances'))->assertSee('₦500.00');
+    }
+
+    public function test_member_cannot_report_against_another_members_levy_or_without_an_account(): void
+    {
+        $member = $this->member([], true);
+        $other = $this->member([], true);
+        $assessment = $this->assess([$other], '1000');
+        $form = ['obligation_id' => $this->obligationOf($other, $assessment)->id, 'amount' => '1000', 'method' => 'cash', 'received_on' => now()->toDateString(),
+            'confirm' => '1', 'idempotency_key' => $this->key(), 'receipt' => UploadedFile::fake()->image('r.png', 50, 50)];
+        $this->actingAs($member->user)->post(route('portal.payments.store'), $form)->assertSessionHasErrors('domain');
+        $this->assertSame(0, Payment::count());
+        $this->assertSame(0, PrivateFile::count(), 'the receipt is removed when the report is refused');
+        // Officers (no member record) cannot use the member route.
+        $this->actingAs($this->officer('treasurer'))->get(route('portal.payments.create'))->assertRedirect();
+        $this->assertSame(0, \App\Models\Payment::count());
     }
 }

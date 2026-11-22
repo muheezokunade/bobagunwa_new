@@ -11,6 +11,7 @@ use App\Models\Member;
 use App\Models\Post;
 use App\Services\AccountService;
 use App\Services\Finance\LedgerQuery;
+use App\Services\Finance\PaymentService;
 use App\Services\MemberService;
 use App\Services\UploadService;
 use App\Support\Audit;
@@ -81,6 +82,53 @@ class PortalController extends Controller
             'obligations' => $this->ledger->openObligations($member->id),
             'payments' => $this->ledger->memberLedgerDetail($member->id),
         ]);
+    }
+
+    /** Report a payment with its receipt (pending until a payment verifier confirms it). */
+    public function paymentForm(Request $request): View
+    {
+        $member = $this->member($request);
+        $open = $this->ledger->openObligations($member->id)->filter(fn ($o) => $o->outstanding > 0)->values();
+        $selected = $open->firstWhere('id', $request->integer('obligation'));
+
+        return view('portal.payment-report', ['member' => $member, 'obligations' => $open, 'selected' => $selected]);
+    }
+
+    public function submitPayment(Request $request, PaymentService $payments, UploadService $uploads): RedirectResponse
+    {
+        $member = $this->member($request);
+        $maxKb = (int) config('boba.uploads.application_file_max_kb');
+        $data = $request->validate([
+            'obligation_id' => ['nullable', 'integer'],
+            'amount' => ['required', 'string', 'max:20'],
+            'method' => ['required', 'in:bank_transfer,cash,pos,other'],
+            'received_on' => ['required', 'date_format:Y-m-d', 'before_or_equal:today'],
+            'external_reference' => ['nullable', 'string', 'max:120'],
+            'payer_name' => ['nullable', 'string', 'max:190'],
+            'receipt' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', "max:{$maxKb}"],
+            'confirm' => ['accepted'],
+            'idempotency_key' => ['required', 'string'],
+        ], [
+            'receipt.required' => 'Upload the receipt or a screenshot of the transfer.',
+            'receipt.mimes' => 'The receipt must be a PDF, JPEG or PNG file.',
+            'receipt.max' => 'The receipt must be smaller than '.intdiv($maxKb, 1024).' MB.',
+            'received_on.before_or_equal' => 'The payment date cannot be in the future.',
+            'confirm.accepted' => 'Confirm that the details are correct.',
+        ], ['received_on' => 'payment date', 'external_reference' => 'bank reference', 'payer_name' => 'payer name']);
+        $evidence = $uploads->storePrivate($request->file('receipt'), 'payment_evidence', $request->user(), $maxKb);
+        try {
+            [$payment, $replayed] = $payments->submitByMember($request->user(), $data, $evidence->id, $data['idempotency_key']);
+        } catch (\Throwable $e) {
+            $uploads->deletePrivate($evidence);
+            throw $e;
+        }
+        if ($replayed && $payment->evidence_file_id !== $evidence->id) {
+            $uploads->deletePrivate($evidence);
+        }
+
+        return redirect()->route('portal.finances')->with('status', $replayed
+            ? 'This payment was already reported; it was not duplicated.'
+            : "Thank you. Payment {$payment->reference} has been sent for verification. It counts towards your balance once the treasury confirms it.");
     }
 
     public function statement(Request $request): View

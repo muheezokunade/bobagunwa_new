@@ -1,6 +1,7 @@
 @extends('layouts.app', ['area' => 'portal', 'title' => 'Dues and payments'])
 @section('content')
 <x-page-head title="Dues and payments" subtitle="Balances are calculated from your verified payments and posted assessments.">
+    <a class="btn" href="{{ route('portal.payments.create') }}">Report a payment</a>
     <a class="btn secondary" href="{{ route('portal.statement') }}">View statement</a>
 </x-page-head>
 <dl class="stats">
@@ -15,18 +16,19 @@
 @else
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption class="sr-only">Your dues and levies</caption>
-    <thead><tr><th scope="col">Item</th><th scope="col">Reference</th><th scope="col">Date</th><th scope="col">Due</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Paid</th><th scope="col" class="num">Outstanding</th></tr></thead>
+    <thead><tr><th scope="col">Item</th><th scope="col">Reference</th><th scope="col">Date</th><th scope="col">Due</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Paid</th><th scope="col" class="num">Outstanding</th><th scope="col"><span class="sr-only">Action</span></th></tr></thead>
     <tbody>
     @foreach ($obligations as $o)
         <tr><td>{{ $o->title }}<br><span class="muted small">{{ $o->category }}</span></td><td>{{ $o->reference }}</td><td>{{ \Carbon\Carbon::parse($o->effective_on)->format('j M Y') }}</td><td>{{ $o->due_on ? \Carbon\Carbon::parse($o->due_on)->format('j M Y') : '—' }}</td>
-            <td class="num"><x-money :kobo="$o->effective" /></td><td class="num"><x-money :kobo="$o->allocated" /></td><td class="num"><x-money :kobo="$o->outstanding" /></td></tr>
+            <td class="num"><x-money :kobo="$o->effective" /></td><td class="num"><x-money :kobo="$o->allocated" /></td><td class="num"><x-money :kobo="$o->outstanding" /></td>
+            <td>@if ($o->outstanding > 0)<a class="small" href="{{ route('portal.payments.create', ['obligation' => $o->id]) }}">Report payment<span class="sr-only"> for {{ $o->title }}</span></a>@endif</td></tr>
     @endforeach
     </tbody>
 </table></div>
 @endif
 <h2>Payments</h2>
 @if ($payments->isEmpty())
-    <x-empty title="No payments recorded"><p>When you pay, the treasurer records and verifies the payment. It then appears here.</p></x-empty>
+    <x-empty title="No payments recorded"><p>After you pay, use “Report a payment” to upload the receipt. A payment verifier confirms it, and it then counts towards your balance.</p></x-empty>
 @else
 <div class="table-wrap" tabindex="0" role="region" aria-label="Table (scrolls sideways on small screens)"><table>
     <caption class="sr-only">Your payments</caption>
@@ -37,6 +39,6 @@
     @endforeach
     </tbody>
 </table></div>
-<p class="small muted">Pending payments are being checked by the treasury and are not yet included in your balance. Rejected and reversed payments are not counted.</p>
+<p class="small muted">Pending payments are being checked by the treasury and are not yet included in your balance. A part-payment reduces what you owe; the rest stays outstanding. Rejected and reversed payments are not counted.</p>
 @endif
 @endsection

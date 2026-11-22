@@ -12,7 +12,7 @@ class Payment extends Model
 
     protected $guarded = ['id', 'live_external_reference'];
 
-    protected $casts = ['received_on' => 'date', 'verified_at' => 'datetime', 'rejected_at' => 'datetime', 'requires_distinct_verifier' => 'boolean'];
+    protected $casts = ['received_on' => 'date', 'verified_at' => 'datetime', 'rejected_at' => 'datetime', 'requires_distinct_verifier' => 'boolean', 'submitted_by_member' => 'boolean'];
 
     public function member(): BelongsTo
     {
@@ -47,5 +47,10 @@ class Payment extends Model
     public function evidence(): BelongsTo
     {
         return $this->belongsTo(PrivateFile::class, 'evidence_file_id');
+    }
+
+    public function intendedObligation(): BelongsTo
+    {
+        return $this->belongsTo(MemberObligation::class, 'intended_obligation_id');
     }
 }
