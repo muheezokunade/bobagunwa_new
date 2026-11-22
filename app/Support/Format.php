@@ -14,7 +14,7 @@ final class Format
 
     public static function date(?CarbonInterface $value): string
     {
-        return $value ? $value->format('j F Y') : '—';
+        return $value ? $value->format('j M Y') : '—';
     }
 
     public static function label(?string $value): string

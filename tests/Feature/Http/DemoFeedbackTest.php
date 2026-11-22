@@ -61,7 +61,7 @@ class DemoFeedbackTest extends TestCase
     {
         $this->get(route('membership.apply'))->assertOk()
             ->assertSee('name="date_of_birth_day"', false)->assertSee('name="date_of_birth_month"', false)->assertSee('name="date_of_birth_year"', false)
-            ->assertSee('<option value="6" >June</option>', false);
+            ->assertSee('<option value="6" >Jun</option>', false);
         $form = ['first_name' => 'Synthetic', 'last_name' => 'Applicant', 'email' => 'dob.synthetic@example.test', 'phone' => '08035550999',
             'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic', 'reason' => 'A synthetic reason long enough to pass validation.',
             'declaration' => '1', 'privacy' => '1', 'website' => '', 'form_stamp' => Crypt::encryptString((string) (time() - 30))];
@@ -73,6 +73,6 @@ class DemoFeedbackTest extends TestCase
         $this->post(route('membership.apply.store'), $form + ['date_of_birth_day' => '15', 'date_of_birth_month' => '6', 'date_of_birth_year' => '1981'])
             ->assertRedirect(route('membership.receipt'));
         $this->assertSame('1981-06-15', MembershipApplication::sole()->date_of_birth->format('Y-m-d'));
-        $this->assertSame('15 June 1981', Format::date(MembershipApplication::sole()->date_of_birth));
+        $this->assertSame('15 Jun 1981', Format::date(MembershipApplication::sole()->date_of_birth));
     }
 }

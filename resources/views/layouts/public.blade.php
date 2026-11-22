@@ -26,7 +26,7 @@
     </div>
 @endif
 @php
-    $nav = [['About', 'about'], ['History', 'history'], ['Giwa-in-Council', 'leadership'], ['Membership', 'membership'], ['Events', 'events.index'], ['News', 'news.index'], ['Contact', 'contact']];
+    $nav = [['About', 'about'], ['History', 'history'], ['Leadership', 'leadership'], ['Membership', 'membership'], ['Events', 'events.index'], ['News', 'news.index'], ['Contact', 'contact']];
     $current = fn ($r) => request()->routeIs($r) || request()->routeIs(str_replace('.index', '', $r).'.*') || ($r === 'membership' && request()->routeIs('membership.*'));
 @endphp
 <header class="site-header">
@@ -82,7 +82,7 @@
             <ul>
                 <li><a href="{{ route('about') }}">About</a></li>
                 <li><a href="{{ route('history') }}">History and heritage</a></li>
-                <li><a href="{{ route('leadership') }}">Giwa-in-Council</a></li>
+                <li><a href="{{ route('leadership') }}">Leadership</a></li>
                 <li><a href="{{ route('activities') }}">Activities</a></li>
                 <li><a href="{{ route('gallery.index') }}">Gallery</a></li>
             </ul>

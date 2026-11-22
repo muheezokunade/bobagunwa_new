@@ -15,7 +15,7 @@
             @endif
             <div class="actions">
                 <a class="btn secondary" href="{{ route('history') }}">History and heritage</a>
-                <a class="btn secondary" href="{{ route('leadership') }}">Giwa-in-Council</a>
+                <a class="btn secondary" href="{{ route('leadership') }}">Leadership</a>
                 <a class="btn secondary" href="{{ route('activities') }}">Activities</a>
             </div>
         </div>
