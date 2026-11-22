@@ -349,6 +349,14 @@ Recorded, not code defects: the privacy notice version is still `draft-2026-11` 
 
 Test data left on staging by the walkthrough: application `BOB-APP-2026-YP57J6` (now member `BOB-000005`), open application `BOB-APP-2026-YNSEGR`, enquiry `ENQ-2026-H9UJG2`, two pending messages. All synthetic.
 
+## 6g. Release `08d54e0` — demo changes (22 Nov 2026), rehearsed
+
+Release `bobagunwa-08d54e0caf8a.zip` (SHA-256 `f7a9b70ca936b58d2c71e4eceae026084705ddff6e7b1192db9253816bd710e1`, verified) carries the 22 Nov demo work: walkthrough fixes, association content and Giwa-in-Council, Member Profile application form with documents, two-step approval, separate officer logins, member receipt upload, levy payers report, administrator-only two-factor, the Giwa's recovery role, five values draft and the History & heritage structure (`docs/39`).
+
+Rehearsed on the simulated cPanel account (existing database with earlier synthetic data): six new migrations (000008–000013) applied; members, payments and uploads preserved; 35 triggers and ledger verified; roles synchronised (adds Membership Initiator and Giwa); `boba:content:official --publish` loaded the pages and 37 leaders (History kept as draft); smoke 13/13. Then `staging-acceptance.cjs` over local HTTP: **21/21 PASS**, including the eight synthetic officers (new: Membership Initiator, Giwa) and W2 with the new form, documents and two-step approval. (A first run stopped at W4 because the script still looked for the applicant's old two-part name; fixed in the script, which is not part of the release.)
+
+**Before testing it on Namecheap:** raise the PHP limits for the domain (`post_max_size` 64M, `upload_max_filesize` 12M, `max_file_uploads` 20); after deploying, run `boba:content:official --publish` to load the association's pages and leadership; issue fresh officer links with `boba:staging:prepare` (now eight roles).
+
 ## 7. Continuing on Namecheap
 
 **Correction (18 Nov 2026):** staging is an **upgrade to `bobagunwa-8db1405f54af.zip`**, not a first install, using `BOBA_PHP=/opt/alt/php83/usr/bin/php`. Keep the existing database, `staging.env` (with its `APP_KEY`) and `user.ini`. Add only the empty restore-drill database and the password protection (replace `Require all denied` in `staging-protection.htaccess` with the Directory Privacy lines, keeping a copy of the old file). Run the §0a check first.

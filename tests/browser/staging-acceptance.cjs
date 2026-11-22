@@ -242,7 +242,7 @@ function must(cond, msg) { if (!cond) throw new Error(msg); }
     const catValue = await t.locator('select[name="fee_category_id"] option', { hasText: `STG-${RUN}` }).first().getAttribute('value')
       || await t.locator('select[name="fee_category_id"] option', { hasText: `Staging dues ${RUN}` }).first().getAttribute('value');
     await tick(t.locator('#mode-selected'));
-    await tick(t.getByLabel(`Select Synthetic Applicant ${RUN}`));
+    await tick(t.getByLabel(`Select Synthetic Acceptance Applicant ${RUN}`));
     await submit(t, '/admin/finance/assessments', { fee_category_id: catValue, title: `Staging assessment ${RUN}`, amount: '50,000', effective_on: daysAgo(20) });
     must((await text(t)).includes('₦50,000.00'), 'preview did not show ₦50,000.00: ' + (await errors(t)));
     const showPath = new URL(t.url()).pathname.replace(/^.*(\/admin\/finance\/assessments\/\d+)$/, '$1');
