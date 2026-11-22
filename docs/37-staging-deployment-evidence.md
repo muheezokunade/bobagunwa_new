@@ -330,6 +330,25 @@ Notes: the first approval attempt in item 5 was not saved because the page's con
 
 **Still to observe on Namecheap:** the nightly scheduled backup (02:00 UTC). **Still to do:** the officers' own run of §6, recorded by Mr Ibrahim. Everything else in §3–§5 is verified on the real host.
 
+## 6f. Staging walkthrough findings (22 Nov 2026) and fixes
+
+A Claude Code session on the maintainer's computer walked the full membership journey on staging (application → tracking → review → information request → reply → approval → delivery record → activation → portal → sign-out/in → password change → contact form). Everything worked end to end; it reported these defects, all confirmed in the code and fixed in `main` with regression tests (`TesterFeedbackFixesTest`, `ApplicationWorkflowTest`; 158 tests pass):
+
+| # | Finding | Cause | Fix |
+|---|---|---|---|
+| 1 | **Security:** after a password change the session list still showed the old session | the session ID was regenerated without deleting the old record, so a copy of the pre-change cookie stayed valid | `regenerate(true)` everywhere the ID changes (password change in portal and admin, activation, sign-in) |
+| 2 | An approved application flagged its own new member as a possible duplicate | the duplicate search did not exclude the member created from that application | excluded; genuine duplicates still shown |
+| 3 | The "Information needed" message stayed Pending after the applicant replied | nothing withdrew superseded messages | withdrawn automatically (status cancelled, reason recorded, audited) when the applicant replies or the application moves on |
+| 4 | Opening an activation link while signed in as an officer replaced the officer's session silently | activation logged the new account in unconditionally | the page now says who is signed in and offers Sign out; activation is refused while signed in, and the link is not used up |
+| 5 | Refreshing after an applicant reply resubmitted it; Back or a bookmark gave 405 | the reply was rendered directly from the POST | post/redirect/get, and a GET on the reply address redirects to the status form |
+| — | Error wording ("last name", "ijebu town"); phone message differed between forms | default attribute names | messages now use the form labels; one phone message |
+| — | Error summary not focused after a failed submit | no focus handling | focused on load (screen readers announce it) |
+| — | Sitemap seemed to omit the homepage; robots.txt `Sitemap:` was relative | static `robots.txt`; homepage URL without trailing slash | `robots.txt` generated with an absolute sitemap URL; homepage listed as `…/` |
+
+Recorded, not code defects: the privacy notice version is still `draft-2026-11` (final version follows the legal review, D-016); applications with birth dates outside the age-group range — including under-18 — are flagged, not refused (new decision **D-027**); History, Leadership, News, Activities, Gallery, Documents and Notices await approved content (D-015).
+
+Test data left on staging by the walkthrough: application `BOB-APP-2026-YP57J6` (now member `BOB-000005`), open application `BOB-APP-2026-YNSEGR`, enquiry `ENQ-2026-H9UJG2`, two pending messages. All synthetic.
+
 ## 7. Continuing on Namecheap
 
 **Correction (18 Nov 2026):** staging is an **upgrade to `bobagunwa-8db1405f54af.zip`**, not a first install, using `BOBA_PHP=/opt/alt/php83/usr/bin/php`. Keep the existing database, `staging.env` (with its `APP_KEY`) and `user.ini`. Add only the empty restore-drill database and the password protection (replace `Require all denied` in `staging-protection.htaccess` with the Directory Privacy lines, keeping a copy of the old file). Run the §0a check first.

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\MembershipApplication;
 use App\Services\ApplicationService;
 use App\Support\FormGuard;
 use App\Support\Settings;
@@ -41,6 +42,9 @@ class ApplicationController extends Controller
             'reason.min' => 'Please tell us a little more (at least 20 characters).',
             'declaration.accepted' => 'You must confirm the declaration.',
             'privacy.accepted' => 'You must confirm that you have read the privacy notice.',
+        ], [
+            'first_name' => 'first name', 'last_name' => 'surname', 'other_names' => 'other names',
+            'date_of_birth' => 'date of birth', 'ijebu_town' => 'Ijebu town', 'reason' => 'reason for joining',
         ]);
         [$application, $token] = $this->applications->submit($data);
         // One-time display of the private tracking code; it is never shown again.
@@ -59,8 +63,20 @@ class ApplicationController extends Controller
         return view('public.apply-receipt', ['receipt' => $receipt]);
     }
 
-    public function statusForm(): View
+    public function statusForm(Request $request): View
     {
+        // After a reply the applicant is redirected here once (no resubmission on refresh).
+        $id = $request->session()->get('applicant_reply_application_id');
+        $application = $id ? MembershipApplication::find($id) : null;
+        if ($application) {
+            return view('public.status', [
+                'application' => $application,
+                'events' => $application->events()->whereNotNull('applicant_message')->get(),
+                'code' => null,
+                'responded' => true,
+            ]);
+        }
+
         return view('public.status', ['application' => null]);
     }
 
@@ -79,7 +95,13 @@ class ApplicationController extends Controller
         ]);
     }
 
-    public function respond(Request $request): View
+    /** Refresh, back button or bookmark on the reply address: back to the status form, not a 405. */
+    public function respondRedirect(): RedirectResponse
+    {
+        return redirect()->route('membership.status');
+    }
+
+    public function respond(Request $request): View|RedirectResponse
     {
         $data = $request->validate([
             'reference' => ['required', 'string', 'max:40'],
@@ -91,13 +113,7 @@ class ApplicationController extends Controller
             return view('public.status', ['application' => null, 'notFound' => true]);
         }
         $this->applications->applicantRespond($application, $data['response']);
-        $application->refresh();
 
-        return view('public.status', [
-            'application' => $application,
-            'events' => $application->events()->whereNotNull('applicant_message')->get(),
-            'code' => $data['code'],
-            'responded' => true,
-        ]);
+        return redirect()->route('membership.status')->with('applicant_reply_application_id', $application->id);
     }
 }

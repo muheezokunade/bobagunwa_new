@@ -105,8 +105,17 @@ class ApplicationWorkflowTest extends TestCase
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'changes_requested', 'private_note' => 'Need town', 'applicant_message' => 'Please confirm your Ijebu town of origin.'])->assertSessionHasNoErrors();
 
         // Applicant replies privately.
-        $this->post(route('membership.status.respond'), ['reference' => $receipt['reference'], 'code' => $receipt['token'], 'response' => 'My town is Ijebu Ode.'])->assertOk()->assertSee('passed to the reviewing officers');
+        $request = OutboundMessage::where('purpose', 'application_information_request')->where('related_id', $application->id)->sole();
+        $this->assertSame('pending', $request->status);
+        // Post/redirect/get: refreshing after a reply cannot resubmit it, and a bookmark is not a 405.
+        $this->post(route('membership.status.respond'), ['reference' => $receipt['reference'], 'code' => $receipt['token'], 'response' => 'My town is Ijebu Ode.'])->assertRedirect(route('membership.status'));
+        $this->get(route('membership.status'))->assertOk()->assertSee('passed to the reviewing officers')->assertSee('Your reply has been sent');
+        $this->get(route('membership.status'))->assertOk()->assertDontSee('Your reply has been sent');
+        $this->get('/membership/status/respond')->assertRedirect('/membership/status');
         $this->assertSame('under_review', $application->fresh()->status);
+        // The information request no longer applies, so it is withdrawn and cannot be sent late.
+        $this->assertSame('cancelled', $request->fresh()->status);
+        $this->assertStringContainsString('the applicant has replied', $request->fresh()->attestation_note);
         $this->post(route('membership.status.lookup'), ['reference' => $receipt['reference'], 'code' => $receipt['token']])->assertDontSee('Need town');
 
         $response = $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Meets criteria', 'applicant_message' => 'Welcome.']);
@@ -117,6 +126,9 @@ class ApplicationWorkflowTest extends TestCase
         $this->assertNull($member->user->password);
         $this->assertStringNotContainsString(session('one_time_link')['url'], OutboundMessage::pluck('body')->implode("\n"));
         $this->assertStringNotContainsString(explode('/', session('one_time_link')['url'])[5] ?? 'none', AuditEvent::get()->toJson());
+
+        // The member created from this application is not flagged as its own duplicate.
+        $this->actingAs($officer)->get(route('admin.applications.show', $application))->assertOk()->assertDontSee('Possible existing member');
 
         $this->actingAs($officer)->post(route('admin.applications.decide', $application), ['decision' => 'approved', 'private_note' => 'Again'])->assertSessionHasErrors('domain');
         $this->assertSame(1, Member::count());

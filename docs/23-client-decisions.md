@@ -30,6 +30,7 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-024 | Require two-factor sign-in for privileged officers (finance writers, access, settings, backups) | Pending | Implemented and tested; **enforcement off**; opt-in enrolment available; lockout-guarded (`32-two-factor-authentication.md`) |
 | D-025 | Email channel for integrity alerts (use the existing mailbox?) and who must receive alerts | Pending | Dashboard banner always on for `integrity.alerts` holders; email off until enabled and verified (`31-integrity-alerting.md`) |
 | D-026 | Procedure for genuinely distinct members who share a full name | Pending | Officer must confirm and record a distinguishing note (≥ 10 characters); audited (manual add and import) |
+| D-027 | Hard eligibility rules for applications (e.g. a minimum age; whether births outside the age-group years are refused or only flagged) | Pending | Birth dates outside the configured age-group range are **flagged for the officer, not refused**; no minimum age is enforced (a 2015 birth date was accepted and flagged in the 22 Nov staging walkthrough) |
 
 ## Content awaiting confirmation (D-015)
 

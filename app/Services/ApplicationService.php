@@ -136,6 +136,7 @@ class ApplicationService
             ApplicationEvent::create(['membership_application_id' => $locked->id, 'type' => 'applicant_response', 'applicant_message' => trim($message)]);
             ApplicationEvent::create(['membership_application_id' => $locked->id, 'type' => 'status_changed', 'from_status' => 'changes_requested', 'to_status' => 'under_review', 'applicant_message' => 'Thank you. Your reply has been passed to the reviewing officers.']);
             $locked->update(['status' => 'under_review', 'version' => $locked->version + 1]);
+            $this->messages->supersede('application_information_request', $locked, 'the applicant has replied');
             Audit::record('application.applicant_responded', "Applicant responded on {$locked->reference}", $locked);
         });
     }
@@ -169,6 +170,9 @@ class ApplicationService
             }
             $from = $locked->status;
             $locked->update($updates);
+            if ($from === 'changes_requested' && $to !== 'changes_requested') {
+                $this->messages->supersede('application_information_request', $locked, "the application moved on to {$to}");
+            }
             if (in_array($to, ['changes_requested', 'rejected'], true)) {
                 $this->messages->prepare(
                     $to === 'rejected' ? 'application_decision' : 'application_information_request',
@@ -233,6 +237,7 @@ class ApplicationService
                 'actor_user_id' => $officer->id, 'private_note' => trim($privateNote), 'applicant_message' => $message,
             ]);
             $locked->update(['status' => 'approved', 'member_id' => $member->id, 'decided_by' => $officer->id, 'decided_at' => now(), 'version' => $locked->version + 1]);
+            $this->messages->supersede('application_information_request', $locked, 'the application was approved');
             $user = $this->accounts->provisionMemberAccount($member);
             $this->messages->prepare('application_decision', $member->full_name, $member->email, $member->phone,
                 "Your Bobagunwa membership application {$locked->reference}",

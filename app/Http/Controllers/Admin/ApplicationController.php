@@ -37,9 +37,12 @@ class ApplicationController extends Controller
 
     public function show(MembershipApplication $application): View
     {
-        $possibleMatches = Member::where('email_normalized', $application->email_normalized)
+        $possibleMatches = Member::where(fn ($q) => $q->where('email_normalized', $application->email_normalized)
             ->orWhere('phone_normalized', $application->phone_normalized)
-            ->orWhere('name_normalized', Normalize::name($application->fullName()))->limit(5)->get();
+            ->orWhere('name_normalized', Normalize::name($application->fullName())))
+            // The member created by approving this application is not a duplicate of it.
+            ->when($application->member_id, fn ($q) => $q->where('id', '!=', $application->member_id))
+            ->limit(5)->get();
 
         return view('admin.applications.show', [
             'application' => $application->load('events.actor', 'member', 'decider'),

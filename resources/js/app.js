@@ -77,3 +77,8 @@ document.querySelectorAll('[data-print]').forEach((button) => {
     button.hidden = false;
     button.addEventListener('click', () => window.print());
 });
+
+// Move focus to the error summary after a failed submission so screen-reader
+// users hear it and keyboard users start from it.
+const errorSummary = document.querySelector('.alert.error[tabindex="-1"]');
+if (errorSummary) errorSummary.focus();

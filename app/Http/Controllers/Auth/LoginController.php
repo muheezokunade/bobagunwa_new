@@ -43,7 +43,7 @@ class LoginController extends Controller
 
         if ($user->two_factor_confirmed_at) {
             // Password accepted; the session is not authenticated until the second factor succeeds.
-            $request->session()->regenerate();
+            $request->session()->regenerate(true);
             $request->session()->put('two_factor.login', ['user_id' => $user->id, 'expires' => time() + 300, 'attempts' => 0]);
             Audit::security('login.awaiting_two_factor', $user->id);
 
@@ -56,7 +56,7 @@ class LoginController extends Controller
     public function complete(Request $request, User $user, bool $usedTwoFactor): RedirectResponse
     {
         Auth::login($user);
-        $request->session()->regenerate();
+        $request->session()->regenerate(true);
         $user->forceFill(['last_login_at' => now()])->save();
         Audit::security('login.succeeded', $user->id, ['two_factor' => $usedTwoFactor]);
 

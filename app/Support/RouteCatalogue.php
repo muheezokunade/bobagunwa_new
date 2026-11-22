@@ -38,6 +38,7 @@ final class RouteCatalogue
             'privacy' => ['p' => 'Privacy notice (managed page).', 'd' => 'pages', 'a' => 'Reachable from every page footer.'],
             'terms' => ['p' => 'Terms of use (managed page).', 'd' => 'pages', 'a' => 'Reachable from every page footer.'],
             'sitemap' => ['p' => 'XML sitemap of public pages.', 'd' => 'pages, posts, events, galleries', 's' => '200 XML; nothing is written.', 'a' => 'Contains no admin, portal or member-only URLs.'],
+            'robots' => ['p' => 'robots.txt with an absolute Sitemap URL built from APP_URL.', 'd' => 'none', 's' => '200 text; nothing is written.', 'a' => 'Disallows admin, portal, account and status pages.'],
             'contact' => ['p' => 'Contact form.', 'd' => 'settings', 'a' => 'Form carries CSRF token, consent checkbox and honeypot.'],
             'contact.store' => ['p' => 'Submit an enquiry.', 'd' => 'writes enquiries', 's' => 'Redirect with the enquiry reference.', 'f' => 'Validation errors re-shown; honeypot or rate limit → refused without storing.', 'a' => 'One enquiry row with a reference; officers see it in the enquiry queue.'],
             'membership.apply' => ['p' => 'Membership application form.', 'd' => 'settings', 'a' => 'Explains the eligibility range; works without JavaScript.'],
@@ -46,6 +47,7 @@ final class RouteCatalogue
             'membership.status' => ['p' => 'Application status lookup form.', 'd' => 'none', 'a' => 'Asks for reference and private token.'],
             'membership.status.lookup' => ['p' => 'Look up an application by reference and token.', 'd' => 'reads membership_applications, application_events', 's' => 'Status and applicant-visible messages only.', 'f' => 'Wrong pair → generic “not found” (no enumeration); rate limited.', 'a' => 'Private officer notes are never shown.'],
             'membership.status.respond' => ['p' => 'Applicant replies to an officer request for information.', 'd' => 'writes application_events', 's' => 'Reply recorded in the timeline.', 'f' => 'Wrong reference/token or application not awaiting information → refused.', 'a' => 'Reply only possible while the application requests information.'],
+            'membership.status.respond.redirect' => ['p' => 'GET on the reply address (refresh, back button, bookmark) redirects to the status form instead of a 405.', 'd' => 'none', 's' => '302 to /membership/status.', 'a' => 'A refreshed or bookmarked reply page never resubmits and never shows a 405.'],
 
             // Authentication
             'login' => ['p' => 'Sign-in form.', 'd' => 'none', 'a' => 'Signed-in users are redirected away.'],

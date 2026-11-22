@@ -30,6 +30,7 @@ Route::get('/gallery/{slug}', [SiteController::class, 'gallery'])->name('gallery
 Route::get('/privacy', [SiteController::class, 'legal'])->defaults('key', 'privacy')->name('privacy');
 Route::get('/terms', [SiteController::class, 'legal'])->defaults('key', 'terms')->name('terms');
 Route::get('/sitemap.xml', [SiteController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [SiteController::class, 'robots'])->name('robots');
 // Retain the established public URL of the previous website.
 Route::redirect('/members', '/membership', 301);
 
@@ -41,6 +42,7 @@ Route::post('/membership/apply', [ApplicationController::class, 'store'])->middl
 Route::get('/membership/receipt', [ApplicationController::class, 'receipt'])->name('membership.receipt');
 Route::get('/membership/status', [ApplicationController::class, 'statusForm'])->name('membership.status');
 Route::post('/membership/status', [ApplicationController::class, 'status'])->middleware('throttle:status-lookups')->name('membership.status.lookup');
+Route::get('/membership/status/respond', [ApplicationController::class, 'respondRedirect'])->name('membership.status.respond.redirect');
 Route::post('/membership/status/respond', [ApplicationController::class, 'respond'])->middleware('throttle:status-lookups')->name('membership.status.respond');
 
 /*

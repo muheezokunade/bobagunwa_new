@@ -56,7 +56,8 @@ class AccountController extends Controller
     {
         $data = $request->validate(['current_password' => ['required', 'string'], 'password' => ['required', 'string', 'confirmed', 'max:128']]);
         $accounts->changePassword($request->user(), $data['current_password'], $data['password'], $request->session()->getId());
-        $request->session()->regenerate();
+        // true = delete the old session record too, so a copied old cookie stops working.
+        $request->session()->regenerate(true);
 
         return redirect()->route('admin.account')->with('status', 'Your password has been changed and your other sessions have been signed out.');
     }

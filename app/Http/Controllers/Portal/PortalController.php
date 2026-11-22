@@ -65,7 +65,7 @@ class PortalController extends Controller
             'city' => ['nullable', 'string', 'max:120'],
             'occupation' => ['nullable', 'string', 'max:120'],
             'address' => ['nullable', 'string', 'max:255'],
-        ]);
+        ], ['phone.regex' => 'Enter a valid phone number.']);
         $members->correct($this->member($request), $data, (int) $data['version'], $request->user(), 'Member self-service update', true);
 
         return redirect()->route('portal.profile')->with('status', 'Your profile has been updated.');
@@ -203,7 +203,8 @@ class PortalController extends Controller
     {
         $data = $request->validate(['current_password' => ['required', 'string'], 'password' => ['required', 'string', 'confirmed', 'max:128']]);
         $accounts->changePassword($request->user(), $data['current_password'], $data['password'], $request->session()->getId());
-        $request->session()->regenerate();
+        // true = delete the old session record too, so a copied old cookie stops working.
+        $request->session()->regenerate(true);
 
         return redirect()->route('portal.security')->with('status', 'Your password has been changed and your other sessions have been signed out.');
     }

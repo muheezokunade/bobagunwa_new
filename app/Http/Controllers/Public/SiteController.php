@@ -98,13 +98,25 @@ class SiteController extends Controller
 
     public function sitemap(): Response
     {
-        $urls = collect(['home', 'about', 'history', 'leadership', 'membership', 'membership.apply', 'activities', 'events.index', 'news.index', 'gallery.index', 'contact', 'privacy', 'terms'])->map(fn ($r) => route($r));
+        $urls = collect(['home', 'about', 'history', 'leadership', 'membership', 'membership.apply', 'activities', 'events.index', 'news.index', 'gallery.index', 'contact', 'privacy', 'terms'])->map(fn ($r) => $r === 'home' ? rtrim(route('home'), '/').'/' : route($r));
         $urls = $urls->merge(Post::where('type', 'news')->where('audience', 'public')->where('status', 'published')->pluck('slug')->map(fn ($s) => route('news.show', $s)))
             ->merge($this->publicEvents()->pluck('slug')->map(fn ($s) => route('events.show', $s)));
         $xml = '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
             .$urls->map(fn ($u) => '<url><loc>'.e($u).'</loc></url>')->implode('').'</urlset>';
 
         return response($xml, 200, ['Content-Type' => 'application/xml']);
+    }
+
+    /** robots.txt needs an absolute Sitemap URL, so it is generated from APP_URL. */
+    public function robots(): Response
+    {
+        $lines = ['User-agent: *'];
+        foreach (['/admin', '/portal', '/account', '/login', '/membership/status', '/membership/receipt'] as $path) {
+            $lines[] = 'Disallow: '.$path;
+        }
+        $lines[] = 'Sitemap: '.route('sitemap');
+
+        return response(implode("\n", $lines)."\n", 200, ['Content-Type' => 'text/plain; charset=UTF-8']);
     }
 
     private function publicEvents()

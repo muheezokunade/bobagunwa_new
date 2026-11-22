@@ -8,6 +8,15 @@
             <x-empty title="This link cannot be used">
                 <p>The activation link is invalid, has expired, or has already been used. Please <a href="{{ route('contact') }}">contact the secretariat</a> for a new link.</p>
             </x-empty>
+        @elseif ($signedInAs)
+            <div class="alert warning" role="status">
+                <p>You are signed in as <strong>{{ $signedInAs->name }}</strong>. This link activates a <strong>different</strong> account ({{ $user->name }}).</p>
+                <p>Sign out first, then open the activation link again. The link has not been used.</p>
+            </div>
+            <form method="post" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="btn secondary">Sign out</button>
+            </form>
         @else
             <p>Welcome, {{ $user->name }}. Choose a password to activate your account.</p>
             <form method="post" action="{{ route('account.activate.store') }}" class="panel">

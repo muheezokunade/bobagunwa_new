@@ -76,6 +76,23 @@ class MessageService
         Audit::record('message.delivery_attested', "Delivery attested for {$message->purpose} message to {$message->recipient_name}", $message, ['note' => $note]);
     }
 
+    /**
+     * Withdraw prepared messages that no longer apply (e.g. an information
+     * request after the applicant has replied), so nobody sends them late.
+     * Delivered or already-closed messages are left untouched.
+     */
+    public function supersede(string $purpose, object $related, string $note): int
+    {
+        $stale = OutboundMessage::where('purpose', $purpose)->where('related_type', class_basename($related))
+            ->where('related_id', $related->getKey())->whereIn('status', ['pending', 'failed'])->get();
+        foreach ($stale as $message) {
+            $message->update(['status' => 'cancelled', 'attested_at' => now(), 'attestation_note' => mb_substr($note, 0, 255)]);
+            Audit::record('message.superseded', 'Prepared message withdrawn automatically: '.$note, $message, ['purpose' => $purpose]);
+        }
+
+        return $stale->count();
+    }
+
     public function cancel(OutboundMessage $message, string $note): void
     {
         $message->update(['status' => 'cancelled', 'attested_by' => auth()->id(), 'attested_at' => now(), 'attestation_note' => $note]);

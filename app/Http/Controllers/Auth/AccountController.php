@@ -36,7 +36,7 @@ class AccountController extends Controller
         $token = (string) $request->session()->get('account.activation_token');
         $record = $token !== '' ? $this->accounts->findUsableToken($token, 'activation') : null;
 
-        return view('auth.activate', ['valid' => (bool) $record, 'user' => $record?->user]);
+        return view('auth.activate', ['valid' => (bool) $record, 'user' => $record?->user, 'signedInAs' => Auth::user()]);
     }
 
     public function activate(Request $request): RedirectResponse
@@ -45,10 +45,15 @@ class AccountController extends Controller
             'token' => ['nullable', 'string', 'max:100'],
             'password' => ['required', 'string', 'confirmed', 'max:128'],
         ]);
+        if (Auth::check()) {
+            // Activating would silently replace the signed-in account. The link is not used up.
+            return redirect()->route('account.activate.form')->withErrors(['domain' => 'You are signed in to another account. Sign out first, then open the activation link again.']);
+        }
         $user = $this->accounts->activate((string) ($data['token'] ?? $request->session()->get('account.activation_token')), $data['password']);
         $request->session()->forget('account.activation_token');
         Auth::login($user);
-        $request->session()->regenerate();
+        // true = delete the old session record too, so a copied old cookie stops working.
+        $request->session()->regenerate(true);
 
         return redirect()->to($user->member_id ? route('portal.dashboard') : route('admin.dashboard'))->with('status', 'Your account is active. Welcome.');
     }
