@@ -16,6 +16,7 @@ use App\Support\Idempotency;
 use App\Support\Normalize;
 use App\Support\Settings;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -30,6 +31,22 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
         $this->withoutVite();
         Settings::flush();
+    }
+
+    /** Synthetic supporting documents for a membership application (real PDF header, real images). */
+    protected function applicationDocuments(): array
+    {
+        $pdf = fn (string $name) => UploadedFile::fake()->createWithContent($name, "%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n");
+
+        return ['attachments' => [
+            'birth_certificate' => $pdf('birth.pdf'),
+            'lg_certificate' => $pdf('lg-origin.pdf'),
+            'first_school_certificate' => $pdf('fslc.pdf'),
+            'secondary_school_certificate' => UploadedFile::fake()->image('waec.jpg', 120, 80),
+            'referee_letter' => [$pdf('referee-1.pdf'), $pdf('referee-2.pdf')],
+            'passport_photo' => UploadedFile::fake()->image('passport.jpg', 60, 80),
+            'full_photo' => UploadedFile::fake()->image('full.png', 60, 120),
+        ]];
     }
 
     protected function officer(string|array $roles, array $attributes = []): User

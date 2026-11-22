@@ -177,7 +177,18 @@ function must(cond, msg) { if (!cond) throw new Error(msg); }
     const a = await newPage();
     await go(a, '/membership/apply');
     await a.waitForTimeout(4500); // public forms reject submissions made within seconds of loading
-    await submit(a, '/membership/apply', { first_name: applicant.first, last_name: applicant.last, email: applicant.email, phone: applicant.phone, date_of_birth: '1981-09-09', ijebu_town: 'Ago Iwoye', city: 'Lagos', occupation: 'Synthetic accountant', reason: 'Synthetic staging acceptance application for workflow two.', declaration: true, privacy: true });
+    // Synthetic supporting documents (a minimal plain PDF and a 1x1 PNG), as the association's form requires.
+    const pdf = (name) => ({ name, mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n1 0 obj << /Type /Catalog >> endobj\ntrailer << /Root 1 0 R >>\n%%EOF\n') });
+    const png = (name) => ({ name, mimeType: 'image/png', buffer: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64') });
+    await submit(a, '/membership/apply', {
+      first_name: applicant.first, other_names: 'Acceptance', last_name: applicant.last, email: applicant.email, phone: applicant.phone,
+      date_of_birth_day: '9', date_of_birth_month: '9', date_of_birth_year: '1981', occupation: 'Synthetic accountant', ijebu_town: 'Ago Iwoye',
+      city: 'Lagos', country: 'Nigeria', profile_summary: 'Synthetic staging acceptance application for workflow two.',
+      'attachments[birth_certificate]': pdf('birth.pdf'), 'attachments[lg_certificate]': pdf('lg-origin.pdf'),
+      'attachments[first_school_certificate]': pdf('fslc.pdf'), 'attachments[secondary_school_certificate]': pdf('waec.pdf'),
+      'attachments[referee_letter][]': [pdf('referee-1.pdf'), pdf('referee-2.pdf')],
+      'attachments[passport_photo]': png('passport.png'), 'attachments[full_photo]': png('full.png'),
+      declaration: true, privacy: true });
     const ref = (await a.locator('#ref').innerText()).trim(); const code = (await a.locator('#code').innerText()).trim();
     must(ref && code, 'no receipt reference/code: ' + (await errors(a)));
     await go(a, '/membership/status'); await submit(a, '/membership/status', { reference: ref, code });

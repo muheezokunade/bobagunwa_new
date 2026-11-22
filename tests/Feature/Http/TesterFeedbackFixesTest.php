@@ -64,6 +64,6 @@ class TesterFeedbackFixesTest extends TestCase
     public function test_application_errors_use_the_form_labels(): void
     {
         $this->post(route('membership.apply.store'), ['form_stamp' => Crypt::encryptString((string) (time() - 30)), 'website' => ''])
-            ->assertSessionHasErrors(['last_name' => 'The surname field is required.', 'ijebu_town' => 'The Ijebu town field is required.']);
+            ->assertSessionHasErrors(['last_name' => 'The surname field is required.', 'ijebu_town' => 'The town of origin field is required.', 'other_names' => 'The middle name field is required.']);
     }
 }

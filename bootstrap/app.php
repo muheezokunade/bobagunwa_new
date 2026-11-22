@@ -41,6 +41,16 @@ $app = Application::configure(basePath: dirname(__DIR__))
 
             return back()->withInput($request->except(['password', 'password_confirmation', 'current_password', 'token']))->withErrors(['domain' => $e->getMessage()]);
         });
+        // Too much uploaded at once (PHP post_max_size): PHP discards the whole request, so
+        // return the applicant to the form with a clear message instead of a bare 413 page.
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, Request $request) {
+            if ($request->expectsJson() || ! $request->is('membership/apply')) {
+                return null;
+            }
+
+            // The session has not started yet at this point, so the message travels in the address.
+            return redirect()->route('membership.apply', ['too_large' => 1]);
+        });
         $exceptions->dontReport([DomainRuleException::class]);
         $exceptions->dontFlash(['password', 'password_confirmation', 'current_password', 'token']);
     })->create();

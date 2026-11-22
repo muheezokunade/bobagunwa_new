@@ -6,6 +6,7 @@ use App\Console\Commands\StagingPrepare;
 use App\Models\AccountToken;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 /**
@@ -20,7 +21,7 @@ class DeploymentChecksTest extends TestCase
         // Namecheap's MariaDB may default to MyISAM (no transactions, foreign keys or row locks).
         $options = config('database.connections.mariadb.options');
         $this->assertContains('SET SESSION default_storage_engine=InnoDB', $options);
-        $this->assertSame('innodb', strtolower(\Illuminate\Support\Facades\DB::selectOne('SELECT @@session.default_storage_engine AS e')->e));
+        $this->assertSame('innodb', strtolower(DB::selectOne('SELECT @@session.default_storage_engine AS e')->e));
     }
 
     public function test_smoke_check_passes_on_a_working_installation(): void

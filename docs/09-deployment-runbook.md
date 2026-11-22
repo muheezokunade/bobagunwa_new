@@ -14,7 +14,7 @@ Requires a clean Git tree. The package contains `MANIFEST.sha256` (every file) a
 
 1. **SSL/TLS Status**: the staging host must show a **valid** certificate before anyone signs in through a browser (`36-staging-installation-plan.md`, gate G3). The server-side steps below may run before that.
 2. **Domains**: confirm the document root of `v2-staging.bobagunwa.com` is `~/bobagunwa-v2-webcheck/public`. Do not change the main domain or WordPress.
-3. **MultiPHP Manager**: PHP 8.3 for the staging domain only. **MultiPHP INI Editor**: apply `deploy/user.ini.example` (upload limits 12M/16M, memory 256M, execution 60 s).
+3. **MultiPHP Manager**: PHP 8.3 for the staging domain only. **MultiPHP INI Editor** (on Namecheap: Select PHP Version → Options): apply `deploy/user.ini.example` (upload 12M per file, **post 64M**, 20 files — membership applications carry up to ten documents — memory 256M, execution 60 s).
 4. **MySQL Databases**: a new database and user for staging, **ALL PRIVILEGES** on that database only (includes TRIGGER). Generate the password in cPanel; never paste it into chat or documents. For restore drills, create a second empty database for the same user.
 5. **Private configuration** (File Manager or SSH), outside every web root:
    ```bash

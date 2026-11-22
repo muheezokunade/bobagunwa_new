@@ -3,14 +3,17 @@
 namespace App\Http\Controllers\Public;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApplicationAttachment;
 use App\Models\MembershipApplication;
 use App\Services\ApplicationService;
+use App\Services\UploadService;
 use App\Support\DateParts;
 use App\Support\FormGuard;
 use App\Support\Settings;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Throwable;
 
 class ApplicationController extends Controller
 {
@@ -18,37 +21,80 @@ class ApplicationController extends Controller
 
     public function create(): View
     {
-        return view('public.apply', ['open' => Settings::bool('membership.applications_open'), 'stamp' => FormGuard::stamp()]);
+        return view('public.apply', [
+            'open' => Settings::bool('membership.applications_open'), 'stamp' => FormGuard::stamp(),
+            'requireDocuments' => Settings::bool('membership.require_documents'), 'maritalStatuses' => self::MARITAL_STATUSES,
+            'maxMb' => intdiv((int) config('boba.uploads.application_file_max_kb'), 1024),
+        ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public const MARITAL_STATUSES = ['single' => 'Single', 'married' => 'Married', 'separated' => 'Separated', 'divorced' => 'Divorced', 'widowed' => 'Widowed'];
+
+    public function store(Request $request, UploadService $uploads): RedirectResponse
     {
         FormGuard::check($request, 'membership_application');
         DateParts::merge($request, 'date_of_birth');
+        $required = Settings::bool('membership.require_documents') ? 'required' : 'nullable';
+        $maxKb = (int) config('boba.uploads.application_file_max_kb');
+        $fileRules = [];
+        $attributes = [
+            'first_name' => 'first name', 'other_names' => 'middle name', 'last_name' => 'surname', 'date_of_birth' => 'date of birth',
+            'phone' => 'mobile number', 'occupation' => 'profession or trade', 'ijebu_town' => 'town of origin', 'city' => 'city of residence',
+            'country' => 'country of residence', 'marital_status' => 'marital status', 'profile_summary' => 'profile summary',
+        ];
+        foreach (ApplicationAttachment::KINDS as $kind => [$label, $isRequired, $multiple, $imagesOnly]) {
+            $type = ['file', $imagesOnly ? 'mimes:jpg,jpeg,png' : 'mimes:pdf,jpg,jpeg,png', "max:{$maxKb}"];
+            $rule = $isRequired ? $required : 'nullable';
+            if ($multiple) {
+                $fileRules["attachments.{$kind}"] = [$rule, 'array', 'max:'.ApplicationAttachment::MAX_MULTIPLE];
+                $fileRules["attachments.{$kind}.*"] = $type;
+                $attributes["attachments.{$kind}.*"] = mb_strtolower($label);
+            } else {
+                $fileRules["attachments.{$kind}"] = array_merge([$rule], $type);
+            }
+            $attributes["attachments.{$kind}"] = mb_strtolower($label);
+        }
         $data = $request->validate([
             'first_name' => ['required', 'string', 'max:80'],
+            'other_names' => ['required', 'string', 'max:120'],
             'last_name' => ['required', 'string', 'max:80'],
-            'other_names' => ['nullable', 'string', 'max:120'],
-            'email' => ['required', 'email:rfc', 'max:190'],
-            'phone' => ['required', 'string', 'max:40', 'regex:/^[0-9+()\-\s]{7,40}$/'],
             'date_of_birth' => ['required', 'date_format:Y-m-d', 'before:today', 'after:1900-01-01'],
+            'phone' => ['required', 'string', 'max:40', 'regex:/^[0-9+()\-\s]{7,40}$/'],
+            'email' => ['required', 'email:rfc', 'max:190'],
+            'occupation' => ['required', 'string', 'max:120'],
             'ijebu_town' => ['required', 'string', 'max:120'],
             'city' => ['required', 'string', 'max:120'],
-            'occupation' => ['required', 'string', 'max:120'],
-            'reason' => ['required', 'string', 'min:20', 'max:2000'],
+            'country' => ['required', 'string', 'max:80'],
+            'address' => ['nullable', 'string', 'max:255'],
+            'marital_status' => ['nullable', 'in:'.implode(',', array_keys(self::MARITAL_STATUSES))],
+            'profile_summary' => ['nullable', 'string', 'max:1500'],
             'declaration' => ['accepted'],
             'privacy' => ['accepted'],
-        ], [
+        ] + $fileRules, [
             'date_of_birth.date_format' => 'Enter your date of birth as a valid date.',
             'phone.regex' => 'Enter a valid phone number.',
-            'reason.min' => 'Please tell us a little more (at least 20 characters).',
             'declaration.accepted' => 'You must confirm the declaration.',
-            'privacy.accepted' => 'You must confirm that you have read the privacy notice.',
-        ], [
-            'first_name' => 'first name', 'last_name' => 'surname', 'other_names' => 'other names',
-            'date_of_birth' => 'date of birth', 'ijebu_town' => 'Ijebu town', 'reason' => 'reason for joining',
-        ]);
-        [$application, $token] = $this->applications->submit($data);
+            'privacy.accepted' => 'You must agree to the data privacy notice.',
+            'mimes' => 'The :attribute must be a PDF, JPEG or PNG file.',
+            'max.file' => 'The :attribute must be smaller than '.intdiv($maxKb, 1024).' MB.',
+        ], $attributes);
+
+        // Store the documents privately first; if anything fails, nothing is kept.
+        $stored = [];
+        try {
+            foreach (ApplicationAttachment::KINDS as $kind => [$label, , $multiple]) {
+                $files = $multiple ? ($request->file("attachments.{$kind}") ?? []) : array_filter([$request->file("attachments.{$kind}")]);
+                foreach ($files as $file) {
+                    $stored[$kind][] = $uploads->storePrivate($file, 'application_'.$kind, null, $maxKb);
+                }
+            }
+            [$application, $token] = $this->applications->submit($data, $stored);
+        } catch (Throwable $e) {
+            foreach (array_merge([], ...array_values($stored)) as $file) {
+                $uploads->deletePrivate($file);
+            }
+            throw $e;
+        }
         // One-time display of the private tracking code; it is never shown again.
         $request->session()->flash('application_receipt', ['reference' => $application->reference, 'token' => $token, 'flagged' => $application->eligibility_status === 'flagged']);
 

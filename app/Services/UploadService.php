@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Exceptions\DomainRuleException;
+use App\Models\ApplicationAttachment;
 use App\Models\Document;
 use App\Models\Media;
 use App\Models\Payment;
@@ -52,9 +53,9 @@ class UploadService
         return $media;
     }
 
-    public function storePrivate(UploadedFile $file, string $purpose, User $user): PrivateFile
+    public function storePrivate(UploadedFile $file, string $purpose, ?User $user, ?int $maxKb = null): PrivateFile
     {
-        $maxKb = (int) config('boba.uploads.document_max_kb');
+        $maxKb ??= (int) config('boba.uploads.document_max_kb');
         if (! $file->isValid() || $file->getSize() > $maxKb * 1024) {
             throw new DomainRuleException('Upload a file smaller than '.intdiv($maxKb, 1024).' MB.');
         }
@@ -77,7 +78,7 @@ class UploadService
 
         $record = PrivateFile::create([
             'purpose' => $purpose, 'path' => $path, 'original_name' => mb_substr($file->getClientOriginalName(), 0, 190),
-            'mime' => $mime, 'size_bytes' => strlen($binary), 'sha256' => hash('sha256', $binary), 'uploaded_by' => $user->id,
+            'mime' => $mime, 'size_bytes' => strlen($binary), 'sha256' => hash('sha256', $binary), 'uploaded_by' => $user?->id,
         ]);
         Audit::record('file.uploaded', "Private file stored ({$purpose})", $record);
 
@@ -87,7 +88,8 @@ class UploadService
     /** Remove a private file that no record references. Refuses referenced files. */
     public function deletePrivate(PrivateFile $file): bool
     {
-        $referenced = Payment::where('evidence_file_id', $file->id)->exists() || Document::where('private_file_id', $file->id)->exists();
+        $referenced = Payment::where('evidence_file_id', $file->id)->exists() || Document::where('private_file_id', $file->id)->exists()
+            || ApplicationAttachment::where('private_file_id', $file->id)->exists();
         if ($referenced) {
             return false;
         }
@@ -104,6 +106,7 @@ class UploadService
         PrivateFile::where('created_at', '<', now()->subDay())
             ->whereNotIn('id', Payment::whereNotNull('evidence_file_id')->select('evidence_file_id'))
             ->whereNotIn('id', Document::select('private_file_id'))
+            ->whereNotIn('id', ApplicationAttachment::select('private_file_id'))
             ->each(function (PrivateFile $file) use (&$count) {
                 if ($this->deletePrivate($file)) {
                     $count++;

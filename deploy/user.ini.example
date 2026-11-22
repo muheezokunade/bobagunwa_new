@@ -1,8 +1,11 @@
 ; Place in the application webroot (public/.user.ini) or set via cPanel ->
-; MultiPHP INI Editor for the staging/production domain. Values are minimums.
+; MultiPHP INI Editor / Select PHP Version -> Options for the staging/production
+; domain. Values are minimums.
 memory_limit = 256M
+; Membership applications carry up to ten supporting documents of up to 5 MB each.
 upload_max_filesize = 12M
-post_max_size = 16M
+post_max_size = 64M
+max_file_uploads = 20
 max_execution_time = 60
 expose_php = Off
 display_errors = Off

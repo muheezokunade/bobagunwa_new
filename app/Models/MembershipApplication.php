@@ -32,6 +32,11 @@ class MembershipApplication extends Model
         'decided_at' => 'datetime',
     ];
 
+    public function attachments(): HasMany
+    {
+        return $this->hasMany(ApplicationAttachment::class)->orderBy('id');
+    }
+
     public function events(): HasMany
     {
         return $this->hasMany(ApplicationEvent::class)->orderBy('id');

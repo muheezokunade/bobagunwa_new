@@ -31,6 +31,7 @@ class Preflight extends Command
         $this->check('GD JPEG/PNG support', function_exists('imagejpeg') && function_exists('imagepng'), 'required to re-encode uploaded images');
         $this->check('Memory limit ≥ 128M', $this->bytes(ini_get('memory_limit')) >= 128 * 1048576 || ini_get('memory_limit') === '-1', ini_get('memory_limit'));
         $this->check('Upload size ≥ 10M', $this->bytes(ini_get('upload_max_filesize')) >= 10 * 1048576, 'upload_max_filesize='.ini_get('upload_max_filesize').', post_max_size='.ini_get('post_max_size'), false);
+        $this->check('Request size ≥ 48M (application documents)', $this->bytes(ini_get('post_max_size')) >= 48 * 1048576 && (int) ini_get('max_file_uploads') >= 12, 'post_max_size='.ini_get('post_max_size').', max_file_uploads='.ini_get('max_file_uploads').' — membership applications send up to ten documents', false);
         $this->check('APP_KEY set', (string) config('app.key') !== '', config('app.key') ? 'set' : 'missing — run php artisan key:generate');
         $this->check('Debug disabled outside local', ! config('app.debug') || app()->environment('local'), 'APP_DEBUG='.(config('app.debug') ? 'true' : 'false').', APP_ENV='.app()->environment());
         $this->check('Secure session cookies', (bool) config('session.secure') || app()->environment('local'), 'SESSION_SECURE_COOKIE='.(config('session.secure') ? 'true' : 'false'), false);

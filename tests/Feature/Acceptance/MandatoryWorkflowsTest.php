@@ -80,7 +80,7 @@ class MandatoryWorkflowsTest extends TestCase
         $this->record(1, 'Existing-member import', ['batch' => $batch->reference, 'members_created' => 2, 'login_accounts_created' => 0, 'replay' => 'returned original receipt', 'duplicate_detection' => '2 of 2 rows flagged on re-upload', 'anonymous' => 'redirected to sign-in', 'unauthorised_role' => 403]);
 
         // ---- Workflow 2: membership application and approval ------------
-        $form = ['first_name' => 'Synthetic', 'last_name' => 'Applicant', 'email' => 'applicant@example.test', 'phone' => '08072220001', 'date_of_birth' => '1981-09-09', 'ijebu_town' => 'Ago Iwoye', 'city' => 'Lagos', 'occupation' => 'Synthetic accountant', 'reason' => 'Synthetic acceptance-test application for workflow two.', 'declaration' => '1', 'privacy' => '1', 'form_stamp' => Crypt::encryptString((string) (time() - 20))];
+        $form = ['first_name' => 'Synthetic', 'last_name' => 'Applicant', 'email' => 'applicant@example.test', 'phone' => '08072220001', 'date_of_birth' => '1981-09-09', 'ijebu_town' => 'Ago Iwoye', 'city' => 'Lagos', 'country' => 'Nigeria', 'other_names' => 'Acceptance', 'occupation' => 'Synthetic accountant', 'profile_summary' => 'Synthetic acceptance-test application for workflow two.', 'declaration' => '1', 'privacy' => '1', 'form_stamp' => Crypt::encryptString((string) (time() - 20))] + $this->applicationDocuments();
         $this->post(route('membership.apply.store'), array_diff_key($form, ['declaration' => 1]))->assertSessionHasErrors('declaration');
         $this->post(route('membership.apply.store'), $form)->assertRedirect(route('membership.receipt'));
         $receipt = session('application_receipt');

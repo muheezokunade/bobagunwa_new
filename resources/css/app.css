@@ -192,6 +192,9 @@ p { margin: 0 0 1em; }
 .people figcaption strong { display: block; font: 400 22px/1.25 var(--serif); }
 .people figcaption span { color: var(--wine); font-weight: 600; font-size: 15px; }
 .narrow-text { max-width: 760px; }
+.pre-line { white-space: pre-line; }
+.notice-box { border-left: 3px solid var(--wine); background: var(--mist); padding: 14px 18px; margin: 12px 0; font-size: 15px; }
+.notice-box p { margin: 0 0 8px; }
 .welcome-address p:first-child { font-family: var(--serif); font-size: 20px; line-height: 1.6; }
 .date-parts { border: 0; padding: 0; margin: 0; min-width: 0; }
 .date-parts legend { font-weight: 600; padding: 0; margin-bottom: 4px; }
@@ -423,3 +426,6 @@ dd, td, code, .details dd, .panel p { overflow-wrap: anywhere; }
     .stats { grid-template-columns: 1fr; }
     .page-head .actions { width: 100%; }
 }
+
+.plain { list-style: none; padding: 0; margin: 0 0 12px; }
+.plain li { margin: 6px 0; }

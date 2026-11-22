@@ -67,19 +67,36 @@
         <h2>Submitted details</h2>
         <dl class="details">
             <dt>First name</dt><dd>{{ $application->first_name }}</dd>
-            <dt>Other names</dt><dd>{{ $application->other_names ?: '—' }}</dd>
-            <dt>Last name</dt><dd>{{ $application->last_name }}</dd>
-            <dt>Email</dt><dd>{{ $application->email }}</dd>
-            <dt>Phone</dt><dd>{{ $application->phone }}</dd>
+            <dt>Middle name</dt><dd>{{ $application->other_names ?: '—' }}</dd>
+            <dt>Last name (surname)</dt><dd>{{ $application->last_name }}</dd>
             <dt>Date of birth</dt><dd>{{ $F::date($application->date_of_birth) }}</dd>
-            <dt>Ijebu town</dt><dd>{{ $application->ijebu_town }}</dd>
+            <dt>Mobile number</dt><dd>{{ $application->phone }}</dd>
+            <dt>Email</dt><dd>{{ $application->email }}</dd>
+            <dt>Profession / trade</dt><dd>{{ $application->occupation }}</dd>
+            <dt>Town of origin</dt><dd>{{ $application->ijebu_town }}</dd>
             <dt>City of residence</dt><dd>{{ $application->city }}</dd>
-            <dt>Occupation</dt><dd>{{ $application->occupation }}</dd>
-            <dt>Reason for applying</dt><dd>{!! nl2br(e($application->reason)) !!}</dd>
+            <dt>Country of residence</dt><dd>{{ $application->country ?: '—' }}</dd>
+            <dt>Current address</dt><dd>{{ $application->address ?: '—' }}</dd>
+            <dt>Marital status</dt><dd>{{ \App\Http\Controllers\Public\ApplicationController::MARITAL_STATUSES[$application->marital_status] ?? '—' }}</dd>
+            <dt>Profile summary</dt><dd class="pre-line">{{ $application->profile_summary ?: '—' }}</dd>
+            @if ($application->reason)<dt>Reason for applying</dt><dd class="pre-line">{{ $application->reason }}</dd>@endif
             <dt>Declaration accepted</dt><dd>{{ $F::dateTime($application->declaration_accepted_at) }}</dd>
             <dt>Privacy notice accepted</dt><dd>{{ $F::dateTime($application->privacy_accepted_at) }} <span class="muted small">(version {{ $application->privacy_notice_version }})</span></dd>
             <dt>Screening rules</dt><dd>{{ $application->screening_version }}</dd>
         </dl>
+        <h3>Supporting documents</h3>
+        @php $byKind = $application->attachments->groupBy('kind'); @endphp
+        <ul class="plain">
+            @foreach (\App\Models\ApplicationAttachment::KINDS as $kind => [$label, $isRequired])
+                @foreach ($byKind->get($kind, collect()) as $i => $attachment)
+                    <li>{{ $label }}@if ($byKind->get($kind)->count() > 1) ({{ $i + 1 }})@endif:
+                        <a href="{{ route('admin.applications.attachments.show', [$application, $attachment]) }}">{{ $attachment->file->original_name }}</a>
+                        <span class="muted small">{{ strtoupper(pathinfo($attachment->file->path, PATHINFO_EXTENSION)) }}, {{ number_format($attachment->file->size_bytes / 1024) }} KB</span></li>
+                @endforeach
+                @if ($isRequired && ! $byKind->has($kind))<li>{{ $label }}: <span class="muted">not provided</span></li>@endif
+            @endforeach
+        </ul>
+        <p class="small muted">Downloads are recorded in the audit log. Do not forward these documents outside the platform.</p>
     </section>
 
     <div>

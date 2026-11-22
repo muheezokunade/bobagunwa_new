@@ -3,9 +3,11 @@
 namespace App\Services;
 
 use App\Exceptions\DomainRuleException;
+use App\Models\ApplicationAttachment;
 use App\Models\ApplicationEvent;
 use App\Models\Member;
 use App\Models\MembershipApplication;
+use App\Models\PrivateFile;
 use App\Models\User;
 use App\Support\Audit;
 use App\Support\Normalize;
@@ -49,7 +51,10 @@ class ApplicationService
      * @param  array<string, mixed>  $data  validated input
      * @return array{0: MembershipApplication, 1: string} application and raw status token
      */
-    public function submit(array $data): array
+    /**
+     * @param  array<string, list<PrivateFile>>  $attachments  kind => stored private files (already validated)
+     */
+    public function submit(array $data, array $attachments = []): array
     {
         if (! Settings::bool('membership.applications_open')) {
             throw new DomainRuleException('Membership applications are not being accepted at the moment. Please contact the secretariat.');
@@ -71,7 +76,7 @@ class ApplicationService
 
         $rawToken = Tokens::generate(24);
         try {
-            $application = DB::transaction(function () use ($data, $email, $phone, $screening, $rawToken) {
+            $application = DB::transaction(function () use ($data, $email, $phone, $screening, $rawToken, $attachments) {
                 $application = MembershipApplication::create([
                     'reference' => $this->uniqueReference(),
                     'status_token_hash' => Tokens::hash($rawToken),
@@ -86,8 +91,12 @@ class ApplicationService
                     'date_of_birth' => $data['date_of_birth'],
                     'ijebu_town' => Normalize::text($data['ijebu_town']),
                     'city' => Normalize::text($data['city']),
+                    'country' => Normalize::text($data['country'] ?? null),
+                    'address' => Normalize::text($data['address'] ?? null),
+                    'marital_status' => $data['marital_status'] ?? null,
                     'occupation' => Normalize::text($data['occupation']),
-                    'reason' => trim($data['reason']),
+                    'profile_summary' => isset($data['profile_summary']) ? (trim($data['profile_summary']) ?: null) : null,
+                    'reason' => isset($data['reason']) ? (trim($data['reason']) ?: null) : null,
                     'eligibility_status' => $screening['status'],
                     'eligibility_flags' => $screening['flags'],
                     'screening_version' => config('boba.membership.screening_version'),
@@ -97,6 +106,11 @@ class ApplicationService
                     'status' => 'submitted',
                     'submitted_ip_hash' => Audit::ipHash(),
                 ]);
+                foreach ($attachments as $kind => $files) {
+                    foreach ($files as $file) {
+                        ApplicationAttachment::create(['membership_application_id' => $application->id, 'private_file_id' => $file->id, 'kind' => $kind]);
+                    }
+                }
                 ApplicationEvent::create(['membership_application_id' => $application->id, 'type' => 'submitted', 'to_status' => 'submitted', 'applicant_message' => 'Your application has been received and will be reviewed by the association.']);
                 Audit::record('application.submitted', "Membership application {$application->reference} received", $application, ['eligibility' => $screening['status']]);
 
@@ -224,7 +238,11 @@ class ApplicationService
                 'date_of_birth' => $locked->date_of_birth,
                 'ijebu_town' => $locked->ijebu_town,
                 'city' => $locked->city,
+                'country' => $locked->country,
+                'address' => $locked->address,
+                'marital_status' => $locked->marital_status,
                 'occupation' => $locked->occupation,
+                'profile_summary' => $locked->profile_summary,
                 'status' => 'active',
                 'origin' => 'application',
                 'membership_application_id' => $locked->id,

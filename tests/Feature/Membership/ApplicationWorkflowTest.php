@@ -20,10 +20,10 @@ class ApplicationWorkflowTest extends TestCase
         return $overrides + [
             'first_name' => 'Ọlá', 'last_name' => 'Synthetic', 'other_names' => 'Adébáyọ̀',
             'email' => 'ola.synthetic@example.test', 'phone' => '0803 555 0101', 'date_of_birth' => '1981-06-15',
-            'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'occupation' => 'Synthetic engineer',
-            'reason' => 'I would like to join my age group in the association (synthetic).',
+            'ijebu_town' => 'Ijebu Ode', 'city' => 'Lagos', 'country' => 'Nigeria', 'occupation' => 'Synthetic engineer',
+            'profile_summary' => 'I would like to join my age group in the association (synthetic).',
             'declaration' => '1', 'privacy' => '1', 'website' => '', 'form_stamp' => Crypt::encryptString((string) (time() - 30)),
-        ];
+        ] + $this->applicationDocuments();
     }
 
     private function submit(array $overrides = []): array

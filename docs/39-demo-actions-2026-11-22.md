@@ -15,12 +15,12 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | History on the Awujale kept as an unpublished draft (the Awujale has passed; text says "living") | `6885a41` |
 | Application reference + private tracking code; role-based access; finance CSV reports; levy categories can be created by the treasurer | already built |
 | Partial payments: a part-payment leaves the remainder outstanding on the statement | already built; display to be made clearer with the receipt upload |
+| **Application form = the association's Member Profile form**, with country of residence and the eight supporting documents (private, reviewer-only, audited downloads; kept by the nightly clean-up; copied profile fields to the member on approval); association's privacy notice wording | this commit — see the note below on PHP upload limits |
 
 ## In progress / to build
 
 | # | Item | Notes |
 |---|---|---|
-| 1 | **Application form = the association's Member Profile form**, plus attachments | Mandatory: first, middle, surname, date of birth, mobile, email, profession/trade, town of origin. Optional: current address, marital status, profile summary. Keep city of residence; add country of residence (members abroad). Attachments: birth certificate, LG of origin certificate, First School Leaving Certificate, secondary school certificate, other certificates, referee letters with contacts, passport photograph, full-length photograph. Association's own privacy notice wording. |
 | 2 | **Two-step membership approval** | General Secretary initiates (reviews, may ask for information, recommends); the membership lead who chairs the screening committee approves. Committee reviews in the app only — no emailed copies of applicants' data. |
 | 3 | **Members upload payment receipts** | Pick the levy, amount pre-filled (part-payment allowed), upload receipt, payer name if another account paid; payment verifier confirms against the bank alert. |
 | 4 | **Report of who has paid a particular levy** (paid / part-paid / unpaid), CSV export; levy categories CSV | Requested in the demo. |
@@ -39,6 +39,10 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | Spreadsheet of existing members who updated their details (import, D-019) | **not received by email** — said to be sent by email/WhatsApp |
 | Membership form and required attachments | **received** (Member Profile form + attachment list, 22 Nov) |
 | Giwa's photograph for the welcome address; leaders' photographs and short biographies | awaited |
+
+**PHP upload limits (before testing applications on staging or production):** applications now send up to ten documents of up to 5 MB each. Set, for the domain, `post_max_size = 64M`, `upload_max_filesize = 12M`, `max_file_uploads = 20` (Namecheap: cPanel → Select PHP Version → Options, or the `user.ini` kept with the staging config). `boba:preflight` warns until this is done; an oversized submission returns the applicant to the form with a clear message.
+
+**Privacy:** the form collects birth certificates, school certificates, referee letters and photographs. They are stored outside the webroot, visible only to officers who review applications, and every download is audited. How long they are kept after a decision is part of the legal review (D-016).
 
 ## Decisions needed
 

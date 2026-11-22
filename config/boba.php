@@ -43,6 +43,8 @@ return [
         'image_max_kb' => 5120,
         'image_max_pixels' => 6000,
         'document_max_kb' => 10240,
+        // Each supporting document on a membership application (PDF, JPEG or PNG).
+        'application_file_max_kb' => 5120,
         'import_max_kb' => 2048,
         'import_max_rows' => 2000,
     ],

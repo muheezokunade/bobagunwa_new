@@ -3,14 +3,18 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ApplicationAttachment;
 use App\Models\Member;
 use App\Models\MembershipApplication;
 use App\Models\OutboundMessage;
 use App\Services\ApplicationService;
+use App\Services\UploadService;
+use App\Support\Audit;
 use App\Support\Normalize;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ApplicationController extends Controller
 {
@@ -45,7 +49,7 @@ class ApplicationController extends Controller
             ->limit(5)->get();
 
         return view('admin.applications.show', [
-            'application' => $application->load('events.actor', 'member', 'decider'),
+            'application' => $application->load('events.actor', 'member', 'decider', 'attachments.file'),
             'matches' => $possibleMatches,
             'messages' => OutboundMessage::where('related_type', 'MembershipApplication')->where('related_id', $application->id)->latest()->get(),
             'otherApplications' => MembershipApplication::where('id', '!=', $application->id)->where(fn ($q) => $q->where('email_normalized', $application->email_normalized)->orWhere('phone_normalized', $application->phone_normalized))->get(),
@@ -69,5 +73,14 @@ class ApplicationController extends Controller
         $service->transition($application, $data['decision'], $request->user(), $data['private_note'], $data['applicant_message'] ?? null);
 
         return redirect()->route('admin.applications.show', $application)->with('status', 'Application updated.');
+    }
+
+    /** A supporting document, for reviewing officers only; every download is audited. */
+    public function attachment(MembershipApplication $application, ApplicationAttachment $attachment, UploadService $uploads): BinaryFileResponse
+    {
+        abort_unless($attachment->membership_application_id === $application->id, 404);
+        Audit::record('application.document_viewed', "{$attachment->label()} downloaded for {$application->reference}", $application, ['attachment' => $attachment->id]);
+
+        return response()->download($uploads->privatePath($attachment->file), $attachment->file->original_name, ['Content-Type' => $attachment->file->mime, 'X-Content-Type-Options' => 'nosniff']);
     }
 }

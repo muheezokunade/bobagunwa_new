@@ -120,6 +120,7 @@ Route::middleware(['auth', 'staff', 'two-factor'])->prefix('admin')->name('admin
         Route::get('/applications', 'index')->name('applications.index');
         Route::get('/applications/{application}', 'show')->name('applications.show');
         Route::post('/applications/{application}/decision', 'decide')->name('applications.decide');
+        Route::get('/applications/{application}/documents/{attachment}', 'attachment')->name('applications.attachments.show');
     });
 
     Route::middleware('permission:applications.review|accounts.issue|access.manage')->controller(Admin\MessageController::class)->group(function () {
