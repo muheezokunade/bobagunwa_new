@@ -43,7 +43,7 @@
             @endforeach
             @error('roles')<span class="error-text">{{ $message }}</span>@enderror
         </fieldset>
-        <x-field name="membership_number" label="Membership number (optional)" hint="To link the officer account to an existing member record." />
+        <p class="small muted">Officer logins are separate from member portal logins. If the officer is also a member, use a different email address from the one on his member account (for example an office address).</p>
         <x-field name="reason" label="Reason and approval reference" required hint="For example: “Elected treasurer, AGM minutes 12 Oct 2026”." />
         <button class="btn" type="submit">Grant officer access</button>
     </form>

@@ -8,6 +8,7 @@ use App\Models\MembershipApplication;
 use App\Models\Page;
 use App\Models\PageRevision;
 use App\Models\PrivateFile;
+use App\Models\User;
 use App\Services\UploadService;
 use App\Support\Format;
 use App\Support\Settings;
@@ -164,5 +165,25 @@ class DemoFeedbackTest extends TestCase
             ->post(route('membership.apply.store'), [])
             ->assertRedirect(route('membership.apply', ['too_large' => 1]));
         $this->withServerVariables([])->get(route('membership.apply', ['too_large' => 1]))->assertSee('too large to send together');
+    }
+
+    public function test_officer_logins_are_separate_from_member_logins(): void
+    {
+        $admin = $this->officer('system_admin');
+        $member = $this->member([], true);
+
+        // The member's own email cannot become an officer login.
+        $this->actingAs($admin)->post(route('admin.access.store'), ['name' => $member->full_name, 'email' => $member->user->email, 'roles' => ['treasurer'], 'reason' => 'Elected treasurer (synthetic)'])
+            ->assertSessionHasErrors(['domain' => 'This email address is already used by another account, such as the person’s member portal login. Officer logins are separate: use a different email address for the officer account.']);
+        // A member portal account cannot be given officer roles.
+        $this->actingAs($admin)->post(route('admin.access.roles', $member->user), ['roles' => ['treasurer'], 'reason' => 'Elected treasurer (synthetic)'])->assertSessionHasErrors('domain');
+        $this->assertFalse($member->user->fresh()->roles()->where('is_staff', true)->exists());
+
+        // A separate officer login with another address works and is not linked to the member record.
+        $this->actingAs($admin)->post(route('admin.access.store'), ['name' => $member->full_name, 'email' => 'treasurer.office@example.test', 'roles' => ['treasurer'], 'reason' => 'Elected treasurer (synthetic)'])->assertSessionHasNoErrors();
+        $officer = User::where('email', 'treasurer.office@example.test')->sole();
+        $this->assertNull($officer->member_id);
+        $this->assertSame(['treasurer'], $officer->roles()->pluck('key')->all());
+        $this->assertSame(['member'], $member->user->fresh()->roles()->pluck('key')->all());
     }
 }

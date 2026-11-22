@@ -36,7 +36,7 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | Redrafted history; royal lineage / past Awujales information | awaited |
 | OneDrive photo link (2023, 2025, 2026 folders; Contact-page photo for About) | awaited |
 | Past activities documentation (for activity pages) | awaited |
-| Spreadsheet of existing members who updated their details (import, D-019) | **not received by email** — said to be sent by email/WhatsApp |
+| Spreadsheet of existing members who updated their details (import, D-019) | **deferred** — import left for later (22 Nov) |
 | Membership form and required attachments | **received** (Member Profile form + attachment list, 22 Nov) |
 | Giwa's photograph for the welcome address; leaders' photographs and short biographies | awaited |
 
@@ -48,8 +48,8 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 
 | Question | Options |
 |---|---|
-| Imported members' first sign-in | one-time link to set their own password (current) **or** temporary password with forced change (offered in the demo) |
-| Officers who are also members | one account (current) **or** a separate admin login |
+| Imported members' first sign-in | **Decided: one-time link** (D-029) |
+| Officers who are also members | **Decided: separate officer login** with a different email (D-028), enforced in the code |
 | WhatsApp receipt upload (QR-linked number) | deferred — separate commercial product |
 | Online payment (e.g. Paystack) with automatic verification | future option, mentioned in the demo |
 

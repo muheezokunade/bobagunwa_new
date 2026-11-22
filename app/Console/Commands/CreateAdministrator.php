@@ -30,7 +30,7 @@ class CreateAdministrator extends Command
             return self::FAILURE;
         }
         if (User::where('email', $email)->exists()) {
-            $this->error('An account with this email already exists.');
+            $this->error('An account with this email already exists (it may be a member portal login). Officer logins are separate: use a different email address.');
 
             return self::FAILURE;
         }

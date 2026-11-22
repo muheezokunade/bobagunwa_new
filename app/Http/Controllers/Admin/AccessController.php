@@ -44,7 +44,6 @@ class AccessController extends Controller
             'email' => ['required', 'email:rfc', 'max:190'],
             'roles' => ['required', 'array', 'min:1'],
             'roles.*' => ['string', 'exists:roles,key'],
-            'membership_number' => ['nullable', 'string', 'max:32'],
             'reason' => ['required', 'string', 'min:5', 'max:255'],
         ]);
         $email = Normalize::email($data['email']);
@@ -52,20 +51,18 @@ class AccessController extends Controller
         if ($roles->isEmpty()) {
             throw new DomainRuleException('Choose at least one officer role.');
         }
-        $member = null;
-        if (! empty($data['membership_number'])) {
-            $member = Member::where('membership_number', strtoupper(trim($data['membership_number'])))->first();
-            if (! $member) {
-                throw new DomainRuleException('No member has that membership number.');
-            }
-        }
-        $existing = $member?->user ?? User::where('email', $email)->first();
+        // Officer logins are separate from member portal logins (decided 22 Nov 2026): an officer
+        // who is also a member keeps his member account and gets a second login with another email.
+        $existing = User::where('email', $email)->first();
         if ($existing && $existing->roles()->where('is_staff', true)->exists()) {
             throw new DomainRuleException('This person already has an officer account. Open it to change roles.');
         }
+        if ($existing) {
+            throw new DomainRuleException('This email address is already used by another account, such as the person’s member portal login. Officer logins are separate: use a different email address for the officer account.');
+        }
 
-        $user = DB::transaction(function () use ($existing, $email, $data, $roles, $request, $member) {
-            $user = $existing ?? User::create(['name' => $data['name'], 'email' => $email, 'member_id' => $member?->id, 'status' => 'pending_activation']);
+        $user = DB::transaction(function () use ($email, $data, $roles, $request) {
+            $user = User::create(['name' => $data['name'], 'email' => $email, 'status' => 'pending_activation']);
             foreach ($roles as $role) {
                 $user->roles()->syncWithoutDetaching([$role->id => ['granted_by' => $request->user()->id, 'reason' => $data['reason'], 'granted_at' => now()]]);
             }
@@ -102,6 +99,9 @@ class AccessController extends Controller
         }
         $wanted = Role::whereIn('key', $data['roles'] ?? [])->get();
         if ($user->member_id) {
+            if ($wanted->contains('is_staff', true)) {
+                throw new DomainRuleException('A member portal account cannot hold officer roles. Officer logins are separate: create an officer account with a different email address.');
+            }
             $wanted = $wanted->push(Role::where('key', 'member')->first())->unique('id');
         }
 

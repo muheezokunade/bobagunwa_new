@@ -22,7 +22,7 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-016 | Privacy notice, terms, retention periods, NDPA obligations (legal review) | Pending | Working drafts shown with a "awaiting review" banner |
 | D-017 | Deploy the full application to protected staging | **Approved** by Mr Ibrahim (16 Nov 2026) — `v2-staging.bobagunwa.com` only; no production, WordPress, DNS, email or cutover | Deployment tooling verified in a simulation; Namecheap deployment pending SSL (B1) and server access (B2) — `37-staging-deployment-evidence.md` |
 | D-018 | Production cutover (domain route, WordPress coexistence, date) | Pending | Not deployed; WordPress untouched |
-| D-019 | Verified existing-member roster (86 provisional names) and identity fields | Pending | Not imported; **gate** `approval.member_import` |
+| D-019 | Verified existing-member roster (86 provisional names) and identity fields | Pending | Not imported; **gate** `approval.member_import` — **Deferred 22 Nov 2026**: existing-member import left for later |
 | D-020 | Historical financial records, cut-off date and source documents | Pending | None imported; **gate** `approval.historical_finance` |
 | D-021 | Initial production administrator(s) | Pending | Provisioned only by `boba:admin:create`; no default account |
 | D-022 | Officer role assignments (treasurer, verifier, secretariat, executive) | Pending | Templates only |
@@ -30,7 +30,9 @@ Single register of decisions the association must make. Each has a **safe curren
 | D-024 | Require two-factor sign-in for privileged officers (finance writers, access, settings, backups) | Pending | Implemented and tested; **enforcement off**; opt-in enrolment available; lockout-guarded (`32-two-factor-authentication.md`) |
 | D-025 | Email channel for integrity alerts (use the existing mailbox?) and who must receive alerts | Pending | Dashboard banner always on for `integrity.alerts` holders; email off until enabled and verified (`31-integrity-alerting.md`) |
 | D-026 | Procedure for genuinely distinct members who share a full name | Pending | Officer must confirm and record a distinguishing note (≥ 10 characters); audited (manual add and import) |
-| D-027 | Hard eligibility rules for applications (e.g. a minimum age; whether births outside the age-group years are refused or only flagged) | Pending | Birth dates outside the configured age-group range are **flagged for the officer, not refused**; no minimum age is enforced (a 2015 birth date was accepted and flagged in the 22 Nov staging walkthrough) |
+| D-027 | Hard eligibility rules for applications (e.g. a minimum age; whether births outside the age-group years are refused or only flagged) | **Decided** at the 22 Nov 2026 demo: never rejected automatically; the officer reviews flagged applications and exceptions are discussed and approved separately | Birth dates outside 1980–1982 are flagged for the officer, not refused |
+| D-028 | Officer logins versus member logins | **Decided** 22 Nov 2026 (developer, following the demo): **separate** — an officer who is also a member has a member portal login and a separate officer login with a different email address | Enforced: officer accounts cannot be created on an email already in use and member portal accounts cannot hold officer roles; `boba:preflight` checks it (required in production) |
+| D-029 | First sign-in for imported existing members | **Decided** 22 Nov 2026: **single-use activation link** (member sets his own password; no temporary passwords) | As built |
 
 ## Content awaiting confirmation (D-015)
 
