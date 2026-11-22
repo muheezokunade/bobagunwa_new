@@ -48,11 +48,7 @@
     <div class="wrap">
         <p class="kicker on-dark">What guides us</p>
         <h2 id="values-title">Our values are our <em>foundation.</em></h2>
-        <div class="values-row">
-            <article><p class="meta"><span>01</span><b>Unity</b></p><h3 lang="yo">Ìṣọ̀kan</h3><p>We build lasting bonds across generations, communities and families.</p></article>
-            <article><p class="meta"><span>02</span><b>Character</b></p><h3 lang="yo">Ìwà Ọmọlúàbí</h3><p>We lead with honour, responsibility, dignity and respect for all.</p></article>
-            <article><p class="meta"><span>03</span><b>Service</b></p><h3 lang="yo">Iṣẹ́</h3><p>We turn fellowship into meaningful action for Ijebuland and beyond.</p></article>
-        </div>
+        @include('partials.values')
     </div>
 </section>
 

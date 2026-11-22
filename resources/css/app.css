@@ -149,6 +149,10 @@ p { margin: 0 0 1em; }
 .values-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid rgba(255, 255, 255, .2); border-bottom: 1px solid rgba(255, 255, 255, .2); margin-top: 40px; }
 .values-row article { padding: 30px 28px 36px; border-right: 1px solid rgba(255, 255, 255, .2); }
 .values-row article:last-child { border-right: 0; }
+.values-five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.values-five article { padding: 26px 20px 30px; }
+.values-five h3 { font-size: clamp(24px, 2.2vw, 34px); margin-top: 28px; }
+@media (max-width: 1100px) { .values-five { grid-template-columns: repeat(2, minmax(0, 1fr)); } .values-five article { border-bottom: 1px solid rgba(255, 255, 255, .2); } }
 .values-row .meta { display: flex; justify-content: space-between; color: #cbb8b1; font-size: 14px; letter-spacing: .12em; text-transform: uppercase; }
 .values-row .meta b { color: var(--sun); font-weight: 700; }
 .values-row h3 { font-size: clamp(32px, 3.4vw, 48px); color: var(--crown); margin: 40px 0 14px; }

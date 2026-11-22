@@ -21,7 +21,7 @@ The loader saves pages as **new revisions** (history kept, earlier text recovera
    - History (draft): "Nigerian's greatest living monarch" → "Nigeria's greatest living monarchs"; "Price Rufai" → "Prince Rufai"; "the the" → "the"; "Ijebu's" → "Ijebus"; "6months" → "six months".
    - Leadership: "Asst. general Secretary" → "Asst. General Secretary".
 3. **Leadership list:** "Gunwa Kolawole Orekoya – Akogun Egbe" appears twice (loaded once). Five titles have no named holder and are not shown: Babalaje Egbe, Bobaselu Egbe, Bamofin Egbe, Tunwashe Egbe, Otun Balogun Egbe. Photographs and short biographies are still to come.
-4. **Core values** in English and Yoruba (demo action) and Yoruba diacritics throughout are still to be supplied; the text above is loaded exactly as written, without tone marks.
+4. **Core values**: a draft of five value tiles (English and Yoruba) is on the site — Progress / Ìtẹ̀síwájú, Character / Ìwà Ọmọlúàbí, Protection / Ààbò, Unity / Ìṣọ̀kan, Service / Iṣẹ́ Ìsìn — summarising the five commitments; the association should confirm the Yoruba and the wording. Yoruba diacritics in the supplied pages are still to come; that text is loaded exactly as written.
 
 ## Not loaded on purpose
 

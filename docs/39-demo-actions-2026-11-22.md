@@ -22,12 +22,12 @@ From the full Gemini notes and transcript of the "Bobagunwa Demo" (Gunwa Abiodun
 | **Who has paid a due or levy**: Reports page section per category (assessed, paid, outstanding; Paid / Part-paid / Not paid) with CSV export, and a CSV of the dues and levy categories | this commit |
 | **MFA for administrators only**: two-factor scoped to administrator rights (officer access, settings, backups); members never asked; finance officers optional by setting; switch on once administrators have enrolled (D-024 decided) | this commit |
 | **Admin access recovery**: the System Administrator resets other officers’ access (one-time links, two-factor reset — already built); new **Giwa** role: read-only oversight plus restoring a System Administrator’s lost access, never his own and nothing else, covered by two-factor; warning if more than one top-level administrator; Executive role = General Secretary and other read-only executives | this commit |
+| **Five values** (draft) on the home and About pages, from the five “We are committed to” points: Progress — Ìtẹ̀síwájú; Character — Ìwà Ọmọlúàbí; Protection — Ààbò; Unity — Ìṣọ̀kan; Service — Iṣẹ́ Ìsìn. **The Yoruba words and one-line summaries need the association’s confirmation** (`resources/views/partials/values.blade.php`) | this commit |
 
 ## In progress / to build
 
 | # | Item | Notes |
 |---|---|---|
-| 7 | **Five values** as short English + Yoruba tiles from the five "We are committed to" points (fifth = Service) | Draft by the developer; Yoruba to be confirmed by the association. |
 | 8 | **History & heritage**: past Awujales with picture, years and summary, full text in a pop-up | Structure now; content from Abiodun (redraft in the past tense; Ijebu museum sources). |
 
 ## Waiting for the association (Gunwa Abiodun Orehin)
