@@ -8,6 +8,34 @@
     <button class="btn secondary" type="submit">Show period</button>
 </form>
 
+<h2 id="levy-payers">Who has paid a due or levy</h2>
+<form method="get" action="{{ route('admin.finance.reports.index') }}#levy-payers" class="filters no-print">
+    <input type="hidden" name="from" value="{{ $from->toDateString() }}"><input type="hidden" name="to" value="{{ $to->toDateString() }}">
+    <x-select name="category" label="Due or levy" :options="$categories->mapWithKeys(fn ($c) => [$c->id => $c->name.' ('.$c->code.')'])->all()" :value="$levy?->id" placeholder="Choose…" />
+    <button class="btn secondary" type="submit">Show members</button>
+</form>
+@if ($canExport)<p class="no-print"><a class="text-link" href="{{ route('admin.finance.reports.export', ['report' => 'category-list']) }}">Export the list of dues and levy categories (CSV)</a></p>@endif
+@if ($levy)
+    @php
+        $statusLabels = ['paid' => 'Paid', 'part_paid' => 'Part-paid', 'not_paid' => 'Not paid', 'cancelled' => 'Cancelled'];
+        $counts = $levyPayers->countBy('payment_status');
+    @endphp
+    <p>{{ $levy->name }}: {{ $levyPayers->count() }} member(s) assessed —
+        {{ $counts->get('paid', 0) }} paid, {{ $counts->get('part_paid', 0) }} part-paid, {{ $counts->get('not_paid', 0) }} not paid.
+        @if ($canExport)<a class="text-link no-print" href="{{ route('admin.finance.reports.export', ['report' => 'levy-payers', 'category' => $levy->id]) }}">Export CSV</a>@endif</p>
+    @if ($levyPayers->isEmpty())
+        <x-empty title="No one has been assessed under this category yet"><p>Post an assessment for it first.</p></x-empty>
+    @else
+    <div class="table-wrap" tabindex="0" role="region" aria-label="Members assessed under {{ $levy->name }}"><table>
+        <caption class="sr-only">Members assessed under {{ $levy->name }}</caption>
+        <thead><tr><th scope="col">Member</th><th scope="col" class="num">Assessed</th><th scope="col" class="num">Paid</th><th scope="col" class="num">Outstanding</th><th scope="col">Status</th></tr></thead>
+        <tbody>@foreach ($levyPayers as $r)
+            <tr><td>{{ $r->membership_number }} — {{ $r->full_name }}</td><td class="num"><x-money :kobo="$r->effective" /></td><td class="num"><x-money :kobo="$r->allocated" /></td><td class="num"><x-money :kobo="$r->outstanding" /></td><td><x-status :value="$r->payment_status" /></td></tr>
+        @endforeach</tbody>
+    </table></div>
+    @endif
+@endif
+
 <h2>Position today (all time)</h2>
 <dl class="stats">
     <div><dt>Assessed</dt><dd><x-money :kobo="$totals['assessed']" /></dd></div>

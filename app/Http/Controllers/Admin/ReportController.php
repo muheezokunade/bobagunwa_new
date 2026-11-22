@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\FeeCategory;
 use App\Models\FinancialReversal;
 use App\Models\ObligationAdjustment;
 use App\Models\Payment;
@@ -23,6 +24,8 @@ class ReportController extends Controller
     {
         [$from, $to] = $this->period($request);
         $balances = $this->ledger->memberBalances($request->query('q'), $request->query('filter', 'all'));
+        $categories = FeeCategory::orderBy('name')->get(['id', 'code', 'name', 'kind', 'default_amount_kobo', 'is_active']);
+        $levy = $categories->firstWhere('id', $request->integer('category'));
 
         return view('admin.finance.reports', [
             'from' => $from, 'to' => $to,
@@ -36,6 +39,9 @@ class ReportController extends Controller
             ],
             'exceptions' => $this->ledger->exceptions(),
             'filter' => $request->query('filter', 'all'),
+            'categories' => $categories,
+            'levy' => $levy,
+            'levyPayers' => $levy ? $this->ledger->levyPayers($levy->id) : collect(),
         ]);
     }
 
@@ -55,8 +61,22 @@ class ReportController extends Controller
             'categories' => Csv::download("category-performance-{$from->toDateString()}-{$to->toDateString()}.csv",
                 ['Code', 'Category', 'Kind', 'Obligations', 'Assessed', 'Adjustments', 'Effective', 'Allocated', 'Outstanding', 'Collection rate %'],
                 $this->ledger->periodReport($from, $to)['by_category']->map(fn ($r) => [$r->code, $r->name, $r->kind, $r->obligations, Money::decimal((int) $r->assessed), Money::decimal((int) $r->adjustments), Money::decimal($r->effective), Money::decimal((int) $r->allocated), Money::decimal($r->outstanding), $r->collection_rate])),
+            'levy-payers' => $this->levyPayersCsv($request),
+            'category-list' => Csv::download('dues-and-levy-categories-'.now()->format('Ymd').'.csv',
+                ['Code', 'Name', 'Kind', 'Default amount', 'Active'],
+                FeeCategory::orderBy('name')->get()->map(fn ($c) => [$c->code, $c->name, $c->kind, $c->default_amount_kobo !== null ? Money::decimal((int) $c->default_amount_kobo) : '', $c->is_active ? 'yes' : 'no'])),
             default => abort(404),
         };
+    }
+
+    private function levyPayersCsv(Request $request): StreamedResponse
+    {
+        $category = FeeCategory::findOrFail($request->integer('category'));
+        $labels = ['paid' => 'Paid', 'part_paid' => 'Part-paid', 'not_paid' => 'Not paid', 'cancelled' => 'Cancelled'];
+
+        return Csv::download('payers-'.strtolower($category->code).'-'.now()->format('Ymd').'.csv',
+            ['Membership number', 'Name', 'Member status', 'Category', 'Assessed (after adjustments)', 'Paid', 'Outstanding', 'Payment status'],
+            $this->ledger->levyPayers($category->id)->map(fn ($r) => [$r->membership_number, $r->full_name, $r->member_status, $category->name, Money::decimal($r->effective), Money::decimal($r->allocated), Money::decimal($r->outstanding), $labels[$r->payment_status]]));
     }
 
     /** @return array{0: CarbonImmutable, 1: CarbonImmutable} */

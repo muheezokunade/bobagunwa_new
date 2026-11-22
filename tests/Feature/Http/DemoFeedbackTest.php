@@ -12,8 +12,10 @@ use App\Models\PrivateFile;
 use App\Models\User;
 use App\Services\ApplicationService;
 use App\Services\Finance\LedgerQuery;
+use App\Services\Finance\PaymentService;
 use App\Services\UploadService;
 use App\Support\Format;
+use App\Support\Money;
 use App\Support\Settings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -283,6 +285,31 @@ class DemoFeedbackTest extends TestCase
         $this->assertSame(0, PrivateFile::count(), 'the receipt is removed when the report is refused');
         // Officers (no member record) cannot use the member route.
         $this->actingAs($this->officer('treasurer'))->get(route('portal.payments.create'))->assertRedirect();
-        $this->assertSame(0, \App\Models\Payment::count());
+        $this->assertSame(0, Payment::count());
+    }
+
+    public function test_report_shows_who_has_paid_a_levy_and_exports_csv(): void
+    {
+        [$paid, $part, $none] = [$this->member(), $this->member(), $this->member()];
+        $assessment = $this->assess([$paid, $part, $none], '1000');
+        $treasurer = $this->officer('treasurer');
+        foreach ([[$paid, '1000'], [$part, '400']] as [$m, $naira]) {
+            $payment = $this->verifiedPayment($m, $naira);
+            app(PaymentService::class)->allocate($payment, [$this->obligationOf($m, $assessment)->id => Money::parse($naira)], $treasurer, $this->key());
+        }
+        $categoryId = $assessment->fee_category_id;
+
+        $this->actingAs($treasurer)->get(route('admin.finance.reports.index', ['category' => $categoryId]))->assertOk()
+            ->assertSee('Who has paid a due or levy')->assertSee('3 member(s) assessed')->assertSee('1 paid, 1 part-paid, 1 not paid')
+            ->assertSee('Part-paid')->assertSee('Not paid');
+        $csv = $this->actingAs($treasurer)->get(route('admin.finance.reports.export', ['report' => 'levy-payers', 'category' => $categoryId]))->assertOk()->streamedContent();
+        $this->assertStringContainsString('Payment status', $csv);
+        $this->assertStringContainsString($part->membership_number, $csv);
+        $this->assertStringContainsString('1000.00,400.00,600.00,Part-paid', $csv);
+        $this->assertStringContainsString('Not paid', $csv);
+        $list = $this->actingAs($treasurer)->get(route('admin.finance.reports.export', ['report' => 'category-list']))->assertOk()->streamedContent();
+        $this->assertStringContainsString('Synthetic dues', $list);
+        // The membership officer has no finance access.
+        $this->actingAs($this->officer('membership_officer'))->get(route('admin.finance.reports.index', ['category' => $categoryId]))->assertForbidden();
     }
 }

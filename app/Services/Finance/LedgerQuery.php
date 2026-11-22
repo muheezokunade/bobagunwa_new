@@ -90,6 +90,39 @@ SQL;
     }
 
     /** @return Collection<int, object> */
+    /**
+     * Who has paid a given due or levy category: one row per member assessed
+     * under it, with assessed (after adjustments), paid (active allocations)
+     * and outstanding amounts, and a plain status.
+     */
+    public function levyPayers(int $categoryId): Collection
+    {
+        return collect(DB::select('SELECT m.id AS member_id, m.membership_number, m.full_name, m.status AS member_status,
+              COUNT(o.id) AS obligations,
+              SUM(o.amount_kobo) AS assessed,
+              SUM(COALESCE((SELECT SUM(x.amount_kobo) FROM obligation_adjustments x WHERE x.member_obligation_id = o.id), 0)) AS adjustments,
+              SUM(COALESCE((SELECT SUM(p.amount_kobo) FROM payment_allocations p WHERE p.member_obligation_id = o.id AND p.status = \'active\'), 0)) AS allocated
+            FROM member_obligations o
+            JOIN assessments a ON a.id = o.assessment_id
+            JOIN members m ON m.id = o.member_id
+            WHERE a.fee_category_id = ?
+            GROUP BY m.id, m.membership_number, m.full_name, m.status
+            ORDER BY m.membership_number', [$categoryId]))
+            ->map(function ($r) {
+                $r->effective = (int) $r->assessed + (int) $r->adjustments;
+                $r->allocated = (int) $r->allocated;
+                $r->outstanding = $r->effective - $r->allocated;
+                $r->payment_status = match (true) {
+                    $r->effective <= 0 => 'cancelled',
+                    $r->outstanding <= 0 => 'paid',
+                    $r->allocated > 0 => 'part_paid',
+                    default => 'not_paid',
+                };
+
+                return $r;
+            });
+    }
+
     public function openObligations(int $memberId): Collection
     {
         return collect(DB::select('SELECT o.id, o.effective_on, o.amount_kobo, a.reference, a.title, a.due_on, c.name AS category,

@@ -1979,7 +1979,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Anonymous → redirect to sign-in; without permission → 403; unknown record → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Period boundaries in Lagos time. |
-| Tests | `PerformanceTest::test_heavy_pages_stay_bounded_at_volume`<br>`LedgerServiceTest::test_reversal_period_boundaries_follow_lagos_calendar_days`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
+| Tests | `PerformanceTest::test_heavy_pages_stay_bounded_at_volume`<br>`DemoFeedbackTest::test_report_shows_who_has_paid_a_levy_and_exports_csv`<br>`LedgerServiceTest::test_reversal_period_boundaries_follow_lagos_calendar_days`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.finance.reports.export`
@@ -1996,7 +1996,7 @@ Status values: **Implemented · HTTP-tested** (at least one feature test calls o
 | Failure states | Unknown report → 404. |
 | Security controls | authenticated session (database sessions); two-factor enrolment gate when enforcement is on; server-side permission check (403 otherwise); `Cache-Control: no-store`; strict CSP and security headers |
 | Acceptance criterion | Export audited. |
-| Tests | `PerformanceTest::test_heavy_pages_stay_bounded_at_volume`<br>`AuthorisationMatrixTest::test_member_cannot_reach_another_members_records`<br>`AuthorisationMatrixTest::test_unauthorised_exports_are_denied`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
+| Tests | `PerformanceTest::test_heavy_pages_stay_bounded_at_volume`<br>`DemoFeedbackTest::test_report_shows_who_has_paid_a_levy_and_exports_csv`<br>`AuthorisationMatrixTest::test_member_cannot_reach_another_members_records`<br>`AuthorisationMatrixTest::test_unauthorised_exports_are_denied`<br>`MandatoryWorkflowsTest::test_all_seven_mandatory_workflows_pass_together` |
 | Status | Implemented · HTTP-tested |
 
 ## `admin.finance.imports.index`
